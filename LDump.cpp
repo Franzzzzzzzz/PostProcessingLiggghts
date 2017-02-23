@@ -66,7 +66,7 @@ int LucDump::read (unsigned char read_type, int index)
   Step null_step ;
   int i, j, type, stop=0, idx ;
   char *ligneC, *actu,*suiv ; 
-  bool istriclinic=false ; 
+  bool istriclinic=false ; static bool first_naninf=true ; 
 
   // Function pointer readline(ifstream dumpin, string ligne)
   // if compress => the function decompress and write the ligne string
@@ -136,10 +136,11 @@ int LucDump::read (unsigned char read_type, int index)
 		  }
 		  else 
 		    actu=suiv ; 
-		  if ( !isfinite(steps[idx].datas[j][i]))
+		  if ( !isfinite(steps[idx].datas[j][i]) && first_naninf)
 		  {
-		    DISP_Warn("Une valeur lue dans LDump est inf ou nan. ") ;  
+		    DISP_Warn("\n\n!!! Une valeur lue dans LDump est inf ou nan. ") ;  
 		    DISP_Warn("Elle n'a PAS été supprimée.\n") ;
+                    first_naninf=false ; 
 		      //steps[idx].datas[j][i]=0 ;
 		  }
 		}

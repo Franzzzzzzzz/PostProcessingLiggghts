@@ -13,7 +13,7 @@ int LcfDump::read (unsigned char read_type, int index)
   Step null_step ;
   int i, j, type, stop=0, idx ;
   static bool first=true ; 
-  char *ligneC, *actu, *suiv ; 
+  char *ligneC, *actu, *suiv ; static bool first_naninf=true ; 
   
   Type=TCF ; 
   ligneC=(char*)malloc(5000) ; 
@@ -83,10 +83,12 @@ int LcfDump::read (unsigned char read_type, int index)
 			 if (actions["nofileerror"].set && first)
 			 { DISP_Warn("Une valeur lue est inf ou nan \n") ; 
 			   first=false ; }
-			 else if (!actions["nofileerror"].set)
+			 else if (!actions["nofileerror"].set && first_naninf)
 			 {
-			  DISP_Warn("Une valeur lue est inf ou nan.  ") ; 
+                           
+			  DISP_Warn("\n\n!!! Une valeur lue est inf ou nan.  ") ; 
 			  DISP_Warn("Elle n'a PAS été supprimée.\n") ;
+                          first_naninf=false ; 
 			  //steps[idx].datas[j][i]=0 ;
 			 }
 			}

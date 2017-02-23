@@ -1429,7 +1429,10 @@ int Writing::ASCIIwrite (FILE * out, double *datas, int lig, int col)
   int i, j ; 
   for (i=0 ; i<col ; i++)
   {for (j=0 ; j<lig ; j++)
-     fprintf(out, "%g,", datas[i*lig+j]) ; //out << datas[j][i] << " " ; 
+    {
+     fprintf(out, "%g", datas[i*lig+j]) ; 
+     if (j<lig-1) fprintf(out, ",") ; 
+    }
     fprintf(out, "\n") ; }
 return 1 ; 
 }
