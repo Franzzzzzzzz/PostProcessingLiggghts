@@ -46,6 +46,7 @@ private :
   int swappbc (Step &step, struct Op op) ;
   int zrotate (Step &step, struct Op op) ; 
   int cf_postproc (Step &step, struct Op op) ; 
+  int wallforceatm (Step &step, struct Op op) ; 
   int pourcentage (Step & step, struct Op op) ; 
   int moveto_xplusyplus (Step & step, struct Op op) ;
   int copypartiallink (Step & step, struct Op op) ;

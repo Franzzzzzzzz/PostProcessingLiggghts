@@ -247,10 +247,11 @@ for (i=0 ; i<boites ; i++)
     forces[i][3]=0 ; forces[i][4]=forces[i][5]=forces[i][6]=0 ;}
 
 // Initialisation des index
-idx[0]=find_idx(IDS("FORCEWALLX ")) ; idx[1]=find_idx(IDS("FORCEWALLY")) ; idx[2]=find_idx(IDS("FORCEWALLZ")) ;
+idx[0]=find_idx(IDS("FORCEWALLX")) ; idx[1]=find_idx(IDS("FORCEWALLY")) ; idx[2]=find_idx(IDS("FORCEWALLZ")) ;
 idx[3]=find_idx(IDS("POSX")) ; idx[4]=find_idx(IDS("POSY")) ; idx[5]=find_idx(IDS("POSZ")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1||idx[3]==-1||idx[4]==-1||idx[5]==-1)
-   {DISP_Err("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump") ; return 1 ; }
+   {printf("%d %d %d %d %d ||", idx[0], idx[1], idx[2], idx[3], idx[4], idx[5] ) ;  
+     DISP_Err("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump") ; return 1 ; }
 
 if (actions["wallforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau") ; info=false ; } } // Fenêtre créneau
 else {sigma=actions["wallforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info ("Utilisation d'une fenêtre gaussienne") ; info=false ; } } // Fenêtre gaussienne

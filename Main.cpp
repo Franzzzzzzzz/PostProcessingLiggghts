@@ -87,9 +87,6 @@ else if (actions["chainforce"].set)
      	else sprintf(filterdo, "null::.cfpp.::null") ;
      	cfdump.prefiltre=filtre_tmp.parse_arg(filterdo,TCF) ;
 
-     	// Création des filtres pour le WallDump (qui est un Ldump en fait ...) : on enlève les interactions nulles juste, l'ajout aux CFDump se fera dans le filtre .cfpp.
-     	// Non en fait on va pas se faire chier, on fera le test des forces non nulles dans le filtre .cfpp.
-
      	// Création du lien avec les autres dump dans le CFdump, et ajout d'un postfiltre si nécessaire
      	cfdump.prefiltre[0].alter_dump=&(dump) ; cfdump.prefiltre[1].alter_dump=&(dump) ;
      	cfdump.prefiltre[0].wall_dump=&(walldump) ; cfdump.prefiltre[1].wall_dump=&(walldump) ;
@@ -167,12 +164,8 @@ else if (actions["chainforce"].set)
 
 else 									//Atom dump (chainforce not set)
      {
-     /*if (actions & COMPARE)
-        {
-        comparer (argv[argc-2], argv[argc-1]) ; exit(0) ; 
-        }*/
      
-     if (actions["cp"].set)   // C'est un dump compressé
+     if (actions["cp"].set)   // C'est un dump compressé // TODO remove that ... gunzip est bien mieux ...
        {
        LcpDump dump ;
        // if (filtre_tmp.lst_op.size()>0) {dump.filtre=filtre_tmp.lst_op ; } 
@@ -209,7 +202,7 @@ else 									//Atom dump (chainforce not set)
 
      else			// C'est un dump décompressé
        {
-       LucDump dump ;
+       LucDump dump; LcfDump walldump ;
        
        if (actions["multisphere"].set)
        {
@@ -218,13 +211,19 @@ else 									//Atom dump (chainforce not set)
        	 dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
        }
      
+       if (actions["wallchainforce"].set) // Wallchainforce sans chainforce. If faut filtrer le dump de test avec le wallchainforce
+       {
+         Filter filtre_tmp ; char filterdo[50] ;
+         sprintf(filterdo, "null::.wallforceatm.::null") ;
+         dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+         dump.prefiltre[0].wall_dump=&(walldump) ;
+         walldump.open(actions.dumpnames[1]) ;
+       }
      
        res=dump.open(actions.dumpnames[0]) ;
        if (res==-1) {std::exit(EXIT_FAILURE) ; }
        //dump.disp();
-
        //Stats stat ; stat.compute_step(dump, dump.nbsteps-10) ; stat.disp() ;  
-
        if (actions["dstminmax"].set) 
        	   {
     	   Stats stat ;
@@ -287,9 +286,9 @@ else 									//Atom dump (chainforce not set)
        //if (actions["downsampling"].set)
        //  dump.write_asDUMP(actions.dumpnames[0]) ;
        if (actions["w/forcetot"].set)
-	 dump.write_forcestot(actions.dumpnames[0]) ;
+	 dump.write_forcestot(actions.dumpnames[0]) ; 
        if (actions["wallforce-by-angle"].set)
-         dump.write_wallforce(actions.dumpnames[0]) ;
+         dump.write_wallforce(actions.dumpnames[0]) ; 
        if (actions["xray"].set)
 	 dump.write_xray(actions.dumpnames[0]) ; 
        if (actions["multisphere"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set)
@@ -440,7 +439,7 @@ actions.new_arg ("F", "Raccourci du précédent",0,0) ;
 actions.new_arg ("filterCF", "filtre les données de CFDUMP avec l'argument suivant entre guillemets. Chaque opération est séparé par un point-virgule (cf. examples ailleurs TODO)", 0, 1, dep) ;
 actions.new_arg ("FCF", "Raccourci du précédent",0,1, dep) ; 
 args[0]=(char *) "xcyl" ; args[1]=(char *) "zcyl" ; args[2]=(char *) "rayon" ;
-actions.new_arg ("wallchainforce", "utilise un dump externe pour les liaisons grains-murs. L'antépénultième argument est alors le dump de wallforce", 3, args , 1, dep) ;
+actions.new_arg ("wallchainforce", "utilise un dump externe pour les liaisons grains-murs. 2 manières de l'utiliser:\n 1) avec --chainforce, 3 dump: wallforce, atoms, chainforces.\n 2/ sans --chainforce, 2 dumps: wallforce suivi de test.", 3, args , 0, dep) ;
 actions.new_arg ("wallchainforcenodump", "calcul les liaisons grains-murs par équilibre des forces", 0, 1, dep) ; 
 args[0]=(char *) "cutoff" ;
 actions.new_arg("clone-periodic-chain", "copie les chaines de force traversant les parois periodiques (pas pour cylperiodic !)", 0, 1, dep) ;
@@ -637,7 +636,7 @@ for (i=1; i<argc ; i++)
     if (commande[1]=='-') commande.erase(0,2) ; 
     else commande.erase(0,1) ; 
  
-    if (actions[commande].id==-1)  {DISP_Warn("WARN: argument de ligne de commande inconnu : ") ; printf("%s\n", commande.c_str()) ; continue ; }
+    if (actions[commande].id==-1)  {DISP_Warn("WARN: argument de ligne de commande inconnu (verifier les deprecated argument peut-être?) : ") ; printf("%s\n", commande.c_str()) ; continue ; }
     actions[commande].set=true ; 
 
     if (commande ==  "filter" || commande == "F") 

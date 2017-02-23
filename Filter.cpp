@@ -36,6 +36,7 @@ add_operation ("::%sup::", &Filter::pourcentage) ;
 add_operation ("::%inf::", &Filter::pourcentage) ; 
 add_operation ("::.cfpp.::", &Filter::cf_postproc) ;
 add_operation ("::.cpplink.::", &Filter::copypartiallink) ;
+add_operation ("::.wallforceatm.::", &Filter::wallforceatm) ;
 add_operation ("::multisphere::", &Filter::multisphere) ; 
 add_operation ("::.nopbc.::", &Filter::no_periodic_chain) ;
 }
@@ -1036,6 +1037,68 @@ else
  
 return 1 ;
 }
+//--------------------------------------------------------------------------
+int Filter::wallforceatm (Step & step, struct Op op)
+{
+bool first ; int intersampling ; int samplingatm ;
+int idx[8] ; Step * wstep ; int i ; 
+
+if (step.find_idx(IDS("FORCEWALLX")) != -1 || step.find_idx(IDS("FORCEWALLY")) != -1 || step.find_idx(IDS("FORCEWALLZ")) != -1)
+{DISP_Info ("Le dump atomique contient déjà les forces avec le mur, le dump de wallforce n'a pas été utilisé") ; return 0 ; }
+
+if (first==true)
+ {
+ op.wall_dump->check_timestep(0) ;
+ intersampling=step.timestep/(double)op.wall_dump->steps[0].timestep ; 
+ samplingatm=step.timestep ; 
+ first=false ; i=0 ; 
+ }
+else
+  i=floor(step.timestep/samplingatm)*intersampling-1 ; // Le -1 donne une marge de maneuvre, c'est mieux ...
+
+while (op.wall_dump->steps[i].timestep != step.timestep)
+   {
+   if (op.wall_dump->steps[i].timestep > step.timestep)
+     {cout << "ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump" ; return -1 ; }
+   i++ ;
+   }
+op.wall_dump->check_timestep(i) ;
+wstep=&(op.wall_dump->steps[i]) ; 
+
+step.idx_col.push_back(IDS("FORCEWALLX")) ; 
+step.idx_col.push_back(IDS("FORCEWALLY")) ; 
+step.idx_col.push_back(IDS("FORCEWALLZ")) ;
+step.nb_idx+=3 ; 
+step.datas.resize(step.idx_col.size()) ; 
+step.datas[step.find_idx(IDS("FORCEWALLX"))].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(IDS("FORCEWALLY"))].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(IDS("FORCEWALLZ"))].resize(step.nb_atomes) ; 
+idx[0]=step.nb_idx-3 ; idx[1]=step.nb_idx-2 ; idx[2]=step.nb_idx-1 ; 
+idx[3]=step.find_idx(IDS("ID") ) ; 
+idx[4]=wstep->find_idx(IDS("FORCEWALLX")) ; 
+idx[5]=wstep->find_idx(IDS("FORCEWALLY")) ; 
+idx[6]=wstep->find_idx(IDS("FORCEWALLZ")) ; 
+idx[7]=wstep->find_idx(IDS("ID")) ; 
+
+if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 || idx[3]==-1 || idx[4]==-1 || idx[5]==-1 || idx[6]==-1)
+{DISP_Warn("Attention: wallchainforce non trouvées dans le walldump...") ; return 0 ; } 
+
+for (int i=0 ; i<step.nb_atomes ; i++)
+{
+ for (int j=0 ; j<wstep->nb_atomes ; j++)
+ {
+   if (wstep->datas[idx[7]][j]==step.datas[idx[3]][i])
+   {
+     step.datas[idx[0]][i]=wstep->datas[idx[4]][j] ; 
+     step.datas[idx[1]][i]=wstep->datas[idx[5]][j] ; 
+     step.datas[idx[2]][i]=wstep->datas[idx[6]][j] ; 
+     break ; 
+   }
+ }
+}
+
+}
+
 //=========================
 int Filter::no_periodic_chain (Step & step, struct Op op)
 {

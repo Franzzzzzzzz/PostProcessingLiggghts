@@ -77,6 +77,8 @@ idalias[20].push_back("sigyx") ; idalias[21].push_back("sigyy") ; idalias[22].pu
 idalias[23].push_back("sigzx") ; idalias[24].push_back("sigzy") ; idalias[25].push_back("sigzz") ; 
 idalias[26].push_back("forcewallx") ; idalias[27].push_back("forcewally") ; idalias[28].push_back("forcewallz") ; 
 idalias[26].push_back("f_force_cyl[1]") ; idalias[27].push_back("f_force_cyl[2]") ; idalias[28].push_back("f_force_cyl[3]") ; 
+idalias[26].push_back("f_contactforces_cyl[2]") ; idalias[27].push_back("f_contactforces_cyl[3]") ; idalias[28].push_back("f_contactforces_cyl[4]") ; 
+idalias[1].push_back("f_contactforces_cyl[1]") ; 
 
 
 idalias[64].push_back("cfid1") ; idalias[65].push_back("cfid2") ; 
