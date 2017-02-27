@@ -124,6 +124,7 @@ idalias[255].push_back("null") ;
 
 }
 
+//------------------------------
 vector <string> IDSCLASS::alias(int id) 
 {vector <string> retour ;
 
@@ -135,6 +136,7 @@ vector <string> IDSCLASS::alias(int id)
   }
 }
 
+//------------------------------
 int IDSCLASS::new_id(string name, int type) 
 {
 int min, max ; int i ; 
@@ -171,3 +173,17 @@ sprintf(info, "L'alias %s a été ajouté avec succès sous le nom %s avec l'id 
 DISP_Info (info) ;
 return i ;   
 }
+
+//------------------------------
+int IDSCLASS::display_all ()
+{
+  printf("List of ID names and aliases as defined in IDS\n----------------------------------------------\n") ;
+  for (int i=0 ; i<idname.size() ; i++)
+  {
+   printf("[%3d] %s\n", i, idname[i].c_str() ) ; 
+   for (int j=0 ; j<idalias[i].size() ; j++)
+     printf("\t%s\n",idalias[i][j].c_str()) ;
+  }
+  return 0 ; 
+}
+

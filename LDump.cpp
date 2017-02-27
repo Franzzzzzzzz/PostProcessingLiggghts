@@ -89,7 +89,7 @@ int LucDump::read (unsigned char read_type, int index)
 		{
 		 nbsteps++ ; // Create new step and read 1 line to have timestep number.
 		 steps.resize(nbsteps, null_step) ;
-		 steps[nbsteps-1].multisphere=&multisphere ;
+		 steps[nbsteps-1].multisphere=&multisphere ; 
 		 steps[nbsteps-1].nb_atomes=0 ; steps[nbsteps-1].Type=TL ;
 		 steps[nbsteps-1].posinfile=dumpin.tellg()-(streampos)1 -(streampos)ligne.length() ;
                  if (index==-1) idx=nbsteps-1 ;
@@ -442,157 +442,45 @@ return 0 ;
 //---------------------------------------
 int LucDump::write_multisphere_dumbell (string chemin)
 {
-  /*int Meridien=10, Parallel=10, *Numbers; // Hard coded sampling. On va travailler que sur la demi-sphere +x, y, z ; de pôles z
-  double dtheta, dphi ; int dt, dp ;
-  Numbers=(int*)calloc(Meridien*Parallel,sizeof(int)) ;  
-  dtheta=M_PI/Parallel ; 
-  dphi=M_PI/Meridien ; */
   Icosahedre Ico ; 
   //if (actions["mean"].set) Ico.subdivide(4) ; 
   
-  long int loop[3] ; int idx[5] ; string chem ; Matrix3d K, Kvec, Kmatseg ; Vector3d Kval ; Map<Vector3d> Ksegment(NULL); int Kn ; 
-  int i, j, k, l, n ; double maxlen ; int idmax ; FILE *out,*out2 ; 
-  int *id1, *id2 ; int gp ; Vector v, vsph, null(0) ; double theta=5, angular[72], angular2[72], nangular, tmptheta ; int tmpidxtheta ;
-  int **gps, ngp=-1 ; vector < Vector > pts, segments ; Vector t, dir, vect, centroid ; int longest ; double Phi ;
-  int type ; type=actions["multisphere"]["type"] ; double box[6] ; 
-  bool symetrie[7]={false,false,false,false,false,false,false} ; 
+  long int loop[3] ; string chem ; 
+  int i, j, k ; FILE *out,*out2 ; 
+  double theta=5, angular[72], angular2[72], nangular, tmptheta ; int tmpidxtheta ; // All these for the icosahedre thing
+  Vector seg, vect ;
+  Matrix3d K ; 
   
   loopdat(loop) ; 
   cout << "\nLucDump::multisphere_dumbell          \n" ;
   actions.set_progress(loop) ; actions.disp_progress() ; 
   check_timestep(loop[0]) ; 
-  idx[0]=steps[loop[0]].find_idx(IDS("POSX")) ; idx[1]=steps[loop[0]].find_idx(IDS("POSY")) ;  idx[2]=steps[loop[0]].find_idx(IDS("POSZ")) ;  
-  idx[3]=steps[loop[0]].find_idx(IDS("IDMULTISPHERE")) ; idx[4]=steps[loop[0]].find_idx(IDS("ID")) ; 
   
   chem=chemin ; 
   chem.append("-") ; chem.append("multisphere-tensor") ; chem.append(".txt") ; 
   out=fopen(chem.c_str(), "w") ; 
-  if (actions["use-box"].set)
-  {
-   box[0] =  actions["use-box"]["box_xmin"] ; 
-   box[1] =  actions["use-box"]["box_xmax"] ; 
-   box[2] =  actions["use-box"]["box_ymin"] ; 
-   box[3] =  actions["use-box"]["box_ymax"] ; 
-   box[4] =  actions["use-box"]["box_zmin"] ; 
-   box[5] =  actions["use-box"]["box_zmax"] ; 
-  }
-  else
-  {box[0]=box[2]=box[4]=-std::numeric_limits <double>::infinity() ; 
-   box[1]=box[3]=box[5]= std::numeric_limits <double>::infinity()  ; }
-   
-  if (actions["symetriser"].set)
-  {
-    symetrie[0]=true ; double r=actions["symetriser"]["axes"] ;
-    if (r>=100) {symetrie[1]=true ; r=r-100 ; }
-    if (r>=10)  {symetrie[2]=true ; r=r-10 ; }
-    if (r>=1)   {symetrie[3]=true ;}
-  }
-  printf("%d %d %d %d %d %d %d-----------------\n", symetrie[0], symetrie[1],symetrie[2],symetrie[3],symetrie[4],symetrie[5],symetrie[6]) ; 
   
   for (i=0 ; i<360/theta ; i++) angular[i]=angular2[i]=0 ; 
   theta=theta/180*M_PI ; 
   
-  gps=(int **)malloc(sizeof(int*)*0) ;
-  for (i=0 ; i<steps[loop[0]].nb_atomes ; i++)
-  {
-    if (steps[loop[0]].datas[idx[3]][i]>=0)
-    {
-      if (steps[loop[0]].datas[idx[3]][i]>ngp)
-      {
-	gps=(int**)realloc(gps,sizeof(int*)*(steps[loop[0]].datas[idx[3]][i]+1)) ; 
-	for (j=ngp+1 ; j<=steps[loop[0]].datas[idx[3]][i] ; j++)
-	{
-	  gps[j]=(int*)malloc(sizeof(int)*1) ; 
-	  gps[j][0]=0 ; 
-	}
-      ngp=steps[loop[0]].datas[idx[3]][i] ; 
-      }
-      gps[(int)(steps[loop[0]].datas[idx[3]][i])][0]++ ; 
-      gps[(int)(steps[loop[0]].datas[idx[3]][i])]=(int*)realloc(gps[(int)(steps[loop[0]].datas[idx[3]][i])], sizeof(int)*(gps[(int)(steps[loop[0]].datas[idx[3]][i])][0]+1)) ;
-      gps[(int)(steps[loop[0]].datas[idx[3]][i])][gps[(int)(steps[loop[0]].datas[idx[3]][i])][0]]=(int)steps[loop[0]].datas[idx[4]][i] ;
-    }
-  }
-  if (ngp==-1) {DISP_Warn("Aucun groupe multisphere trouvé, il y a un problème.") ; printf("%d %d %d", loop[0], steps[loop[0]].nb_atomes, idx[3]) ; fflush(stdout) ;   } 
+  int r ;
   
-  for (i=1, longest=0 ; i<=ngp ; i++) if (longest<gps[i][0]) longest=gps[i][0] ; 
-  pts.resize(longest, null) ; 
-  segments.resize(longest*(longest-1)/2, null) ; 
-  bool * activegp = new bool[ngp] ;
-  std::fill_n(activegp, ngp, true); 
-  
-  int r ;  int count=0 ;
   for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   {
     actions.valeur=i ; 
-    check_timestep(i) ;   
-    K=Matrix3d::Zero() ; Kn=0 ; 
-    for (j=1 ; j<=ngp ; j++)
+    check_timestep(i) ; steps[i].multisphere->set_current_step(i) ; 
+    
+    
+    
+    K=steps[i].multisphere->compute_K(steps[i]) ; 
+    fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ; 
+  
+    for (j=1 ; j<=steps[i].multisphere->ngp ; j++)
     {
-     centroid=0 ; 
-     if (!activegp[j]) continue ; 
-     for (k=0 ; k<gps[j][0] ; k++)
-     {
-       if (steps[i].datas[idx[4]][gps[j][k+1]-1]!=gps[j][k+1]) {printf("%g %g ", steps[i].datas[idx[4]][gps[j][k+1]-1],gps[j][k+1] ) ; DISP_Err("Probleme in multisphere\n") ;} 
-       t.set(steps[i].datas[idx[0]][gps[j][k+1]-1], steps[i].datas[idx[1]][gps[j][k+1]-1], steps[i].datas[idx[2]][gps[j][k+1]-1]);
-       pts[k]=t ;
-       if (t.isnan()) 
-       {
-	 activegp[j]=false ; printf("Le groupe %d a été perdu. Atomes:", j) ; for (l=0 ; l<gps[j][0] ; l++) {printf("%d ", gps[j][l+1]-1) ; } printf("\n") ; break ;  
-       }
-       centroid=centroid+pts[k] ;
-     }
-     if (!activegp[j]) continue ; 
-     centroid=centroid/4 ; 
-     if (symetrie[0]) 
-     {
-       if (symetrie[1]==true && centroid(1)<0) {symetrie[4]=true ; centroid(1)=-centroid(1) ; } else {symetrie[4]=false ; }
-       if (symetrie[2]==true && centroid(2)<0) {symetrie[5]=true ; centroid(2)=-centroid(2) ; } else {symetrie[5]=false ; }
-       if (symetrie[3]==true && centroid(3)<0) {symetrie[6]=true ; centroid(3)=-centroid(3) ; } else {symetrie[6]=false ; }
-     }
-     if (centroid(1)<box[0] || centroid(1)>box[1] || centroid(2)<box[2] || centroid[2]>box[3] || centroid(3)<box[4] || centroid(3)>box[5]) { continue ; }
-     for (k=0, n=0, maxlen=0, idmax=0 ; k<gps[j][0]-1 ; k++)
-     {
-       for (l=k+1 ; l<gps[j][0] ; l++, n++)
-       {
-	 segments[n]=pts[l]-pts[k] ;
-	 if (maxlen<segments[n].norm()) 
-	 {
-	   maxlen=segments[n].norm() ;
-	   idmax=n ; 
-	 }
-       }
-     } 
-     if (type==1) //Flat particles, have to do more
-     {
-       Vector crossp ;
-       n=0 ; 
-       do 
-       {
-	 crossp=segments[idmax].cross(segments[n]) ;
-	 n++ ; 
-       } while (crossp.norm() < 0.000001 || crossp.isnan()) ; 
-       
-       crossp=segments[idmax].norm()/crossp.norm()*crossp ; 
-       segments[idmax]=crossp ; 
-       
-     }
-     //else 
-     //  DISP_Err("Unknown particle shape for multisphere") ; 
-     if (symetrie[0])
-     {
-       if (symetrie[4]) {segments[idmax](1)=-segments[idmax](1) ; }
-       if (symetrie[5]) {segments[idmax](2)=-segments[idmax](2) ; }
-       if (symetrie[6]) {segments[idmax](3)=-segments[idmax](3) ; }
-     }
-     
-     
-     vsph=Geometrie::cart2sph(segments[idmax]) ; 
-     if (type==0)
-       {if (vsph(1)>actions.Cst["Radius"]*gps[j][0]*2+0.0001) {continue ;}}
-     else if (type==1)
-       {if (vsph(1)>actions.Cst["Radius"]*(floor(log2((gps[j][0]-1)/3.))*2)+0.0001) {continue ;}}
-       
-     tmptheta=Calcul::angle_0_2pi(atan2(segments[idmax](3), segments[idmax](1))) ; 
+     if (steps[i].multisphere->data[0][j]!=GP_OK) continue ;  
+      
+     seg.set(steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ; 
+     tmptheta=Calcul::angle_0_2pi(atan2(seg(3), seg(1))) ; 
      if (tmptheta>(2*M_PI-theta/2)) tmptheta-=(2*M_PI) ; 
      tmpidxtheta=(int)(round(tmptheta/theta)) ; 
      
@@ -607,35 +495,15 @@ int LucDump::write_multisphere_dumbell (string chemin)
      for (k=0 ; k<72 ; k++)
      {
       vect(1)=cos(2*M_PI/72.*k) ; vect(2)=0 ; vect(3)=sin(2*M_PI/72.*k) ; 
-      angular2[k]+=(segments[idmax].dot(vect))*(segments[idmax].dot(vect)) ;  
+      angular2[k]+=(seg.dot(vect))*(seg.dot(vect)) ;  
      }
-     new (&Ksegment) Map<Vector3d>(segments[idmax].dat); // THIS IS NOT AN ALLOCATION (no delete) ; 
-     Ksegment=Ksegment/(Ksegment.norm()) ; 
-     Kmatseg=Ksegment*(Ksegment.transpose());
-     K=K+Kmatseg ; Kn++ ; 
-
-     r=Ico.belonging_tri(segments[idmax]) ;  
-     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!") ; //printf("%g %g %g\n", segments[idmax](1), segments[idmax](2), segments[idmax](3)) ;
-     r=Ico.belonging_tri(-segments[idmax]) ; 
+     r=Ico.belonging_tri(seg) ;  
+     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!") ;
+     r=Ico.belonging_tri(-seg) ; 
      if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!") ;
     }
-    K=K/Kn ; 
-    Phi=sqrt((3*(K.norm())*(K.norm())-1)/2) ;
-    //Calcul::eigen(K, Kval, Kvec) ;
-    
-    if (type==0)
-    {if (Kvec(0,0)<0) {Kvec.col(0)=-Kvec.col(0) ;}}
-    else if (type==1)
-    {if (Kvec(2,0)<0) {Kvec.col(0)=-Kvec.col(0) ;}}
-    else
-      DISP_Err("Unknown multisphere type\n") ; 
-    
-    if (Kvec.determinant()<0) {Kvec.col(2)=-Kvec.col(2) ; }
-
-    //fprintf(out, "%d %g %g %g %g %g %g %g %g %g %g %g %g %g\n", steps[i].timestep, Phi, Kval(0), Kval(1), Kval(2), Kvec(0,0), Kvec(0,1), Kvec(0,2), Kvec(1,0), Kvec(1,1), Kvec(1,2), Kvec(2,0), Kvec(2,1), Kvec(2,2)) ; 
-    fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ; 
-    
   }
+  fclose(out) ; 
   
   if (actions["mean"].set)
   {

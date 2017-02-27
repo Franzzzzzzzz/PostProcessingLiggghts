@@ -466,6 +466,7 @@ actions.new_arg("restart2vtk", "Genere le script restart2vtk pour transformer le
 actions.new_arg("help", "Affiche tous les arguments possibles et sort.", 0, 0);
 actions.new_arg("bashcomplete", "Genère le script pour la completion bash", 0, 0);
 actions.new_arg("version", "Indique la date de compilation.", 0, 0);
+actions.new_arg("ids_list", "Affiche la liste des IDs definis.",0,0) ; 
 actions.new_arg("teststress" , "Génére des forces par triangle idéales pour tester",0,0) ; 
 }
 
@@ -672,6 +673,8 @@ for (i=1; i<argc ; i++)
        if (res>0) argc=res ; 
        i++ ; continue ; 
        }      
+    if (commande == "ids_list")
+      IDS.display_all() ;
     if (commande ==  "bashcomplete") 
        {genere_bash_complete() ; continue ; }
 

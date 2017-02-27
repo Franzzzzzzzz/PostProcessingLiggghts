@@ -45,6 +45,7 @@ public :
   int new_id(const char *name, int type) {string nom ; nom=name ; return (new_id(nom, type)) ;} 
   int new_alias(const char *name, const char *alias) {int id=find(name) ; if (id!=-1) {idalias[id].push_back(alias) ; return (idalias[id].size()-1) ; }
 									  else return -1 ; } 
+  int display_all() ; 
   int operator() (string name) {return find(name) ;}  
   string operator() (int id) {return idname[id] ;}  
   vector <string> alias(int id) ; //{vector <string> retour ; for (int i=0 ; i<idalias[id].size() ; i++) retour.push_back(idalias[id][i]) ; return retour ; /*retour=idalias[id] ; return retour ; */}

@@ -224,6 +224,7 @@ void gzifstream::gzmove (unsigned long int pos)
     }
     else
     {
+     // printf("%ld %ld %ld\n", cur, curtot, pos) ; 
     DISP_Warn("Déplacement en arrière, pas assez de données dans le buffer: relecture du fichier (il faudrait éviter ça ...)\n") ; 
     fclose(gzin) ; 
     gzopen(name) ; 

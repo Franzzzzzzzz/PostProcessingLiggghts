@@ -8,6 +8,15 @@ Vector null(0) ;
 idx[0]=step.find_idx(IDS("POSX")) ; idx[1]=step.find_idx(IDS("POSY")) ;  idx[2]=step.find_idx(IDS("POSZ")) ;  
 idx[3]=step.find_idx(IDS("IDMULTISPHERE")) ; idx[4]=step.find_idx(IDS("ID")) ; 
 
+if (actions["symetriser"].set)
+  {
+    symetrie[0]=true ; double r=actions["symetriser"]["axes"] ;
+    if (r>=100) {symetrie[1]=true ; r=r-100 ; }
+    if (r>=10)  {symetrie[2]=true ; r=r-10 ; }
+    if (r>=1)   {symetrie[3]=true ;}
+  }
+  printf("%d %d %d %d %d %d %d-----------------\n", symetrie[0], symetrie[1],symetrie[2],symetrie[3],symetrie[4],symetrie[5],symetrie[6]) ; 
+
 type=actions["multisphere"]["type"] ; 
 for (i=0 ; i<step.nb_atomes ; i++)
 {
@@ -24,6 +33,8 @@ for (i=0 ; i<step.nb_atomes ; i++)
     gps[(int)(step.datas[idx[3]][i])].push_back((int)step.datas[idx[4]][i]) ;
  }
 }
+if (ngp==-1) {DISP_Warn("Aucun groupe multisphere trouvé, il y a un problème.") ; printf("Step ID=%d", currentstep) ; fflush(stdout) ;   } 
+  
 for (i=1, longest=0 ; i<=ngp ; i++) if (longest<gps[i][0]) longest=gps[i][0] ; 
 pts.resize(longest, null) ; 
 segments.resize(longest*(longest-1)/2, null) ;  
@@ -38,8 +49,7 @@ return 0 ;
 //=====================================================================================================
 int Multisphere::get_orientations (Step & step)
 {
-if (!initialized) init(step) ;   
-  
+vector < Vector > pts, segments ;
 double box[6] ;
 int j, k, l, n ; int idx[5] ; 
 Vector t ; 
@@ -47,6 +57,8 @@ Vector t ;
 Vector centroid ; int longest ; double maxlen ;
 Vector vsph, null(0) ; int idmax ; 
 double radius ; 
+
+if (!initialized) init(step) ;   
 
 radius=actions.Cst["Radius"] ; 
 idx[0]=step.find_idx(IDS("POSX")) ; idx[1]=step.find_idx(IDS("POSY")) ;  idx[2]=step.find_idx(IDS("POSZ")) ;  
@@ -73,9 +85,10 @@ for (j=1 ; j<=ngp ; j++)
   {
     if (step.datas[idx[4]][gps[j][k+1]-1]!=gps[j][k+1]) 
     {
+      printf("%g %g ", step.datas[idx[4]][gps[j][k+1]-1],gps[j][k+1] ) ; 
       DISP_Err("Probleme in multisphere ici\n") ; data[0][j]=GP_BAD ; 
     } 
-    t.set(step.datas[idx[0]][gps[j][k+1]-1], step.datas[idx[1]][gps[j][k+1]-1], step.datas[idx[2]][gps[j][k+1]-1]);
+    t.set(step.datas[idx[0]][gps[j][k+1]-1], step.datas[idx[1]][gps[j][k+1]-1], step.datas[idx[2]][gps[j][k+1]-1]);   
     pts[k]=t ;
     if (t.isnan()) 
     {
@@ -86,6 +99,14 @@ for (j=1 ; j<=ngp ; j++)
   if (data[0][j]==GP_LOST) continue ; 
   
   centroid=centroid/gps[j][0] ; 
+  
+  if (symetrie[0]) 
+     {
+       if (symetrie[1]==true && centroid(1)<0) {symetrie[4]=true ; centroid(1)=-centroid(1) ; } else {symetrie[4]=false ; }
+       if (symetrie[2]==true && centroid(2)<0) {symetrie[5]=true ; centroid(2)=-centroid(2) ; } else {symetrie[5]=false ; }
+       if (symetrie[3]==true && centroid(3)<0) {symetrie[6]=true ; centroid(3)=-centroid(3) ; } else {symetrie[6]=false ; }
+     }
+  
   if (centroid(1)<box[0] || centroid(1)>box[1] || centroid(2)<box[2] || centroid[2]>box[3] || centroid(3)<box[4] || centroid(3)>box[5]) { data[0][j]=GP_OUT ; continue ; }
   
   
@@ -101,7 +122,6 @@ for (j=1 ; j<=ngp ; j++)
       }
     }
   } 
-  
 
   if (type==1) //Flat particles, have to do more
   {
@@ -114,8 +134,14 @@ for (j=1 ; j<=ngp ; j++)
     } while (crossp.norm() < 0.000001 || crossp.isnan()) ; 
     crossp=segments[idmax].norm()/crossp.norm()*crossp ; 
     segments[idmax]=crossp ; 
-       
   }
+
+ if (symetrie[0])
+     {
+       if (symetrie[4]) {segments[idmax](1)=-segments[idmax](1) ; }
+       if (symetrie[5]) {segments[idmax](2)=-segments[idmax](2) ; }
+       if (symetrie[6]) {segments[idmax](3)=-segments[idmax](3) ; }
+     }
   
   vsph=Geometrie::cart2sph(segments[idmax]) ;
   if (type==0)
@@ -135,8 +161,91 @@ for (j=1 ; j<=ngp ; j++)
   data[6][j]=segments[idmax](3) ; 
 }
 
+currentstepinit=true ; 
+
 return 0 ; 
 }
+
+
+// -----------------------------------------
+Matrix3d Multisphere::compute_K (Step &step)
+{
+  int Kn ; 
+  Matrix3d K, Kvec, Kmatseg ;
+  Map<Vector3d> Ksegment(NULL);
+  
+  K=Matrix3d::Zero() ; Kn=0 ;
+  
+  if (! currentstepinit) get_orientations(step) ; 
+  
+  for (int j=1 ; j<=ngp ; j++)
+  {
+    if (data[0][j]!=GP_OK) continue ; 
+    
+     new (&Ksegment) Map<Vector3d>(&(data[4][j])); // THIS IS NOT AN ALLOCATION (no delete) ; 
+     Ksegment=Ksegment/(Ksegment.norm()) ; 
+     Kmatseg=Ksegment*(Ksegment.transpose());
+     K=K+Kmatseg ; Kn++ ; 
+  }
+  K=K/Kn ; 
+  return K ;   
+}
+//--------------------------------------------------
+double Multisphere::compute_dzeta (Step & step)
+{
+  Matrix3d K ;
+  K=compute_K(step) ; 
+  return (sqrt((3*(K.norm())*(K.norm())-1)/2)) ;
+}
+//--------------------------------------------------
+void Multisphere::compute_eigen(Step &step)
+{
+ DISP_Err("This function hasn't been test and probably don't work. Please check the source (Multisphere::compute_eigen()) to check what to do") ; 
+ return ; 
+ /*    //Calcul::eigen(K, Kval, Kvec) ;
+    
+    if (type==0)
+    {if (Kvec(0,0)<0) {Kvec.col(0)=-Kvec.col(0) ;}}
+    else if (type==1)
+    {if (Kvec(2,0)<0) {Kvec.col(0)=-Kvec.col(0) ;}}
+    else
+      DISP_Err("Unknown multisphere type\n") ; 
+    
+    if (Kvec.determinant()<0) {Kvec.col(2)=-Kvec.col(2) ; }
+
+    //fprintf(out, "%d %g %g %g %g %g %g %g %g %g %g %g %g %g\n", steps[i].timestep, Phi, Kval(0), Kval(1), Kval(2), Kvec(0,0), Kvec(0,1), Kvec(0,2), Kvec(1,0), Kvec(1,1), Kvec(1,2), Kvec(2,0), Kvec(2,1), Kvec(2,2)) ; 
+    */
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
