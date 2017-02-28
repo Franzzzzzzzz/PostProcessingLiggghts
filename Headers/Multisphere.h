@@ -4,11 +4,11 @@
 #else
 
 // Flags
-#define GP_OK 0
-#define GP_OUT 1
-#define GP_PBC 2
-#define GP_LOST 16
-#define GP_BAD 255
+#define GP_OK 0.
+#define GP_OUT 1.
+#define GP_PBC 2.
+#define GP_LOST 16.
+#define GP_BAD 255.
 
 class Multisphere {
 
@@ -22,6 +22,7 @@ public :
   double compute_dzeta (Step &step) ; 
   void compute_eigen(Step &step) ; 
   void set_current_step (int stepid) {if (stepid != currentstep) {currentstep=stepid ; currentstepinit=false ; } }
+  void check() ; 
   
   // Variables
   int ngp ;  // Nombre de groupes

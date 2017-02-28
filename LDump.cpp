@@ -453,6 +453,8 @@ int LucDump::write_multisphere_dumbell (string chemin)
   
   loopdat(loop) ; 
   cout << "\nLucDump::multisphere_dumbell          \n" ;
+  DISP_Warn("Lack of testing of the multisphere since the reorganisation, be carefull") ; 
+  
   actions.set_progress(loop) ; actions.disp_progress() ; 
   check_timestep(loop[0]) ; 
   
@@ -469,17 +471,16 @@ int LucDump::write_multisphere_dumbell (string chemin)
   {
     actions.valeur=i ; 
     check_timestep(i) ; steps[i].multisphere->set_current_step(i) ; 
-    
-    
-    
+
     K=steps[i].multisphere->compute_K(steps[i]) ; 
     fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ; 
   
+    //steps[i].multisphere->check() ; 
     for (j=1 ; j<=steps[i].multisphere->ngp ; j++)
     {
-     if (steps[i].multisphere->data[0][j]!=GP_OK) continue ;  
-      
+     if ((steps[i].multisphere->data[0][j])!=GP_OK) continue ;  
      seg.set(steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ; 
+     if (isnan(steps[i].multisphere->data[4][j])) printf("[%d %g %g %g %g]", j, steps[i].multisphere->data[0][j],steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ; 
      tmptheta=Calcul::angle_0_2pi(atan2(seg(3), seg(1))) ; 
      if (tmptheta>(2*M_PI-theta/2)) tmptheta-=(2*M_PI) ; 
      tmpidxtheta=(int)(round(tmptheta/theta)) ; 
@@ -490,7 +491,7 @@ int LucDump::write_multisphere_dumbell (string chemin)
      nangular++ ; 
      }
      else
-       printf("!\n") ; 
+       printf("!") ; 
      
      for (k=0 ; k<72 ; k++)
      {

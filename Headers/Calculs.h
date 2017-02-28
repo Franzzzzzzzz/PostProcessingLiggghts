@@ -151,7 +151,7 @@ public :
 inline Vector operator+ (Vector const& a, Vector const& b) {Vector c(a) ; if (a.iscol()!=b.iscol()) {printf("VECERR:WAY+") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c+=b ; return c ; }
 inline Vector operator- (Vector const& a) {Vector c(a) ; c-=a ; c-=a ; return c ; }
 inline Vector operator- (Vector const& a, Vector const& b) {Vector c(a) ; if (a.iscol()!=b.iscol()) {printf("VECERR:WAY-") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c-=b ; return c ; }
-inline Vector operator* (Vector const& a, Vector const& b) {Vector c(a) ; if (!(a.isconst()||b.isconst())) {printf("VECERR:WAY*") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c*=b ; return c ; }
+inline Vector operator* (Vector const& a, Vector const& b) {Vector c(a) ; if (!(a.isconst()||b.isconst())) {/*printf("VECERR:WAY*") ;*/ c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c*=b ; return c ; }
 inline Vector operator* (Matrix3x3 & m, Vector & v) ;
 inline Vector operator* (Vector & v, Matrix3x3 & m) ;
 inline Vector operator/ (Vector const& a, Vector const& b) {Vector c(a) ; if (!(b.isconst())) {printf("VECERR:WAY/") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c/=b ; return c ; }

@@ -33,8 +33,8 @@ for (i=0 ; i<step.nb_atomes ; i++)
     gps[(int)(step.datas[idx[3]][i])].push_back((int)step.datas[idx[4]][i]) ;
  }
 }
-if (ngp==-1) {DISP_Warn("Aucun groupe multisphere trouvé, il y a un problème.") ; printf("Step ID=%d", currentstep) ; fflush(stdout) ;   } 
-  
+if (ngp==-1) {DISP_Warn("Aucun groupe multisphere trouvé, il y a un problème.") ; printf("Step ID=%d", currentstep) ; fflush(stdout) ;   }   
+
 for (i=1, longest=0 ; i<=ngp ; i++) if (longest<gps[i][0]) longest=gps[i][0] ; 
 pts.resize(longest, null) ; 
 segments.resize(longest*(longest-1)/2, null) ;  
@@ -49,7 +49,6 @@ return 0 ;
 //=====================================================================================================
 int Multisphere::get_orientations (Step & step)
 {
-vector < Vector > pts, segments ;
 double box[6] ;
 int j, k, l, n ; int idx[5] ; 
 Vector t ; 
@@ -79,8 +78,9 @@ else
 
 for (j=1 ; j<=ngp ; j++)
 {
-  centroid=0 ;     
+  centroid=0 ;   
   if (data[0][j]==GP_LOST) continue ;  
+  if (data[0][j]<GP_LOST) data[0][j]=GP_OK ; // A priori les groupes qui ne sont pas perdus ou problematique sont OK. Eventuellement ils seront marqués PBC ou OUT ensuite. 
   for (k=0 ; k<gps[j][0] ; k++)
   {
     if (step.datas[idx[4]][gps[j][k+1]-1]!=gps[j][k+1]) 
@@ -99,7 +99,6 @@ for (j=1 ; j<=ngp ; j++)
   if (data[0][j]==GP_LOST) continue ; 
   
   centroid=centroid/gps[j][0] ; 
-  
   if (symetrie[0]) 
      {
        if (symetrie[1]==true && centroid(1)<0) {symetrie[4]=true ; centroid(1)=-centroid(1) ; } else {symetrie[4]=false ; }
@@ -122,7 +121,6 @@ for (j=1 ; j<=ngp ; j++)
       }
     }
   } 
-
   if (type==1) //Flat particles, have to do more
   {
     Vector crossp ;
@@ -132,7 +130,7 @@ for (j=1 ; j<=ngp ; j++)
       crossp=segments[idmax].cross(segments[n]) ;
       n++ ; 
     } while (crossp.norm() < 0.000001 || crossp.isnan()) ; 
-    crossp=segments[idmax].norm()/crossp.norm()*crossp ; 
+    crossp=segments[idmax].norm()/crossp.norm()*crossp ;  
     segments[idmax]=crossp ; 
   }
 
@@ -172,7 +170,8 @@ Matrix3d Multisphere::compute_K (Step &step)
 {
   int Kn ; 
   Matrix3d K, Kvec, Kmatseg ;
-  Map<Vector3d> Ksegment(NULL);
+  //Map<Vector3d> Ksegment(NULL);
+  Vector3d Ksegment ; 
   
   K=Matrix3d::Zero() ; Kn=0 ;
   
@@ -181,8 +180,8 @@ Matrix3d Multisphere::compute_K (Step &step)
   for (int j=1 ; j<=ngp ; j++)
   {
     if (data[0][j]!=GP_OK) continue ; 
-    
-     new (&Ksegment) Map<Vector3d>(&(data[4][j])); // THIS IS NOT AN ALLOCATION (no delete) ; 
+     Ksegment[0]=data[4][j] ; Ksegment[1]=data[5][j] ; Ksegment[2]=data[6][j] ; 
+     //new (&Ksegment) Map<Vector3d>(&(data[4][j])); // THIS IS NOT AN ALLOCATION (no delete) ; 
      Ksegment=Ksegment/(Ksegment.norm()) ; 
      Kmatseg=Ksegment*(Ksegment.transpose());
      K=K+Kmatseg ; Kn++ ; 
@@ -219,6 +218,17 @@ void Multisphere::compute_eigen(Step &step)
 }
 
 
+
+
+void Multisphere::check()
+{
+ for (int j=1; j<ngp ; j++)
+ {
+   if (isnan(data[4][j])) printf("A%d ", j) ; 
+   if (isnan(data[5][j])) printf("B%d ", j) ; 
+   if (isnan(data[6][j])) printf("C%d ", j) ; 
+ }
+}
 
 
 
