@@ -157,6 +157,9 @@ for (j=1 ; j<=ngp ; j++)
   data[4][j]=segments[idmax](1) ; 
   data[5][j]=segments[idmax](2) ; 
   data[6][j]=segments[idmax](3) ; 
+  if ((isnan(data[4][j]) || isnan(data[5][j]) || isnan(data[6][j])) && data[0][j]==GP_OK) 
+  {DISP_Warn("NaN dans le data multisphere avec GP_OK, probleme\n") ; data[0][j]=GP_BAD ;
+  }
 }
 
 currentstepinit=true ; 
@@ -217,9 +220,6 @@ void Multisphere::compute_eigen(Step &step)
   
 }
 
-
-
-
 void Multisphere::check()
 {
  for (int j=1; j<ngp ; j++)
@@ -230,8 +230,21 @@ void Multisphere::check()
  }
 }
 
+//-----------------------------------------------
+int Multisphere::prepare_Writing (Step & step)  
+{
 
+ if (!initialized) init(step) ; 
+ if (!currentstepinit) get_orientations(step) ;
 
+ for (int i=1 ; i<=ngp ; i++)
+  if (data[0][i] != GP_OK)
+  { 
+    gps.erase (gps.begin()+i) ; ngp-- ; i-- ; 
+    initialized=false ; 
+  }
+  return 0 ; 
+}
 
 
 

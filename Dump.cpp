@@ -140,7 +140,8 @@ while (stop==false)
   switch (W->Signal)
   {
     case WHATAREYOU : W->sendin(LDUMP) ; break ; 
-    case FIRSTTS : ts=loop[0] ; W->i=&ts ; check_timestep(ts) ; W->sendin(OK) ; break ;
+    case FIRSTTS : ts=loop[0] ; W->i=&ts ; check_timestep(ts) ; 
+                   W->sendin(OK) ; break ;
     case ASKINGTS : W->i=&steps[ts].timestep ; W->sendin(OK) ; break ; 
     case CHOOSELDUMP : W->sendin(OK) ; break ; //Always the case ...
     case CHOOSECFDUMP : W->sendin(UNABLE) ;  break ; 
@@ -164,7 +165,12 @@ while (stop==false)
     case ASKINGND : 
       for (i=0 ; *(W->i+i)!=-1 ; i++) 
 	W->d[i]=&(steps[ts].datas[steps[ts].find_idx(*(W->i+i))][0]) ; 
-      W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;    
+      W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;  
+    case ASKINGMULTISPHERE : 
+      multisphere.prepare_Writing(steps[ts]) ; 
+      W->d=(double **)(&(multisphere.gps)) ; // Trick: je passe un pointeur de vector < vector <int> > comme si c'était un pointeur de pointeur de double 
+      W->i=&(multisphere.ngp) ; W->sendin(OK) ;
+      break ; 
     case FINI : stop=true ; W->sendin(OK) ; break ; 
     case ASKINGGRID : W->sendin(UNABLE) ; break ; 
     default : DISP_Warn("Signal d'écriture inconnu"); W->sendin(UNABLE) ; W->disp_Signal() ; break ; 
@@ -194,6 +200,8 @@ if (!actions["dumpall"].set)
   dumpin.seekg(steps[timestep].posinfile, ios::beg) ;
   read(3, (int)timestep) ;
 }
+
+if (actions["multisphere"].set) multisphere.set_current_step(timestep) ; 
 
 if (steps[timestep].filtered==false)
 {

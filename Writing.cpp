@@ -9,8 +9,8 @@ Writing::Writing() : init(false), mkdir(false)
   WSignal_name[8]="ASKINGGRID"; WSignal_name[9]="ASKINGTS"; WSignal_name[10]="LDUMP"; WSignal_name[11]="CFDUMP";
   WSignal_name[12]="COARSEDUMP"; WSignal_name[13]="VTKDUMP"; WSignal_name[14]="OTHERDUMP"; WSignal_name[15]="CHOOSELDUMP";
   WSignal_name[16]="CHOOSECFDUMP"; WSignal_name[17]="OK"; WSignal_name[18]="FINISH"; WSignal_name[19]="FINI";
-  WSignal_name[20]="UNABLE" ;   
-  if (UNABLE !=20) DISP_Err("Writing: erreur dans le programme. WSignal_name ne correspond pas aux WSignaux") ; 
+  WSignal_name[20]="ASKINGMULTISPHERE" ; WSignal_name[21]="UNABLE" ; 
+  if (UNABLE !=21) DISP_Err("Writing: erreur dans le programme. WSignal_name ne correspond pas aux WSignaux") ; 
   
  //dim=vardef ;
  dim["general1D"]=1 ;
@@ -299,15 +299,6 @@ out.open(nom.c_str(), ios::out) ;
 idx[0]=IDS("POSX") ; idx[1]=IDS("POSY") ; idx[2]=IDS("POSZ") ; 
 i=idx ; 
 sendout(ASKING2D) ; pthread_cond_wait(&sigin, &mutex);
-
-if (f==POLYDATA && actions["multisphere"].set) 
-{
-  double ** dtmp ; 
-  idx[3]=IDS("IDMULTISPHERE") ; 
-  i=&(idx[3]) ; dtmp=d ; d=d+3 ; 
-  sendout(ASKING2D) ; pthread_cond_wait(&sigin, &mutex);
-  d=dtmp ; 
-}
 
 if (Signal==UNABLE) {DISP_Err("Writing: Les données de position sont indispensables") ; }
 if (f==POLYDATA) {VTKPolyData(out, d, *i) ; nbpt=*i ; }
@@ -731,80 +722,44 @@ return cpt ;
 //=========================================================
 int Writing::VTKPolyData (ofstream & out, double **datas, int n)
 {
-  int i, j ; double dst ; 
+  int ii, j ; double dst ; 
   out << "# vtk DataFile Version 2.0\n" << "TS=" << tsinfo << ". Made by PostProcessing (CC-BY-NC)\n" << "ASCII \n" ;
   out << "DATASET POLYDATA\n" ; 
   out << "POINTS " << n << " double\n" ;
   
-  for (i=0 ; i<n ; i++)
+  for (ii=0 ; ii<n ; ii++)
   {
    for (j=0 ; j<3 ; j++)
-     out << datas[j][i] << " " ; 
+     out << datas[j][ii] << " " ; 
    out << "\n" ; 
   }
   
   out << "VERTICES " <<n << " "<< n*2 << "\n" ;
-  for (i=0 ; i<n ; i++)
-  {out << "1 " << i <<"\n" ;}
+  for (ii=0 ; ii<n ; ii++)
+  {out << "1 " << ii <<"\n" ;}
     
   if (actions["multisphere"].set)
   {
-    // Creation du tableau de lignes: Clairement pas le plus rapide qu'il soit possible de faire
-    int ** table ; int ngp=-1, ngp_real=0, nnumbers=0 ;  table=(int **)malloc(sizeof(int*)*0) ; 
-    for (i=0 ; i<n ; i++)
-    {
-	if (d[3][i]>=0)
-	{
-	  if (d[3][i]>ngp)
-	  {
-	    table=(int**)realloc(table,sizeof(int*)*(d[3][i]+1)) ; 
-	    for (j=ngp+1 ; j<=d[3][i] ; j++)
-	    {
-	      table[j]=(int*)malloc(sizeof(int)*1) ; 
-	      table[j][0]=0 ; 
-	    }
-	    ngp=d[3][i] ; 
-	  }
-	  table[(int)(d[3][i])][0]++ ; 
-	  table[(int)(d[3][i])]=(int*)realloc(table[(int)(d[3][i])], sizeof(int)*(table[(int)(d[3][i])][0]+1)) ;
-	  table[(int)(d[3][i])][table[(int)(d[3][i])][0]]=i ;
-	}
-    }
-    
-    
-    for (i=0 ; i<=ngp ; i++)
-    {
-      if (table[i][0]>0) 
-      {
-	dst=0 ; 
-	for (j=1; j<table[i][0] ; j++)
-	{
-	dst+=sqrt((d[0][table[i][j]]-d[0][table[i][j+1]])*(d[0][table[i][j]]-d[0][table[i][j+1]])+
-	    (d[1][table[i][j]]-d[1][table[i][j+1]])*(d[1][table[i][j]]-d[1][table[i][j+1]])+
-	    (d[2][table[i][j]]-d[2][table[i][j+1]])*(d[2][table[i][j]]-d[2][table[i][j+1]]));
-	}
-	if (dst<table[i][0]*0.00075*2) 
-	{
-	ngp_real++ ; nnumbers+=table[i][0] ; nnumbers++ ; 
-	}
-	else
-	  table[i][0]=0 ; 
-      }
-    }
+    double ** dtmp ; int * itmp ; 
+    dtmp=d ; itmp=i ; 
+    sendout(ASKINGMULTISPHERE) ; pthread_cond_wait(&sigin, &mutex);
+    // Recast le ** double en *<vector <vector <int>>
+    vector < vector <int> > * ptr ; 
+    int ngp, ngp_real=0, nnumbers=0 ; 
+    ptr=(vector < vector <int> > *)(d) ; 
+    ngp=*i ; 
+    for (ii=1 ; ii<=ngp ; ii++) if ((*ptr)[ii][0]>0) {ngp_real++ ; nnumbers+=(*ptr)[ii][0]+1 ;}
     out << "LINES " << ngp_real << " "<< nnumbers << "\n" ;
-    for (i=0 ; i<=ngp ; i++)
+    for (ii=1 ; ii<=ngp ; ii++)
     {
-      if (table[i][0]>0) 
+      if ((*ptr)[ii][0]>0) 
       {
-	for (j=0 ; j<table[i][0]+1 ; j++)
-	    out << table[i][j] << " " ;
-	out << "\n" ; 
+        for (j=0 ; j<(*ptr)[ii][0]+1 ; j++)
+            out << (*ptr)[ii][j] << " " ;
+        out << "\n" ; 
       }
     }
-    
-    for (i=0 ; i<=ngp ; i++)
-      free(table[i]) ; 
-    free(table) ;
+    i=itmp ; d=dtmp ; 
   }
   
   return 1 ;

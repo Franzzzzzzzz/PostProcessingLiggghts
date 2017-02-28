@@ -453,7 +453,6 @@ int LucDump::write_multisphere_dumbell (string chemin)
   
   loopdat(loop) ; 
   cout << "\nLucDump::multisphere_dumbell          \n" ;
-  DISP_Warn("Lack of testing of the multisphere since the reorganisation, be carefull") ; 
   
   actions.set_progress(loop) ; actions.disp_progress() ; 
   check_timestep(loop[0]) ; 
@@ -470,12 +469,11 @@ int LucDump::write_multisphere_dumbell (string chemin)
   for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   {
     actions.valeur=i ; 
-    check_timestep(i) ; steps[i].multisphere->set_current_step(i) ; 
+    check_timestep(i) ; 
 
     K=steps[i].multisphere->compute_K(steps[i]) ; 
     fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ; 
-  
-    //steps[i].multisphere->check() ; 
+ 
     for (j=1 ; j<=steps[i].multisphere->ngp ; j++)
     {
      if ((steps[i].multisphere->data[0][j])!=GP_OK) continue ;  

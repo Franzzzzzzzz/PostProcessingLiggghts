@@ -23,12 +23,16 @@ public :
   void compute_eigen(Step &step) ; 
   void set_current_step (int stepid) {if (stepid != currentstep) {currentstep=stepid ; currentstepinit=false ; } }
   void check() ; 
+  int prepare_Writing (Step & step)  ;
   
   // Variables
   int ngp ;  // Nombre de groupes
   vector < vector <int> > gps ; 
   vector <vector <double> > data ; //Values: flag, centroid x, y, z, orientation x, y, z.
-  int type ; 
+  int type ;
+  
+  double ** Wdat ;
+  double * Wint ; 
   
 private:
   vector < Vector > pts, segments ; 

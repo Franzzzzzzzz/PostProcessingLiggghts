@@ -178,7 +178,7 @@ else 									//Atom dump (chainforce not set)
         std::exit(EXIT_SUCCESS) ; 
 	    }
        if (actions["dump2vtk"].set)
-        { dump.write_asVTK(actions.dumpnames[0]) ; }
+        { printf("KKKKJOAJ") ; fflush(stdout) ; dump.write_asVTK(actions.dumpnames[0]) ; }
        if (actions["coarse-graining"].set)
         {
 	CoarseDump dcor ; LcfDump nulldump ; 
