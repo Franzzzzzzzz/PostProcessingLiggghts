@@ -54,6 +54,7 @@ private :
   int lieedwardswap (Step & step, struct Op op) ;
   int moveref (Step & step, struct Op op) ;
   int multisphere (Step &step, struct Op op) ;  
+  int multisphere_remove_atm (Step &step, struct Op op) ; 
 
   int translate_ref (Step &step, struct Op op)  {return (translate_refgen(step, op, 7)) ; } 
   int translate_refx (Step &step, struct Op op) {return (translate_refgen(step, op, 1)) ; } 

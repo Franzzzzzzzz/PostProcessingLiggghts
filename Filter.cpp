@@ -38,6 +38,7 @@ add_operation ("::.cfpp.::", &Filter::cf_postproc) ;
 add_operation ("::.cpplink.::", &Filter::copypartiallink) ;
 add_operation ("::.wallforceatm.::", &Filter::wallforceatm) ;
 add_operation ("::multisphere::", &Filter::multisphere) ; 
+add_operation ("::multisphere_remove_atm::", &Filter::multisphere_remove_atm) ; 
 add_operation ("::.nopbc.::", &Filter::no_periodic_chain) ;
 }
 
@@ -1267,6 +1268,12 @@ int Filter::make2D3D (Step & step, struct Op op)
 }
 
 //--------------------------------------------------------------------
+int Filter::multisphere_remove_atm (Step &step, struct Op op)
+{
+  step.multisphere->remove_atoms(step) ;
+  return 0 ; 
+}
+
 int Filter::multisphere (Step &step, struct Op op) 
 {
   DISP_Err("REMOVED FROM IMPLEMENTATION:DO NO USE (filter::multisphere)") ; 

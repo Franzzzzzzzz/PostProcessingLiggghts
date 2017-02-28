@@ -754,8 +754,9 @@ int Writing::VTKPolyData (ofstream & out, double **datas, int n)
     {
       if ((*ptr)[ii][0]>0) 
       {
-        for (j=0 ; j<(*ptr)[ii][0]+1 ; j++)
-            out << (*ptr)[ii][j] << " " ;
+        out << (*ptr)[ii][0] << " " ; 
+        for (j=1 ; j<(*ptr)[ii][0]+1 ; j++)
+            out << (*ptr)[ii][j]-1 << " " ;
         out << "\n" ; 
       }
     }

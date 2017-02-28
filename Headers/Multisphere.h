@@ -24,6 +24,7 @@ public :
   void set_current_step (int stepid) {if (stepid != currentstep) {currentstep=stepid ; currentstepinit=false ; } }
   void check() ; 
   int prepare_Writing (Step & step)  ;
+  int remove_atoms (Step &step) ; 
   
   // Variables
   int ngp ;  // Nombre de groupes

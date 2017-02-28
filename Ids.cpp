@@ -69,7 +69,7 @@ idalias[14].push_back("omegax") ; idalias[15].push_back("omegay") ; idalias[16].
 idalias[17].push_back("sigmaxx") ; idalias[18].push_back("sigmaxy") ; idalias[19].push_back("sigmaxz") ; 
 idalias[20].push_back("sigmayx") ; idalias[21].push_back("sigmayy") ; idalias[22].push_back("sigmayz") ; 
 idalias[23].push_back("sigmazx") ; idalias[24].push_back("sigmazy") ; idalias[25].push_back("sigmazz") ; 
-idalias[29].push_back("atmpressure") ; idalias[30].push_back("id_multisphere") ; 
+idalias[29].push_back("atmpressure") ; idalias[30].push_back("id_multisphere") ; idalias[30].push_back("idmultisphere") ; idalias[30].push_back("multisphere") ; 
 idalias[31].push_back("kx") ; idalias[32].push_back("ky") ; idalias[33].push_back("kz") ; 
 idalias[34].push_back("centroidx") ; idalias[35].push_back("centroidy") ; idalias[36].push_back("centroidz") ;
 idalias[17].push_back("sigxx") ; idalias[18].push_back("sigxy") ; idalias[19].push_back("sigxz") ; 
