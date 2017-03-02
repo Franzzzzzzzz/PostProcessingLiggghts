@@ -149,7 +149,8 @@ for (j=1 ; j<=ngp ; j++)
   }
   else if (type==1)
   {
-    if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2)) {data[0][j]=GP_PBC ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
+    //printf("%g %g \n", vsph(1), radius*(floor(log2((gps[j][0]-1)/3.))*2)) ; 
+    if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2*2)) {data[0][j]=GP_PBC ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
   }        
   data[1][j]=centroid(1) ; 
   data[2][j]=centroid(2) ; 
@@ -189,6 +190,7 @@ Matrix3d Multisphere::compute_K (Step &step)
      Kmatseg=Ksegment*(Ksegment.transpose());
      K=K+Kmatseg ; Kn++ ; 
   }
+  if (Kn==0) DISP_Err("Kn = 0, problem.") ; 
   K=K/Kn ; 
   return K ;   
 }
@@ -252,16 +254,15 @@ int Multisphere::remove_atoms (Step &step)
  vector <int> todelete ;  
  if (!initialized) init(step) ; 
  if (!currentstepinit) get_orientations(step) ; 
- printf("A") ; fflush(stdout) ; 
+
  for (int i=1 ; i<=ngp ; i++)
   if (data[0][i] != GP_OK)
   { 
     for (int j=1 ; j<gps[i][0]+1 ; j++)
       todelete.push_back(gps[i][j]-1) ; 
   }
-  printf("[%d]", todelete.size()) ; fflush(stdout) ; 
   std::sort(todelete.begin(), todelete.end()) ; 
- printf("C") ; fflush(stdout) ; 
+ 
   for (int i=todelete.size()-1 ; i>=0 ; i--)
   {
     printf("%d ", todelete[i]) ; fflush(stdout) ; 
