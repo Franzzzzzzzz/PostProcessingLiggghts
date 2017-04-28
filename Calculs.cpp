@@ -197,6 +197,25 @@ antisymu(3,2)=axe(1) ;
 rotation=utu+(Id-utu)*cos(angle)+antisymu*sin(angle) ;
 return rotation ; 
 }
+//---------------------------------------------------------
+double Geometrie::tri_surface (Vector a, Vector b, Vector c)
+{
+ Vector u, v ; 
+ u=b-a ; 
+ v=c-a ; 
+ u=u.cross(v) ; 
+ return ((1/2.0)*u.norm()) ;  
+}
+
+double Geometrie::solid_angle (Vector a, Vector b, Vector c)
+{
+ double d, n, r ; 
+ n=abs(triple_product(a,b,c)) ; 
+ d=a.norm()*b.norm()*c.norm()+ c.norm()*(a.dot(b))+ b.norm()*(a.dot(c)) + a.norm()*(b.dot(c)) ; 
+ r=atan(n/d) ; if (r<0) r+=M_PI ; 
+ return (2*r) ; 
+}
+
 //==================================================
 /*Matrix Calcul::cross_product (Matrix a, Matrix b)
 {
@@ -964,6 +983,7 @@ Icosahedre::Icosahedre ()
   for (i=0 ; i<nfaces ; i++) faces[i]=(int*)malloc(sizeof(int)*3) ;   
   
   data=(double*) malloc(sizeof(double)*nfaces) ; 
+  solidangle=(double*) malloc(sizeof(double)*nfaces) ; 
   
   pts[0][0]=0 ; pts[0][1]=1 ;  pts[0][2]=Phi ;
   pts[1][0]=0 ; pts[1][1]=1 ;  pts[1][2]=-Phi ;
@@ -1042,7 +1062,15 @@ Icosahedre::Icosahedre ()
     pts[i][0]/=norme ; pts[i][1]/=norme ; pts[i][2]/=norme ;
   }
   
-  for (i=0 ; i<20 ; i++) data[i]=0 ; 
+  Vector t1, t2, t3 ; 
+  for (i=0 ; i<20 ; i++) 
+  {
+    data[i]=0 ; 
+    t1.set(pts[faces[i][0]][0], pts[faces[i][0]][1], pts[faces[i][0]][2]) ; 
+    t2.set(pts[faces[i][1]][0], pts[faces[i][1]][1], pts[faces[i][1]][2]) ; 
+    t3.set(pts[faces[i][2]][0], pts[faces[i][2]][1], pts[faces[i][2]][2]) ;
+    solidangle[i]=Geometrie::solid_angle(t1,t2,t3) ; 
+  }
 }
 
 
@@ -1151,10 +1179,31 @@ int Icosahedre::subdivide()
  printf("Icosahedre subdivision : %d %d %d\n", lastpt , lastface, lastedge) ; 
  
  data=(double*)realloc(data, sizeof(double)*nfaces) ; 
+ solidangle=(double*)realloc(solidangle, sizeof(double)*nfaces) ; 
  for (i=nfaces/4 ; i<nfaces ; i++) data[i]=0 ; 
+ for (i=0 ; i<nfaces ; i++) 
+ {   
+  t1.set(pts[faces[i][0]][0], pts[faces[i][0]][1], pts[faces[i][0]][2]) ; 
+  t2.set(pts[faces[i][1]][0], pts[faces[i][1]][1], pts[faces[i][1]][2]) ; 
+  t3.set(pts[faces[i][2]][0], pts[faces[i][2]][1], pts[faces[i][2]][2]) ; 
+  solidangle[i]=Geometrie::solid_angle(t1,t2,t3) ;
+ }
  
  free(milieux) ; 
  
+ // TEST
+ /*double sum=0 ; 
+ for (i=0 ; i<nfaces ; i++)
+ {
+   t1.set(pts[faces[i][0]][0], pts[faces[i][0]][1], pts[faces[i][0]][2]) ; 
+   t2.set(pts[faces[i][1]][0], pts[faces[i][1]][1], pts[faces[i][1]][2]) ; 
+   t3.set(pts[faces[i][2]][0], pts[faces[i][2]][1], pts[faces[i][2]][2]) ; 
+   printf("[%g %g]", Geometrie::tri_surface(t1,t2,t3), solidangle[i]) ; 
+   sum+=solidangle[i];
+ }
+ printf("{{{%g}}}", sum) ; */
+ // END TEST
+   
  return 0 ; 
 }
 

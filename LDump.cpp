@@ -443,7 +443,7 @@ return 0 ;
 int LucDump::write_multisphere_dumbell (string chemin)
 {
   Icosahedre Ico ; 
-  //if (actions["mean"].set) Ico.subdivide(4) ; 
+  if (actions["mean"].set) Ico.subdivide(3) ; 
   
   long int loop[3] ; string chem ; 
   int i, j, k ; FILE *out,*out2 ; 
@@ -522,7 +522,7 @@ int LucDump::write_multisphere_dumbell (string chemin)
   
     int tot=0 ; 
     for (i=0 ; i<Ico.nfaces ; i++) tot+=Ico.data[i] ;
-    for (i=0 ; i<Ico.nfaces ; i++) Ico.data[i]/=tot ;
+    for (i=0 ; i<Ico.nfaces ; i++) Ico.data[i]/=(tot*Ico.solidangle[i]) ;
     Ico.deform() ; 
     Ico.write_vtk(chem) ;
   }

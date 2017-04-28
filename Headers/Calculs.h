@@ -40,52 +40,6 @@ private :
   int i ; 
 } ;
 //------------------------------------------------------------
-/*OLD CLASS VECTOR class Vector {
-public : 
-  Vector() {dat[0]=dat[1]=dat[2]=0 ; iscolumn=true ; tmp=false ; } ; 
-  // Operateurs
-    //Recherche
-    double & operator() (int i) {return dat[i-1] ;}
-    double & operator[] (int i) {return dat[i] ;}
-    //affectation
-    void operator= (Vector & m) {dat[0]=m[0] ; dat[1]=m[1] ; dat[2]=m[2] ; iscolumn=m.iscol() ; };
-    void operator= (double x) {dat[0]=dat[1]=dat[2]=x ; }; 
-    // Addition
-    Vector  operator+ (double x) ;
-    Vector  operator+ (Vector & m) ;
-    // Soustraction et opposé
-    Vector  operator- () ;
-    Vector  operator- (double x) {return ((*this)+(-x));};    
-    Vector  operator- (Vector & m) {Vector tmp=-m ; return ((*this)+(tmp)) ;}
-    // Multiplication
-    Vector  operator* (double x) ;
-    Vector  operator* (Matrix3x3 & m) ; 
-    Matrix3x3 operator* (Vector & v) ;
-    // Division
-    Vector  operator/ (double x) {return ((*this)*(1/x));}
-    Vector  operator% (Vector & v) ;
-    Vector  operator/ (Vector & v) ;
-    // Comparaison
-    bool operator< (Vector & v) {if (dat[0]<v[0] && dat[1]<v[1] && dat[2]<v[2]) return true ; return false ;}
-    bool operator> (Vector & v) {if (dat[0]>v[0] && dat[1]>v[1] && dat[2]>v[2]) return true ; return false ;}
-    bool operator<= (Vector & v) {if (dat[0]<=v[0] && dat[1]<=v[1] && dat[2]<=v[2]) return true ; return false ;}
-    bool operator>= (Vector & v) {if (dat[0]>=v[0] && dat[1]>=v[1] && dat[2]>=v[2]) return true ; return false ;}
-
-  //Fonctions
-  Vector  t (void) {Vector *res = new Vector ; (*res)=*this ; res->autochange() ; (*res).tmp=true ; return (*res) ; } // transpose
-  void autochange (void) {iscolumn=(iscolumn==true?false:true);}
-  bool iscol (void) { return iscolumn ; }
-  double dot(Vector v) {return (v[0]*dat[0]+v[1]*dat[1]+v[2]*dat[2]) ;}
-  Vector cross(Vector w) {Vector *res = new Vector ; (*res).dat[0]=dat[1]*w.dat[2]-dat[2]*w.dat[1] ;
-  	  	  	  	  	  	  	  	  	  	  	  	  	  (*res).dat[1]=dat[2]*w.dat[0]-dat[0]*w.dat[2] ;
-  	  	  	  	  	  	  	  	  	  	  	  	  	  (*res).dat[2]=dat[0]*w.dat[1]-dat[1]*w.dat[0] ; (*res).iscolumn=iscolumn ; return (*res) ; }
-  void disp (void) ;   
-  
-  bool tmp ;
-private : 
-  double dat[3] ; 
-  bool iscolumn ; 
-};*/
 class Vector {
 public :
   // Constructeurs
@@ -156,7 +110,9 @@ inline Vector operator* (Matrix3x3 & m, Vector & v) ;
 inline Vector operator* (Vector & v, Matrix3x3 & m) ;
 inline Vector operator/ (Vector const& a, Vector const& b) {Vector c(a) ; if (!(b.isconst())) {printf("VECERR:WAY/") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c/=b ; return c ; }
 inline Vector operator% (Vector const& a, Vector const& b) {Vector c(a) ; if (a.iscol()!=b.iscol()) {printf("VECERR:WAY%%") ; c.dat[0]=c.dat[1]=c.dat[2]=NAN ; return c ;} c%=b ; return c ; }
-
+inline Vector cross(Vector & a, Vector & b) {return (a.cross(b)) ; }
+inline double triple_product (Vector a, Vector b, Vector c) {return (a.dot(b.cross(c))) ; }
+inline double mixed_product (Vector a, Vector b, Vector c) {return (triple_product(a,b,c)) ; } // alias for triple_product 
 
 //Surcharge des operateurs sur réels
 inline Matrix3x3  operator+ (double x, Matrix3x3 & m) {return (m+x) ; }
@@ -185,11 +141,12 @@ public:
   int subdivide(int n) {if (n>1) subdivide(n-1) ; subdivide() ; }
   double *data ; 
   int npts, nedges, nfaces ; 
+  double *solidangle ; 
   
 private :
-  double **pts ; 
+  double **pts ;
   int **edges; 
-  int **faces ; 
+  int **faces ;
 } ; 
 
 class Geometrie
@@ -217,6 +174,8 @@ static Matrix3x3 get_rot_matrix (double angle, Vector axe) ;
 
 static double distance_cylindre (Cylindre & C, Vector x) ; 
 static Vector contact_cylindre (Cylindre & C, Vector x) ;
+static double tri_surface (Vector a, Vector b, Vector c) ;
+static double solid_angle (Vector a, Vector b, Vector c) ; 
 } ; 
 
 /*class Convert
@@ -229,7 +188,6 @@ static Matrix toVect (double a, double b) {Matrix t(2,1) ; t<<a<<b ; return t ; 
 class Calcul
 {
 public :
-//static Matrix cross_product (Matrix a, Matrix b) ; 
 static Vector cross_product (Vector a, Vector b) ; 
 static double norm (Vector x) {return sqrt(x(1)*x(1)+x(2)*x(2)+x(3)*x(3));}
 static double norm2D (Vector x) {return sqrt(x(1)*x(1)+x(2)*x(2));}
