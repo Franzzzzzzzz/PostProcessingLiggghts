@@ -150,7 +150,8 @@ for (j=1 ; j<=ngp ; j++)
   else if (type==1)
   {
     //printf("%g %g \n", vsph(1), radius*(floor(log2((gps[j][0]-1)/3.))*2)) ; 
-    if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2*2)) {data[0][j]=GP_PBC ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
+    //if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2)) {
+      if (vsph(1)>radius*2.1) {data[0][j]=GP_PBC ; printf("s") ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
   }        
   data[1][j]=centroid(1) ; 
   data[2][j]=centroid(2) ; 

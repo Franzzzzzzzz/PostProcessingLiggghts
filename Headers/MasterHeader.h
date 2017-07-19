@@ -36,6 +36,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #endif
 
+// Eigen library. No installation required, just always distribute the header files with the others. 
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
 #include "Eigen/Unsupported/KroneckerProduct"

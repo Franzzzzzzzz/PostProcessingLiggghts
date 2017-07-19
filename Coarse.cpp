@@ -626,6 +626,7 @@ if ((type==1 || type==2) && actions["w/kinetic"].set)
   position(1)=stepatm.datas[idxatm[0]][j] ; position(2)=stepatm.datas[idxatm[1]][j] ; position(3)=stepatm.datas[idxatm[2]][j] ; 
   if (idxatm[6]!=-1) {rayon=stepatm.datas[idxatm[6]][j] ;}
   calc_bornes_v2(position(1), position(2), position(3), rayon, 1, bornes) ; 
+  //printf("%d %d %d %d %d %d \n", bornes[0], bornes[1], bornes[2],bornes[3] ,bornes[4] ,bornes[5]) ; 
   for (ii=bornes[0] ; ii<=bornes[1] ; ii++)
    {
    for (jj=bornes[2] ; jj<=bornes[3] ; jj++)
@@ -773,10 +774,12 @@ void Coarse::compute_sigmatot (void)
   {
    for (i=0 ; i<9 ; i++) 
    {
-     if (isinf(cstep->datas[idx0+i][j]) || isnan(cstep->datas[idx0+i][j])) cstep->datas[idx0+i][j]=0 ; 
-     if (isinf(cstep->datas[idx1+i][j]) || isnan(cstep->datas[idx1+i][j])) cstep->datas[idx1+i][j]=0 ;
+     if (isinf(cstep->datas[idx0+i][j]) || isnan(cstep->datas[idx0+i][j])) { cstep->datas[idx0+i][j]=0 ; }
+     if (isinf(cstep->datas[idx1+i][j]) || isnan(cstep->datas[idx1+i][j])) { cstep->datas[idx1+i][j]=0 ; }
    }
-   for (i=0 ; i<9 ; i++) {cstep->datas[idx2+i][j]=cstep->datas[idx0+i][j]+cstep->datas[idx1+i][j] ; check+=fabs(cstep->datas[idx1+i][j]) ; }
+   for (i=0 ; i<9 ; i++) {cstep->datas[idx2+i][j]=cstep->datas[idx0+i][j]+cstep->datas[idx1+i][j] ; //printf("{A%g}", cstep->datas[idx0+i][j]) ;
+   //printf("{B%g}", cstep->datas[idx1+i][j]) ;
+   check+=fabs(cstep->datas[idx1+i][j]) ; }
   }
   if (check<1e-100) DISP_Warn("La partie contrainte cinétique est très faible, il n'y a pas un oublie de w/kinetic ?\n") ; 
 }
@@ -795,21 +798,23 @@ void Coarse::calc_bornes_v2 (double x, double y, double z, double r, int curtype
 {
   int dx, dy, dz ; int bidx[3] ;
   static bool is2D=actions["is2D"].set ; 
-  bidx[0]=floor((x-borders[0][0])/(double)((borders[0][1]-borders[0][0])/(double)nb_boites[0])) ; 
-  bidx[1]=floor((y-borders[1][0])/(double)((borders[1][1]-borders[1][0])/(double)nb_boites[1])) ; 
-  bidx[2]=floor((z-borders[2][0])/(double)((borders[2][1]-borders[2][0])/(double)nb_boites[2])) ; 
+  bidx[0]=int(floor((x-borders[0][0])/(double)((borders[0][1]-borders[0][0])/(double)nb_boites[0]))) ; 
+  bidx[1]=int(floor((y-borders[1][0])/(double)((borders[1][1]-borders[1][0])/(double)nb_boites[1]))) ; 
+  bidx[2]=int(floor((z-borders[2][0])/(double)((borders[2][1]-borders[2][0])/(double)nb_boites[2]))) ; 
   
   if (curtype==0)
   {
    dx=ceil(r/sigmafenetre(1)) ; 
    dy=ceil(r/sigmafenetre(2)) ; 
    if (!is2D) dz=ceil(r/sigmafenetre(3)) ;
+   else dz=0 ; 
   }
   else if (curtype==1)
   {
    dx=ceil(r/sigmafenetreO(1));
    dy=ceil(r/sigmafenetreO(2));
    if (!is2D) dz=ceil(r/sigmafenetreO(3));
+   else dz=0 ; 
   }
   else if (curtype==2) // not looking around
   {

@@ -207,6 +207,7 @@ if (steps[timestep].filtered==false)
 {
   Filter filtre_tmp ;
   // ------ Application des pré-filtres ------
+  
   if (prefiltre.size()>0)
   {
    //printf("PRE ") ; filtre_tmp.disp(prefiltre) ;

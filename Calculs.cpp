@@ -1094,7 +1094,7 @@ int Icosahedre::write_vtk (string chemin)
   fprintf(out, "SCALARS cell_scalars double 1\n") ;
   fprintf(out, "LOOKUP_TABLE default\n") ; 
   for (i=0 ; i<nfaces ; i++)
-    fprintf(out, "%g ", data[i]) ; 
+    fprintf(out, "%g\n", data[i]) ; 
  
   fclose(out) ; 
 }

@@ -808,7 +808,7 @@ unsigned int i,j, ts ; int idx[17] ; //Matrix cart(3,1), sph(3,1) ;
 Vector r, f, fnv, x1, x2, xch ;
 double fn, ft ;
 static bool first=true ; static double samplingcf, intersampling  ;
-Step * atmstep ; 
+Step * atmstep = NULL ; 
 
 // Ajoute des données à celles extraites pour les chaînes de force.
 //step.idx_col.push_back(CFMAG) ; 
@@ -838,8 +838,7 @@ step.datas[step.find_idx(IDS("CFZ"))].resize(step.nb_atomes) ;
 //i=0 ; plutôt que de partir de i=0, on va essayer de se rapprocher en supposant que le coefficient de downsampling est constant
 // Attention, ne fonctionne que si le,premier appel est effectué avec le step[0] du cfdump.
 
-// Si la position des atomes n'est pas dans le dump des contacts, onutilise le dump atomique pour les trouver
-
+// Si la position des atomes n'est pas dans le dump des contacts, onutilise le dump atomique pour les trouver 
 if (!actions["donotusecfpos"].set && (step.find_idx(IDS("CFID1X"))!=-1 && step.find_idx(IDS("CFID1Y"))!=-1 && step.find_idx(IDS("CFID1Z"))!=-1 &&
 	step.find_idx(IDS("CFID2X"))!=-1 && step.find_idx(IDS("CFID2Y"))!=-1 && step.find_idx(IDS("CFID2Z"))!=-1))
  {
@@ -851,7 +850,7 @@ if (!actions["donotusecfpos"].set && (step.find_idx(IDS("CFID1X"))!=-1 && step.f
  idx[11]=step.find_idx(IDS("CFX")) ; idx[12]=step.find_idx(IDS("CFY")) ; idx[13]=step.find_idx(IDS("CFZ")) ;
  idx[14]=step.find_idx(IDS("CFMAG")) ;// idx[9]=step.find_idx(IDS("CFR")) ; idx[10]=step.find_idx(IDS("CFTHETA")) ; idx[11]=step.find_idx(IDS("CFPHI")) ;
  idx[15]=step.find_idx(IDS("CFPERIOD")) ;
-
+ fflush(stdout) ; 
  for (i=0 ; i<step.nb_atomes ; i++)
    {
    step.datas[idx[14]][i]=sqrt(pow(step.datas[idx[3]][i],2)+pow(step.datas[idx[4]][i],2)+pow(step.datas[idx[5]][i],2)) ;
@@ -862,7 +861,6 @@ if (!actions["donotusecfpos"].set && (step.find_idx(IDS("CFID1X"))!=-1 && step.f
    step.datas[idx[9]][i]=(step.datas[idx[7]][i]+step.datas[idx[1]][i])/2. ;
    step.datas[idx[10]][i]=(step.datas[idx[16]][i]+step.datas[idx[2]][i])/2. ;
    }
-
  }
 // Si la position des atomes n'est pas dans le dump des contacts, on utilise le dump atomique pour les trouver
 else
@@ -956,7 +954,7 @@ else
    //printf("%.15f ", sqrt(step.datas[idx[11]][i]*step.datas[idx[11]][i]+step.datas[idx[12]][i]*step.datas[idx[12]][i])
    //		        -atmstep->datas[atmstep->find_idx(IDS("RAYON"))][(int)step.datas[idx[7]][i]-1]-atmstep->datas[atmstep->find_idx(IDS("RAYON"))][(int)step.datas[idx[6]][i]-1]) ;
    }
-
+   
  // Si on veut prendre en compte les wallforce, il est temps de le faire !!!!
  if (actions["wallchainforce"].set)
   {
@@ -1015,6 +1013,8 @@ else
   step.LCFforce_by_particle_v2(*atmstep,3) ;  
  }
  
+if (atmstep)
+{
  idx[0]=atmstep->find_idx(IDS("IDMULTISPHERE")) ; idx[1]=step.find_idx(IDS("CFID1")) ; idx[2]=step.find_idx(IDS("CFID2")) ; 
  if (idx[0]!=-1 && !actions["multisphere"].set) DISP_Warn("Attention, le champ id_mutisphere est défini dans le dump, mais aucune action n'est effectuée. utiliser --mutisphere peut aider\n") ; 
  else if (idx[0]==-1 && actions["multisphere"].set) DISP_Warn("Etrange de definir --multisphere sans champ multisphere\n") ; 
@@ -1034,7 +1034,7 @@ else
    step.nb_atomes-=todelete ; 
    //DISP_Info("Nombre de chaînes internes aux multisphere supprimées :") ; printf("%d sur %d totales\n", todelete, step.nb_atomes+todelete) ; 
  }
- 
+}
  
 return 1 ;
 }

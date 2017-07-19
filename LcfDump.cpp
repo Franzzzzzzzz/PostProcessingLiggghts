@@ -322,7 +322,7 @@ cout << "\nLcfDump::write_grainforce         " ;
 actions.total=loop[2] ; actions.disp_progress() ;
 DISP_Info("On travail sur du 2D en xy\n") ;
 
-chem2=chemin ; chem2.erase(chem2.rfind(".gz")) ; chem2.append("-GrainForce.txt") ;
+chem2=chemin ; try{chem2.erase(chem2.rfind(".gz"));} catch(...){} chem2.append("-GrainForce.txt") ;
 out2.open(chem2.c_str(), ios::out) ;
 
 // Création des tableaux de données moyennes si nécessaires
@@ -337,17 +337,14 @@ if (actions["grainforce-by-angle"].set && actions["mean"].set)
 // Boucle sur les ts
 byangle=actions["grainforce-by-angle"].set ; 
 bytot=actions["grainforce"].set ; 
-
 if (bytot) idgrain=actions["grainforce"]["id"] ; 
 //if (byangle) idgrain=actions["grainforce-by-angle"]["id"] ; // TODO would make sense to do it as well ...
-
 for (i=loop[0] ; i<loop[2] ; i+=loop[1])
 {
   actions.valeur=i ;
   check_timestep(i) ;
   //ldump.check_timestep(i) ; 
   //printf("%d", steps[i].has_periodic_chains) ; 
-
   if (bytot)
   {
     idx[0]=steps[i].find_idx(IDS("CFFORCEX")) ; idx[1]=steps[i].find_idx(IDS("CFFORCEY")) ; idx[2]=steps[i].find_idx(IDS("CFFORCEZ")) ;
@@ -403,7 +400,7 @@ if (byangle)
   // Création du fichier avec moyennage si besoin
   if (actions["mean"].set)
   {
-    chem=chemin ; chem.erase(chem.rfind(".gz")) ; chem.append("-GrainForceByAngle-mean.txt") ;
+    chem=chemin ; try{chem.erase(chem.rfind(".gz")) ;} catch(...){}  chem.append("-GrainForceByAngle-mean.txt") ;
     out.open(chem.c_str(), ios::out) ;
     for (i=0; i<actions["grainforce-by-angle"]["nbbox_theta"] ; i++ )
     {
