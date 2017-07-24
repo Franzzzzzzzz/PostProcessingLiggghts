@@ -34,12 +34,12 @@ idx[0]=find_idx(IDS("CFFORCEX")) ; idx[1]=find_idx(IDS("CFFORCEY")) ; idx[2]=fin
 idx[3]=find_idx(IDS("CFX")) ; idx[4]=find_idx(IDS("CFY")) ; idx[5]=find_idx(IDS("CFZ")) ;
 idx[6]=find_idx(IDS("CFID1")) ; idx[7]=find_idx(IDS("CFID2")) ; idx[8]=find_idx(IDS("CFPERIOD")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1||idx[3]==-1||idx[4]==-1||idx[5]==-1)
-   {DISP_Err("Les valeurs CFFORCEX/Y/Z et CFX/Y/Z sont necessaires avec --grainforce_by_angle et un CFdump") ; return 0 ; }
+   {DISP_Err("Les valeurs CFFORCEX/Y/Z et CFX/Y/Z sont necessaires avec --grainforce_by_angle et un CFdump\n") ; return 0 ; }
 
 //if (has_periodic_chains==true) return 0 ;
 
-if (actions["grainforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau") ; info=false ; } } // Fenêtre créneau
-else {sigma=actions["grainforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info ("Utilisation d'une fenêtre gaussienne") ; info=false ; } } // Fenêtre gaussienne
+if (actions["grainforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau\n") ; info=false ; } } // Fenêtre créneau
+else {sigma=actions["grainforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info ("Utilisation d'une fenêtre gaussienne\n") ; info=false ; } } // Fenêtre gaussienne
 
 // Parcours des atomes, ajout des forces aux angles adaptés
 int sgn, idatom ;
@@ -49,7 +49,7 @@ for (i=0 ; i<nb_atomes+nb_atomes_supp ; i++)
 	//if (datas[idx[8]][i]==1) return 0 ;
         if (datas[idx[7]][i]==idatom) sgn=-1;
 	else if (datas[idx[6]][i]==idatom) sgn=1 ;  //Tout va bien
-	else {DISP_Warn("Il n'y a pas le bon ID dans la chaines !") ; continue ; }
+	else {DISP_Warn("Il n'y a pas le bon ID dans la chaines !\n") ; continue ; }
 
 	angle=Calcul::arctan(datas[idx[3]][i]*sgn, datas[idx[4]][i]*sgn) ;
 	angle=Calcul::angle_0_2pi(angle) ;

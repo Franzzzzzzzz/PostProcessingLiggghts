@@ -449,6 +449,9 @@ actions.new_arg("v1", "modifie les parametres de PostProcessing pour la compatib
 args[0]=(char *) "id" ; args[1]=(char *) "nbbox_theta" ; args[2]=(char *) "sigma" ;
 actions.new_arg("grainforce-by-angle", "répartition angulaire des forces sur un grain", 3, args, 1, dep) ;
 actions.new_arg("grainforce", "répartition angulaire des forces sur un grain", 1, args, 1, dep) ;
+dep[1]=actions["grainforce"].id ; 
+actions.new_arg("grainforce-duration", "histogramme des durées de contact", 0, 2, dep) ;
+
 actions.new_arg("grain-rayon-around", "répartition des rayons autour d'un grain", 1, args, 1, dep) ;
 dep[0]=actions["coarse-graining"].id ; 
 actions.new_arg("is2D", "indique qu'il s'agit d'un coarse 2D", 0, 0) ;

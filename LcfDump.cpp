@@ -310,7 +310,10 @@ long int i, j, loop[3], idx[7], sgn, idgrain;
 double forces[3] ; double rayon ; 
 double ** meanforces ; double *meangrains ; int denom=0 ;
 ofstream out, out2 ;
-bool byangle, bytot ; 
+bool byangle, bytot, byduration ; 
+map<int,int> contact_duration;
+map<int, int> contact_histogram ; int totalcf=0 ; 
+
 //double forces[3] ;
 
 //chem=chemin ; chem.append("-ForceByAngle.txt") ;
@@ -337,14 +340,18 @@ if (actions["grainforce-by-angle"].set && actions["mean"].set)
 // Boucle sur les ts
 byangle=actions["grainforce-by-angle"].set ; 
 bytot=actions["grainforce"].set ; 
+byduration=actions["grainforce-duration"].set ; 
 if (bytot) idgrain=actions["grainforce"]["id"] ; 
 //if (byangle) idgrain=actions["grainforce-by-angle"]["id"] ; // TODO would make sense to do it as well ...
 for (i=loop[0] ; i<loop[2] ; i+=loop[1])
 {
   actions.valeur=i ;
   check_timestep(i) ;
-  //ldump.check_timestep(i) ; 
-  //printf("%d", steps[i].has_periodic_chains) ; 
+  
+  if (byduration)
+    for (multimap<int,int>::iterator it=contact_duration.begin(); it!=contact_duration.end(); it++)
+      (*it).second*=-1 ; // Everyone put to negative. The lost contact remain negative after going through the chainforce.
+  
   if (bytot)
   {
     idx[0]=steps[i].find_idx(IDS("CFFORCEX")) ; idx[1]=steps[i].find_idx(IDS("CFFORCEY")) ; idx[2]=steps[i].find_idx(IDS("CFFORCEZ")) ;
@@ -362,26 +369,44 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
       forces[1]+=(steps[i].datas[idx[1]][j]*sgn) ;
       forces[2]+=(steps[i].datas[idx[2]][j]*sgn) ;
       
-      /*if (steps[i].datas[idx[4]][j]==idgrain)
+      // Mesure de la durée des contacts 
+      if (byduration)
       {
-	if (steps[i].datas[idx[3]][j] != ldump.steps[i].datas[idx[6]][steps[i].datas[idx[3]][j]])
-	  printf("Assumption false. %f %f %f %f \n",steps[i].datas[idx[3]][j], ldump.steps[i].datas[idx[6]][0], ldump.steps[i].datas[idx[6]][1],ldump.steps[i].datas[idx[6]][steps[i].datas[idx[3]][j]]) ;
-	rayon+=(ldump.steps[i].datas[idx[5]][steps[i].datas[idx[3]][j]]) ; 
+        if (sgn==1)
+        {
+          contact_duration[steps[i].datas[idx[4]][j]]*=-1; 
+          contact_duration[steps[i].datas[idx[4]][j]]+=1 ; totalcf++ ; 
+        }
+        else
+        {
+          contact_duration[steps[i].datas[idx[3]][j]]*=-1 ; 
+          contact_duration[steps[i].datas[idx[3]][j]]+=1 ; totalcf++ ; 
+        }
       }
-      else
-      {
-	if (steps[i].datas[idx[4]][j] != ldump.steps[i].datas[idx[6]][steps[i].datas[idx[4]][j]])
-	  printf("Assumption b false. ") ;
-	rayon+=(ldump.steps[i].datas[idx[5]][steps[i].datas[idx[4]][j]]) ; 
-      }*/
     }
-    //cout << rayon/(steps[i].nb_atomes+steps[i].nb_atomes_supp) << "\n" ; 
     out2 << steps[i].has_periodic_chains << " " << forces[0] <<" " << forces[1] << " " << forces[2] << "\n" ;
   }
+  
   if (byangle)
-  {
     denom=denom+steps[i].grain_force(meanforces, meangrains, out) ;
+  
+  if (byduration)
+  {
+    bool changes=true ;
+    while (changes)
+    {
+      changes=false ; 
+      for (multimap<int,int>::iterator it=contact_duration.begin(); it!=contact_duration.end(); it++)
+      {
+        if ((*it).second<0)
+        {
+          contact_histogram[-(*it).second]++ ; 
+          contact_duration.erase(it) ; changes=true ; 
+        }
+      }
+    }
   }
+  
 }
 
 if (bytot) out2.close() ; 
@@ -415,6 +440,18 @@ if (actions["grainforce-by-angle"].set && actions["mean"].set)
 {
   for (i=0 ; i<actions["grainforce-by-angle"]["nbbox_theta"] ; i++) free(meanforces[i]) ; 
   free(meanforces) ; free(meangrains) ; 
+}
+
+if (byduration)
+{
+FILE * outhist ; 
+DISP_Info("Nombre total de chainforce: ") ; printf("%d\n", totalcf) ; 
+chem=chemin ; try{chem.erase(chem.rfind(".gz")) ;} catch(...){} chem.append("-DurationHistogram.txt") ;
+out.open(chem.c_str(), ios::out) ;
+out << "DureeTS Occurence\n" ;  
+for (multimap<int,int>::iterator it=contact_histogram.begin(); it!=contact_histogram.end(); ++it)
+  out << (*it).first << " " << (*it).second << "\n" ; 
+out.close() ; 
 }
 
 return 0 ;
