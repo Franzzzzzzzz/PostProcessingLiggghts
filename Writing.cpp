@@ -738,25 +738,27 @@ int Writing::VTKPolyData (ofstream & out, double **datas, int n)
   for (ii=0 ; ii<n ; ii++)
   {out << "1 " << ii <<"\n" ;}
     
-  if (actions["multisphere"].set)
+  if (actions["multisphere"].set || actions["multisphereflux"].set)
   {
     double ** dtmp ; int * itmp ; 
     dtmp=d ; itmp=i ; 
     sendout(ASKINGMULTISPHERE) ; pthread_cond_wait(&sigin, &mutex);
     // Recast le ** double en *<vector <vector <int>>
     vector < vector <int> > * ptr ; 
-    int ngp, ngp_real=0, nnumbers=0 ; 
+    int ngp, ngp_real=0, nnumbers=0 ; int deb, end, delta ; 
     ptr=(vector < vector <int> > *)(d) ; 
-    ngp=*i ; 
-    for (ii=1 ; ii<=ngp ; ii++) if ((*ptr)[ii][0]>0) {ngp_real++ ; nnumbers+=(*ptr)[ii][0]+1 ;}
+    ngp=*i ;
+    if (actions["multisphere"].set) {deb=1 ; end=ngp+1 ; delta=1 ; }
+    else {deb=0 ; end=ngp ; delta=0 ; }
+    for (ii=deb ; ii<end ; ii++) if ((*ptr)[ii][0]>0) {ngp_real++ ; nnumbers+=(*ptr)[ii][0]+1 ;}
     out << "LINES " << ngp_real << " "<< nnumbers << "\n" ;
-    for (ii=1 ; ii<=ngp ; ii++)
+    for (ii=deb ; ii<end ; ii++)
     {
       if ((*ptr)[ii][0]>0) 
       {
         out << (*ptr)[ii][0] << " " ; 
         for (j=1 ; j<(*ptr)[ii][0]+1 ; j++)
-            out << (*ptr)[ii][j]-1 << " " ;
+            out << (*ptr)[ii][j]-delta << " " ;
         out << "\n" ; 
       }
     }

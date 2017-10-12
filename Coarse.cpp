@@ -71,7 +71,7 @@ for (j=0 ; j<tmp.nb_boites_tot ; j++)
 
 for (i=1 ; i<nbsteps ; i++)
   {
-   tmp=tmp+coarse[i] ; 
+   tmp=tmp+coarse[i] ; // TODO Not the proper way to do the mean, should balance by the significance ...     
    for (j=0 ; j<tmp.nb_boites_tot ; j++)
    {
      stdp[j][i]=(coarse[i].cstep->datas[idx[0]][j]+coarse[i].cstep->datas[idx[1]][j])/2. ; 
@@ -79,7 +79,7 @@ for (i=1 ; i<nbsteps ; i++)
      stdphi[j][i]=coarse[i].cstep->datas[idx[5]][j] ;
    }
   }
-for (j=0 ; j<tmp.cstep->nb_idx-2 ; j++)
+for (j=0 ; j<tmp.cstep->nb_idx ; j++)
   {
    if (tmp.cstep->idx_col[j]==IDS("ID") || 
        tmp.cstep->idx_col[j]==IDS("POSX") || tmp.cstep->idx_col[j]==IDS("POSY") || tmp.cstep->idx_col[j]==IDS("POSZ")) continue;
@@ -356,7 +356,7 @@ cstep->idx_col.push_back(IDS("COARSIGTOTXX") ); cstep->idx_col.push_back(IDS("CO
 cstep->idx_col.push_back(IDS("COARSIGTOTYX") ); cstep->idx_col.push_back(IDS("COARSIGTOTYY") ); cstep->idx_col.push_back(IDS("COARSIGTOTYZ") );
 cstep->idx_col.push_back(IDS("COARSIGTOTZX") ); cstep->idx_col.push_back(IDS("COARSIGTOTZY") ); cstep->idx_col.push_back(IDS("COARSIGTOTZZ") );
 
-if (actions["multisphere"].set)
+if (actions["multisphere"].set || actions["multisphereflux"].set)
 {
 cstep->idx_col.push_back(IDS("COARNBGP"));
 cstep->idx_col.push_back(IDS("COARORIENTXX") ); cstep->idx_col.push_back(IDS("COARORIENTXY") ); cstep->idx_col.push_back(IDS("COARORIENTXZ") );
@@ -714,18 +714,23 @@ if (type==0 || type==2)
 }  
 
 // 6: compute coase in case of multisphere
-if (actions["multisphere"].set)
+if (actions["multisphere"].set || actions["multisphereflux"].set)
 {
  int kxx=cstep->find_idx(IDS("COARORIENTXX")) ;
  vector <double> & nb_gp=cstep->datas[cstep->find_idx(IDS("COARNBGP"))] ;
  Vector3d Ksegment ; Matrix3d Kmatseg ; 
+ int deb,end ; 
  
  stepatm.multisphere->get_orientations(stepatm) ; 
 
- for (i=1 ; i<=stepatm.multisphere->ngp ; i++) // NB: ngp start counting from 1
+ if (actions["multisphereflux"].set) {deb=0 ; end=stepatm.multisphere->ngp ;}
+ else {deb=1 ; end=stepatm.multisphere->ngp+1 ;}
+ 
+
+ for (i=deb ; i<end ; i++) // NB: ngp start counting from 1 Fuck not always ......
  {
-  if (stepatm.multisphere->data[0][i]!=GP_OK) continue ; // remove periodique, lost, etc.  
-  
+  if (stepatm.multisphere->data[0][i]!=GP_OK) {fflush(stdout) ; continue ;} // remove periodique, lost, etc.  
+
   position(1)=stepatm.multisphere->data[1][i] ; position(2)=stepatm.multisphere->data[2][i] ; position(3)=stepatm.multisphere->data[3][i] ; 
 
   calc_bornes_v0(position(1), position(2), position(3), bornes) ; 
@@ -735,16 +740,15 @@ if (actions["multisphere"].set)
   Ksegment=Ksegment/(Ksegment.norm()) ; 
   Kmatseg=Ksegment*(Ksegment.transpose());
   for (j=0 ; j<9 ; j++)
-    cstep->datas[kxx+j][idxclosest]+=Kmatseg(j/3,j%3) ; 
+    {cstep->datas[kxx+j][idxclosest]+=Kmatseg(j/3,j%3) ; }
   nb_gp[idxclosest]++ ;  
  }
- 
  for (j=0 ; j<nb_boites_tot ; j++)
  {
    if (nb_gp[j]>0)
    {
-     for (k=0 ; k<9 ; k++)
-       cstep->datas[kxx+k][j]/=((double)(nb_gp[j])) ;
+     for (k=0 ; k<9 ; k++) 
+        cstep->datas[kxx+k][j]/=((double)(nb_gp[j])) ;
    }
  }
 }

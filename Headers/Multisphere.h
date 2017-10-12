@@ -13,11 +13,14 @@
 class Multisphere {
 
 public :
-  Multisphere ():initialized(false),ngp(0), currentstepinit(false), currentstep(-1) { for (int i=0; i<7; i++) symetrie[i]=false ; } 
+  Multisphere() ; 
   
   // Functions
   int init(Step & step) ; 
-  int get_orientations(Step &step) ; 
+  int init_flux(Step & step) ; 
+  int get_orientations(Step &step) {if (isflux) get_orientations_flux(step) ; else get_orientations_noflux(step) ;}
+  int get_orientations_noflux(Step &step) ; 
+  int get_orientations_flux (Step & step) ; 
   Matrix3d compute_K (Step &step) ; 
   double compute_dzeta (Step &step) ; 
   void compute_eigen(Step &step) ; 
@@ -29,6 +32,7 @@ public :
   // Variables
   int ngp ;  // Nombre de groupes
   vector < vector <int> > gps ; 
+  vector <int> gps_id ; 
   vector <vector <double> > data ; //Values: flag, centroid x, y, z, orientation x, y, z.
   int type ;
   
@@ -38,7 +42,8 @@ public :
 private:
   vector < Vector > pts, segments ; 
   bool initialized ; 
+  bool isflux ; 
   bool symetrie[7] ; 
-  int currentstep ; bool currentstepinit ;  
+  int currentstep ; bool currentstepinit ; 
 } ;
 #endif

@@ -178,7 +178,7 @@ else 									//Atom dump (chainforce not set)
         std::exit(EXIT_SUCCESS) ; 
 	    }
        if (actions["dump2vtk"].set)
-        { printf("KKKKJOAJ") ; fflush(stdout) ; dump.write_asVTK(actions.dumpnames[0]) ; }
+        { dump.write_asVTK(actions.dumpnames[0]) ; }
        if (actions["coarse-graining"].set)
         {
 	CoarseDump dcor ; LcfDump nulldump ; 
@@ -209,6 +209,12 @@ else 									//Atom dump (chainforce not set)
      	 Filter filtre_tmp ; char filterdo[50] ;
 	 sprintf(filterdo, "id::sort::null;id::fill::null") ;
        	 dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+       }
+       else if (actions["multisphereflux"].set)
+       {
+         Filter filtre_tmp ; char filterdo[50] ;
+         sprintf(filterdo, "id_multisphere::sort::null") ;
+         dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
        }
      
        if (actions["wallchainforce"].set) // Wallchainforce sans chainforce. If faut filtrer le dump de test avec le wallchainforce
@@ -246,6 +252,12 @@ else 									//Atom dump (chainforce not set)
 	    sprintf(filterdo, "id::sort::null;id::fill::null") ;
 	    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
 	  }
+	  if (actions["multisphereflux"].set) 
+          {
+            Filter filtre_tmp ; char filterdo[50] ;
+            sprintf(filterdo, "id_multisphere::sort::null") ;
+            dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+          }
 	  dump.write_asVTK(actions.dumpnames[0]) ;
 	}
        if (actions["dump2restart"].set)
@@ -298,6 +310,12 @@ else 									//Atom dump (chainforce not set)
      	 dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
 	 dump.write_multisphere_dumbell(actions.dumpnames[0]) ; 
        }
+       if (actions["multisphereflux"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set) 
+          {
+            Filter filtre_tmp ; char filterdo[50] ;
+            sprintf(filterdo, "id_multisphere::sort::null") ;
+            dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+          }
        if (actions["justtmp"].set) {} //do nothing
        }
      }
@@ -422,6 +440,7 @@ actions.new_arg ("w/rayon", "ajoute les rayons au dump2vtk", 0, 1, dep) ;
 actions.new_arg ("w/masse", "ajoute les masses au dump2vtk", 0, 1, dep) ;
 args[0]=(char *) "type" ; 
 actions.new_arg ("multisphere", "les particules sont en fait des multispheres... Type: 0=long, 1=flat", 1,args,0) ; // dep va surement sauter bientôt, il n'y a pas de raison d'en rester au dump2vtk...
+actions.new_arg ("multisphereflux", "les particules sont en fait des multispheres, mais avec un flux (constante creation et disparition de groupes)... Type: 0=long, 1=flat", 1,args,0) ; // dep va surement sauter bientôt, il n'y a pas de raison d'en rester au dump2vtk...
 args[0]=(char *) "axes" ; 
 actions.new_arg ("symetriser", "les particules seront symetrisées selon les directions choisies. Ex: 100: symetrie axe x, 101: symetrie x & z", 1, args, 0) ; 
 actions.new_arg ("eigen", "Prend les eigenvalues / eigenvectors des tenseurs. Le writing du tenseur génère alors les eigenvectors (columns), et demander lambda génère les eigenvalues",0,0) ; 
