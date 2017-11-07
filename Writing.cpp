@@ -744,21 +744,21 @@ int Writing::VTKPolyData (ofstream & out, double **datas, int n)
     dtmp=d ; itmp=i ; 
     sendout(ASKINGMULTISPHERE) ; pthread_cond_wait(&sigin, &mutex);
     // Recast le ** double en *<vector <vector <int>>
-    vector < vector <int> > * ptr ; 
+    Multisphere * ptr ; 
     int ngp, ngp_real=0, nnumbers=0 ; int deb, end, delta ; 
-    ptr=(vector < vector <int> > *)(d) ; 
+    ptr=(Multisphere *)(d) ; 
     ngp=*i ;
     if (actions["multisphere"].set) {deb=1 ; end=ngp+1 ; delta=1 ; }
     else {deb=0 ; end=ngp ; delta=0 ; }
-    for (ii=deb ; ii<end ; ii++) if ((*ptr)[ii][0]>0) {ngp_real++ ; nnumbers+=(*ptr)[ii][0]+1 ;}
+    for (ii=deb ; ii<end ; ii++) if (ptr->gps[ii][0]>0 && ptr->data[0][ii]==GP_OK) {ngp_real++ ; nnumbers+=ptr->gps[ii][0]+1 ;}
     out << "LINES " << ngp_real << " "<< nnumbers << "\n" ;
     for (ii=deb ; ii<end ; ii++)
     {
-      if ((*ptr)[ii][0]>0) 
+      if (ptr->gps[ii][0]>0 && ptr->data[0][ii]==GP_OK) 
       {
-        out << (*ptr)[ii][0] << " " ; 
-        for (j=1 ; j<(*ptr)[ii][0]+1 ; j++)
-            out << (*ptr)[ii][j]-delta << " " ;
+        out << ptr->gps[ii][0] << " " ; 
+        for (j=1 ; j<ptr->gps[ii][0]+1 ; j++)
+            out << ptr->gps[ii][j]-delta << " " ;
         out << "\n" ; 
       }
     }

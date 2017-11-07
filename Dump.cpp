@@ -168,7 +168,7 @@ while (stop==false)
       W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;  
     case ASKINGMULTISPHERE : 
       multisphere.prepare_Writing(steps[ts]) ; 
-      W->d=(double **)(&(multisphere.gps)) ; // Trick: je passe un pointeur de vector < vector <int> > comme si c'était un pointeur de pointeur de double 
+      W->d=(double **)(&(multisphere)) ; // Trick: je passe un pointeur class multisphere comme si c'était un pointeur de pointeur de double c'est pas beau mais ça marche :)
       W->i=&(multisphere.ngp) ; W->sendin(OK) ;
       break ; 
     case FINI : stop=true ; W->sendin(OK) ; break ; 
