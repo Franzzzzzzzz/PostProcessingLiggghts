@@ -127,8 +127,13 @@ else if (actions["chainforce"].set)
 	
         if (actions["mean"].set)
           {
-          dcor.mean() ;
+          dcor.mean(0) ;
           dcor.write(actions.dumpnames[0]) ;
+          }
+        else if (actions["meanweighted"].set)
+          {
+            dcor.mean(1) ;
+            dcor.write(actions.dumpnames[0]) ;
           }
         else
           {
@@ -270,6 +275,11 @@ else 									//Atom dump (chainforce not set)
         if (actions["mean"].set)
           { 
 	  dcor.mean() ;
+          dcor.write(actions.dumpnames[0]) ;
+          }
+        else if (actions["meanweighted"].set)
+          {
+          dcor.mean(1) ; 
           dcor.write(actions.dumpnames[0]) ;
           }
         else
@@ -426,6 +436,7 @@ actions.new_arg ("dstminmax", "Calculer la distance minimale et maximale entre a
 args[0]=(char *) "extract_deb" ; args[1]=(char *) "extract_fin" ;
 actions.new_arg ("extract", "n'extraire que les timestep entre arg1 et arg2", 2 ,args, 0) ;
 actions.new_arg ("mean", "ne pas faire de dump par pas de tps mais seulment des moyenne", 0, 0) ;
+actions.new_arg ("meanweighted", "ne pas faire de dump par pas de tps mais seulment des moyenne, pondérées par l'importance (pour CoarseGraining. Pas défini pour le reste pour l'instant)", 0, 0) ;
 args[0]=(char *) "xcyl" ; args[1]=(char *) "zcyl" ; args[2]=(char *) "nbbox_theta" ; args[3]=(char *) "sigma" ;
 actions.new_arg ("wallforce-by-angle", "Pour des interactions ycylindre-grains,calcul les forces en fonction de l'angle. arg1=posx, arg2=posz, arg3=discretisation en angle, arg4=sigma en degré pour moyennage gaussien (si =0 moyenne créneau) ", 4, args, 0) ;
 

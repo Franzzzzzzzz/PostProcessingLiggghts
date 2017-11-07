@@ -489,7 +489,7 @@ int LucDump::write_multisphere_dumbell (string chemin)
      nangular++ ; 
      }
      else
-       printf("!") ; 
+       printf("!1") ; 
      
      for (k=0 ; k<72 ; k++)
      {
@@ -497,9 +497,9 @@ int LucDump::write_multisphere_dumbell (string chemin)
       angular2[k]+=(seg.dot(vect))*(seg.dot(vect)) ;  
      }
      r=Ico.belonging_tri(seg) ;  
-     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!") ;
+     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!2[%g %g %g]", seg(1),seg(2),seg(3)) ;
      r=Ico.belonging_tri(-seg) ; 
-     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!") ;
+     if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!3[%g %g %g]", seg(1),seg(2),seg(3)) ;
     }
   }
   fclose(out) ; 

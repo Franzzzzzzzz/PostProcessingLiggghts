@@ -82,7 +82,8 @@ public :
   int do_coarse (Dump &dump, Dump & dumpatm, int type) ;
   int do_coarse_basic (Dump &dump, string chemin)  ;
   int write(string chemin) ;
-  int mean (void) ;
+  int mean (void) {return mean(0) ; } ;
+  int mean (int meantype) ;
   //void * thread_do_coarse (void * donnees) ;
 
   //Variables

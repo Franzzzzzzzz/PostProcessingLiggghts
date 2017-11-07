@@ -44,12 +44,14 @@ return 1 ;
 }
 
 //-----------------------------------------------
-int CoarseDump::mean(void)
+int CoarseDump::mean(int meantype)
 {
 Step nullstep ; 
-Coarse & tmp = coarse[0] ; int i, j ; 
+Coarse & tmp = coarse[0] ; int i, j, k ; 
 int idx[6] ;
 double ** stdp, **stdt, **stdphi ; 
+vector <int> weight ; 
+vector <vector <double> > total ; 
 
 // Pour calculer la standard deviation en prenant en compte les éventuelles correlations
 stdp=(double**)malloc(sizeof(double*)*tmp.nb_boites_tot) ; 
@@ -62,6 +64,66 @@ if ( !actions["is2D"].set) DISP_Warn("COARSTDTAU n'est calculé que pour sigmaxy
 idx[0]=tmp.cstep->find_idx(IDS("COARSIGTOTXX")) ; idx[1]=tmp.cstep->find_idx(IDS("COARSIGTOTYY")) ; idx[2]=tmp.cstep->find_idx(IDS("COARSIGTOTZZ")) ; 
 idx[3]=tmp.cstep->find_idx(IDS("COARSIGTOTXY")) ; idx[4]=tmp.cstep->find_idx(IDS("COARSIGTOTYX")) ; idx[5]=tmp.cstep->find_idx(IDS("COARPHI")) ; 
 
+if (meantype==1)
+{
+ weight.resize(tmp.cstep->nb_idx, 0) ; 
+ total.resize(tmp.cstep->nb_idx) ; 
+ for (i=0 ; i<tmp.cstep->nb_idx ; i++)
+   total[i].resize(tmp.nb_boites_tot, 0) ; 
+ 
+ for (i=0 ; i<tmp.cstep->nb_idx ; i++)
+ {
+   if (tmp.cstep->idx_col[i]==IDS("ID") || 
+       tmp.cstep->idx_col[i]==IDS("POSX") || tmp.cstep->idx_col[i]==IDS("POSY") || tmp.cstep->idx_col[i]==IDS("POSZ"))
+   { weight[i]=-2 ; for (k=0 ; k<tmp.nb_boites_tot ; k++) total[i][k]=1 ;}
+   else if (tmp.cstep->idx_col[i]==IDS("VX") || tmp.cstep->idx_col[i]==IDS("VY") || tmp.cstep->idx_col[i]==IDS("VZ") ||
+            tmp.cstep->idx_col[i]==IDS("COARPHI") || tmp.cstep->idx_col[i]==IDS("COARRAD") )
+   {
+     weight[i]=tmp.cstep->find_idx(IDS("COARATM")) ; 
+     for (k=0 ; k<tmp.nb_boites_tot ; k++) 
+        {
+          tmp.cstep->datas[i][k]*=tmp.cstep->datas[weight[i]][k] ; 
+          total[i][k] += tmp.cstep->datas[weight[i]][k] ;
+        }
+   }
+   else if (tmp.cstep->idx_col[i]==IDS("COARATM") || tmp.cstep->idx_col[i]==IDS("COARCONTACTS") ||
+            tmp.cstep->idx_col[i]==IDS("COARNBGP")||
+            tmp.cstep->idx_col[i]==IDS("CFBREAKCOUNT") || tmp.cstep->idx_col[i]==IDS("CFFMAX") || tmp.cstep->idx_col[i]==IDS("CFKSPR") || tmp.cstep->idx_col[i]==IDS("CFLSPR")
+           )
+   {
+     weight[i]=-1 ;
+     for (k=0 ; k<tmp.nb_boites_tot ; k++) 
+        total[i][k]+=1 ; 
+   }
+   else if ( tmp.cstep->idx_col[i]==IDS("SIGMAXX") || tmp.cstep->idx_col[i]==IDS("SIGMAXY") || tmp.cstep->idx_col[i]==IDS("SIGMAXZ") ||
+             tmp.cstep->idx_col[i]==IDS("SIGMAYX") || tmp.cstep->idx_col[i]==IDS("SIGMAYY") || tmp.cstep->idx_col[i]==IDS("SIGMAYZ") ||
+             tmp.cstep->idx_col[i]==IDS("SIGMAZX") || tmp.cstep->idx_col[i]==IDS("SIGMAZY") || tmp.cstep->idx_col[i]==IDS("SIGMAZZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGKXX") || tmp.cstep->idx_col[i]==IDS("COARSIGKXY") || tmp.cstep->idx_col[i]==IDS("COARSIGKXZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGKYX") || tmp.cstep->idx_col[i]==IDS("COARSIGKYY") || tmp.cstep->idx_col[i]==IDS("COARSIGKYZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGKZX") || tmp.cstep->idx_col[i]==IDS("COARSIGKZY") || tmp.cstep->idx_col[i]==IDS("COARSIGKZZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGTOTXX") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTXY") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTXZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGTOTYX") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTYY") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTYZ") ||
+             tmp.cstep->idx_col[i]==IDS("COARSIGTOTZX") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTZY") || tmp.cstep->idx_col[i]==IDS("COARSIGTOTZZ") )
+   { weight[i]=tmp.cstep->find_idx(IDS("COARCONTACTS")) ;
+     for (k=0 ; k<tmp.nb_boites_tot ; k++) 
+        {
+          tmp.cstep->datas[i][k] *= tmp.cstep->datas[weight[i]][k] ; 
+          total[i][k] += tmp.cstep->datas[weight[i]][k] ;
+        }
+   }
+   else if (tmp.cstep->idx_col[i]==IDS("COARORIENTXX") || tmp.cstep->idx_col[i]==IDS("COARORIENTXY") || tmp.cstep->idx_col[i]==IDS("COARORIENTXZ") ||
+            tmp.cstep->idx_col[i]==IDS("COARORIENTYX") || tmp.cstep->idx_col[i]==IDS("COARORIENTYY") || tmp.cstep->idx_col[i]==IDS("COARORIENTYZ") ||
+            tmp.cstep->idx_col[i]==IDS("COARORIENTZX") || tmp.cstep->idx_col[i]==IDS("COARORIENTZY") || tmp.cstep->idx_col[i]==IDS("COARORIENTZZ") )
+   { weight[i]=tmp.cstep->find_idx(IDS("COARNBGP")) ;  
+     for (k=0 ; k<tmp.nb_boites_tot ; k++) 
+        {
+          tmp.cstep->datas[i][k] *= tmp.cstep->datas[weight[i]][k] ; 
+          total[i][k] += tmp.cstep->datas[weight[i]][k] ;
+        }
+   }
+ }
+}
+
 for (j=0 ; j<tmp.nb_boites_tot ; j++)
    {
      stdp[j][0]=(coarse[0].cstep->datas[idx[0]][j]+coarse[0].cstep->datas[idx[1]][j])/2. ; 
@@ -71,7 +133,36 @@ for (j=0 ; j<tmp.nb_boites_tot ; j++)
 
 for (i=1 ; i<nbsteps ; i++)
   {
-   tmp=tmp+coarse[i] ; // TODO Not the proper way to do the mean, should balance by the significance ...     
+    if (meantype==0)
+      tmp=tmp+coarse[i] ; // non-weighted mean
+    else
+    {
+     for (j=0 ; j<tmp.cstep->nb_idx ; j++)
+     {
+      if (weight[j]==-2) // These one should not be averaged
+      {
+        for (k=0 ; k<tmp.nb_boites_tot ; k++)
+          total[j][k]=1 ; 
+      }
+      else if (weight[j]==-1) // These one should be averaged just with the # of timestep
+      {
+        for (k=0 ; k<tmp.nb_boites_tot ; k++)
+        {
+          tmp.cstep->datas[j][k] += coarse[i].cstep->datas[j][k] ; 
+          total[j][k]+=1 ; 
+        }
+      }
+      else // Thes one are weighted average
+      {
+        for (k=0 ; k<tmp.nb_boites_tot ; k++) 
+        {
+          tmp.cstep->datas[j][k] += coarse[i].cstep->datas[weight[j]][k]*coarse[i].cstep->datas[j][k] ; 
+          total[j][k] += coarse[i].cstep->datas[weight[j]][k] ;
+        }
+      }
+     }
+    }
+   
    for (j=0 ; j<tmp.nb_boites_tot ; j++)
    {
      stdp[j][i]=(coarse[i].cstep->datas[idx[0]][j]+coarse[i].cstep->datas[idx[1]][j])/2. ; 
@@ -81,13 +172,25 @@ for (i=1 ; i<nbsteps ; i++)
   }
 for (j=0 ; j<tmp.cstep->nb_idx ; j++)
   {
-   if (tmp.cstep->idx_col[j]==IDS("ID") || 
-       tmp.cstep->idx_col[j]==IDS("POSX") || tmp.cstep->idx_col[j]==IDS("POSY") || tmp.cstep->idx_col[j]==IDS("POSZ")) continue;
-   for (i=0 ; i<tmp.nb_boites_tot ; i++) 
+   if (meantype==0)
    {
-    tmp.cstep->datas[j][i]/=nbsteps;
+    if (tmp.cstep->idx_col[j]==IDS("ID") || 
+        tmp.cstep->idx_col[j]==IDS("POSX") || tmp.cstep->idx_col[j]==IDS("POSY") || tmp.cstep->idx_col[j]==IDS("POSZ")) continue;
+    for (i=0 ; i<tmp.nb_boites_tot ; i++) 
+    {
+      tmp.cstep->datas[j][i]/=nbsteps;
+    }
+   }
+   else
+   {
+    for (i=0 ; i<tmp.nb_boites_tot ; i++) 
+    {
+      tmp.cstep->datas[j][i]/=total[j][i];
+    }
    }
   }
+
+printf("Averaged %d steps\n", nbsteps) ; 
 
 tmp.cstep->idx_col.push_back(IDS("COARSTDPRES")) ; tmp.cstep->idx_col.push_back(IDS("COARSTDTAU")) ; tmp.cstep->idx_col.push_back(IDS("COARSTDPHI")) ; 
 tmp.cstep->nb_idx+=3 ; tmp.cstep->datas.resize(tmp.cstep->idx_col.size()) ; 

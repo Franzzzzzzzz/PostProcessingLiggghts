@@ -123,18 +123,22 @@ for (j=1 ; j<=ngp ; j++)
 	idmax=n ; 
       }
     }
-  } 
+  }
   if (type==1) //Flat particles, have to do more
   {
-    Vector crossp ;
+    Vector crossp ; double old=segments[idmax].norm() ; Vector oldseg, oldsegn ; 
     n=0 ; 
     do 
     {
+      oldseg=segments[idmax] ; oldsegn=segments[n] ; 
       crossp=segments[idmax].cross(segments[n]) ;
       n++ ; 
-    } while (crossp.norm() < 0.000001 || crossp.isnan()) ; 
-    crossp=segments[idmax].norm()/crossp.norm()*crossp ;  
+    } while (crossp.norm() < 0.0000001 || crossp.isnan()) ; 
+    crossp=(segments[idmax].norm()/crossp.norm())*crossp ;  
     segments[idmax]=crossp ; 
+    //if (crossp.norm()<0.000001) printf("[%g %g %g %g %g %g %g %g %g %d",old, oldseg(1), oldseg(2), oldseg(3),
+    //  oldsegn(1), oldsegn(2), oldsegn(3), 
+    //  crossp.norm(), segments[idmax].norm(), n) ;
   }
 
  if (symetrie[0])
@@ -153,8 +157,11 @@ for (j=1 ; j<=ngp ; j++)
   else if (type==1)
   {
     //printf("%g %g \n", vsph(1), radius*(floor(log2((gps[j][0]-1)/3.))*2)) ; 
+    //printf("%g ",vsph(1)) ; 
+    //if (vsph(1)<1e-4) {printf("%g %d---", vsph(1), j) ; fflush(stdout); }
     //if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2)) {
-      if (vsph(1)>radius*2.1) {data[0][j]=GP_PBC ; printf("s") ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
+      if (vsph(1)>radius*6.1) {
+      data[0][j]=GP_PBC ; /*printf("s") ;*/ segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
   }        
   data[1][j]=centroid(1) ; 
   data[2][j]=centroid(2) ; 
@@ -221,7 +228,7 @@ for (i=0 ; i<step.nb_atomes ; i++)
   }
 }
 ngp=gps_id.size() ; 
-//printf("[%d]\n", ngp) ;
+printf("[%d]\n", ngp) ;
 
 if (firstinit==true) //WARNING will not work if the max size of particle evolves.
 {
@@ -317,8 +324,9 @@ for (j=0 ; j<ngp ; j++)
   else if (type==1)
   {
     //printf("%g %g \n", vsph(1), radius*(floor(log2((gps[j][0]-1)/3.))*2)) ; 
-    //if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2)) {
-      if (vsph(1)>radius*2.1) {data[0][j]=GP_PBC ; printf("s") ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
+      if (vsph(1)>radius*(floor(log2((gps[j][0]-1)/3.))*2)) {
+     // if (vsph(1)>radius*2.1) {
+        data[0][j]=GP_PBC ; segments[idmax](1)=NAN ; segments[idmax](2)=NAN ; segments[idmax](3)=NAN ;}
   }        
   data[1][j]=centroid(1) ; 
   data[2][j]=centroid(2) ; 
@@ -352,14 +360,14 @@ Matrix3d Multisphere::compute_K (Step &step)
   
   for (int j=1 ; j<=ngp ; j++)
   {
-    if (data[0][j]!=GP_OK) continue ; 
+    if (data[0][j]!=GP_OK) { continue ; }
      Ksegment[0]=data[4][j] ; Ksegment[1]=data[5][j] ; Ksegment[2]=data[6][j] ; 
      //new (&Ksegment) Map<Vector3d>(&(data[4][j])); // THIS IS NOT AN ALLOCATION (no delete) ; 
      Ksegment=Ksegment/(Ksegment.norm()) ; 
      Kmatseg=Ksegment*(Ksegment.transpose());
      K=K+Kmatseg ; Kn++ ; 
   }
-  if (Kn==0) DISP_Err("Kn = 0, problem.") ; 
+  if (Kn==0) {DISP_Err("Kn = 0, problem.") ; printf("%d\n", ngp) ;} 
   K=K/Kn ; 
   return K ;   
 }
@@ -418,12 +426,12 @@ int Multisphere::prepare_Writing (Step & step)
  }
  else
  {
-  for (int i=1 ; i<=ngp ; i++)
+  /*for (int i=1 ; i<=ngp ; i++)
     if (data[0][i] != GP_OK)
     { 
       gps.erase (gps.begin()+i) ; ngp-- ; i-- ; 
       initialized=false ; 
-    }
+    }*/
  }
   return 0 ; 
 }
