@@ -162,6 +162,7 @@ else if (actions["chainforce"].set)
     	 Compresser tmp ;
     	 tmp.compress (cfdump, actions.dumpnames[0], out) ;
      	 }
+     else if (actions["energiebalance"].set) {cfdump.energy(actions.dumpnames[0]+"-NRJ.txt", dump) ; }	 
      else if (actions["justtmp"].set) {} // do nothing	 
      else
         cfdump.write_asVTK (actions.dumpnames[0], dump);
@@ -462,6 +463,7 @@ actions.new_arg ("reechantillonner", "Réécris le dump atomique en modifiant si
 actions.new_arg ("chainforce", "s'occupe des chaines de force. ATTENTION : l'avant dernier argument doit être le dump des positions, le dernier le dump des chaines de forces.", 0, 0) ;
 dep[0]=actions["chainforce"].id ;
 actions.new_arg("donotusecfpos", "ne pas utiliser le cfdump pour reconstruire les positions des particules",0,1,dep) ; 
+actions.new_arg ("energiebalance", "Get the different energy components from a ldump and a lcfdump.\n", 0, 1, dep) ; 
 args[0]=(char *) "slices" ;
 actions.new_arg("forcetank", "force exercée par le tank sur une tranche de grains", 1, args, 1, dep) ; 
 actions.new_arg ("filter", "filtre les données de LDUMP avec l'argument suivant entre guillemets. Chaque opération est séparé par un point-virgule (cf. examples ailleurs TODO)", 0, 0) ;

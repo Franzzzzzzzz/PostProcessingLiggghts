@@ -591,3 +591,64 @@ for (i=0 ; i<lstep.nb_atomes ; i++)
 return 1 ;   
 }
 
+
+//-------------------------------------------------------------------
+map <string, double> Step::LCFenergy (Step &lstep) 
+{
+ int idx[14] ; static bool first=true ; 
+ map <string, double> res ; 
+ double nrj_k=0, nrj_r=0, nrj_kn=0, nrj_ktvirtual=0, nrj_gn=0, nrj_gt=0, nrj_mu=0 ;
+ double nrj_springkn=0, nrj_ktgrain=0 ;  
+
+ idx[0]=lstep.find_idx(IDS("VX")) ; idx[1]=lstep.find_idx(IDS("VY")) ; idx[2]=lstep.find_idx(IDS("VZ")) ; 
+ if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err("Missing velocity value in the ldump\n") ; 
+ idx[3]=lstep.find_idx(IDS("OMEGAX")) ; idx[4]=lstep.find_idx(IDS("OMEGAY")) ; idx[5]=lstep.find_idx(IDS("OMEGAZ")) ; 
+ if (idx[3]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err("Missing angular velocity value in the ldump\n") ;  
+ idx[6]=lstep.find_idx(IDS("MASSE")) ; idx[7]=lstep.find_idx(IDS("RAYON")) ; 
+ 
+ //idx[8]=find_idx(IDS("c_cout[7]")) ;   idx[9]=find_idx(IDS("c_cout[10]"))   ;  // deltas
+ //idx[10]=find_idx(IDS("c_cout[8]")) ;  idx[11]=find_idx(IDS("c_cout[9]")) ; // kn gamman
+ //idx[12]=find_idx(IDS("c_cout[11]")) ;  idx[13]=find_idx(IDS("c_cout[12]")) ; //kt gammat
+ //idx[14]=find_idx(IDS("c_cout[13]"))   ;                                        //mu
+ 
+ /*idx[8]=find_idx(IDS("CFNRJKN")) ;
+ idx[9]=find_idx(IDS("CFNRJGN")) ;
+ idx[10]=find_idx(IDS("CFNRJktgrain")) ;
+ idx[11]=find_idx(IDS("NRJktvirtual")) ;
+ idx[12]=find_idx(IDS("NRJgt")) ;
+ idx[13]=find_idx(IDS("NRJmu")) ;*/
+ 
+ 
+ //for (int i=0 ; i<14 ; i++) if (idx[i]==-1) {DISP_Err("Missing data:") ; printf("%d \n", i) ; fflush(stdout) ; return (res ); } 
+ 
+ if (first) {DISP_Info("Using moment of inertia of a sphere") ; first=false ; }
+ for (int i=0 ; i<lstep.nb_atomes ; i++)
+ {
+  if (std::isnan(lstep.datas[idx[6]][i])) continue ; 
+  nrj_k += 0.5*lstep.datas[idx[6]][i]*(lstep.datas[idx[0]][i]*lstep.datas[idx[0]][i]+lstep.datas[idx[1]][i]*lstep.datas[idx[1]][i]+lstep.datas[idx[2]][i]*lstep.datas[idx[2]][i]) ; 
+  nrj_r += 1/5. * lstep.datas[idx[6]][i] * lstep.datas[idx[7]][i] * lstep.datas[idx[7]][i] * (lstep.datas[idx[3]][i]*lstep.datas[idx[3]][i]+lstep.datas[idx[4]][i]*lstep.datas[idx[4]][i]+lstep.datas[idx[5]][i]*lstep.datas[idx[5]][i]) ;
+ }
+ 
+ 
+ 
+ /*for (int i=0 ; i<nb_atomes+nb_atomes_supp ; i++)
+ {
+  nrj_kn += datas[idx[8]][i] ; 
+  nrj_ktgrain += datas[idx[10]][i] ; 
+  nrj_ktvirtual += datas[idx[11]][i] ; 
+  nrj_gn += datas[idx[9]][i] ; 
+  nrj_gt += datas[idx[12]][i] ; 
+  nrj_mu += datas[idx[13]][i] ; 
+ }*/
+ 
+ res["NRJkinetic"] = nrj_k ;
+ res["NRJrotation"]=nrj_r ;
+ res["NRJkn"]= nrj_kn ; 
+ res["NRJktgrain"]= nrj_ktgrain ;
+ res["NRJktvirtual"]= nrj_ktvirtual ;
+ res["NRJgn"]= nrj_gn ;
+ res["NRJgt"]= nrj_gt ;
+ res["NRJmu"]= nrj_mu ;
+ return res ; 
+}
+

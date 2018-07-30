@@ -180,6 +180,7 @@ public :
   int LCFforce_by_particle_v2 (Step &lstep, int type) ;
   int LCFpressure_by_particle (Step &lstep);
   int LCFforce_by_tank (Step &lstep, double * resultat) ;
+  map <string, double> LCFenergy (Step &lstep) ; 
   
 
   // Variables orientées F

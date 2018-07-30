@@ -433,7 +433,8 @@ int Multisphere::prepare_Writing (Step & step)
       initialized=false ; 
     }*/
  }
-  return 0 ; 
+ data2atomes(step) ; 
+ return 0 ; 
 }
 
 //--------------------------------------------
@@ -459,7 +460,56 @@ int Multisphere::remove_atoms (Step &step)
 }
 
 
+int Multisphere::gp_from_atmid (int id)
+{
+  int deb=isflux?0:1 ; 
+  int end=isflux?ngp:ngp+1 ;
+  for (int i=deb ; i<end ;i++)
+    for (int j=1 ; j<=gps[i][0] ; j++)
+      if (gps[i][j]==id) 
+        return i ;
+  return -1 ; 
+}
 
+//---------------------------------------
+int Multisphere::data2atomes (Step &step)
+{
+ int g, i, j, k ; int idx ;
+ step.idx_col.push_back(IDS("CENTROIDX")) ; 
+ step.idx_col.push_back(IDS("CENTROIDY")) ; 
+ step.idx_col.push_back(IDS("CENTROIDZ")) ; 
+ step.idx_col.push_back(IDS("KX")) ; 
+ step.idx_col.push_back(IDS("KY")) ; 
+ step.idx_col.push_back(IDS("KZ")) ; 
+ step.nb_idx+=6 ; 
+ step.datas.resize(step.nb_idx) ;
+ idx=step.find_idx(IDS("ID")) ; 
+ 
+ for (j=step.nb_idx-6 ; j<step.nb_idx; j++) 
+ {
+   step.datas[j].resize(step.nb_atomes,0) ;  
+ }
+ 
+ for (k=0 ; k<step.nb_atomes ; k++)
+   {
+     g=gp_from_atmid(step.datas[idx][k]) ; 
+     if (g>=0)
+     {
+      step.datas[step.nb_idx-6][k]=data[1][g] ; 
+      step.datas[step.nb_idx-5][k]=data[2][g] ; 
+      step.datas[step.nb_idx-4][k]=data[3][g] ; 
+      step.datas[step.nb_idx-3][k]=data[4][g] ; 
+      step.datas[step.nb_idx-2][k]=data[5][g] ; 
+      step.datas[step.nb_idx-1][k]=data[6][g] ; 
+     }
+     else
+     {
+       step.datas[step.nb_idx-6][k]=step.datas[step.nb_idx-5][k]=step.datas[step.nb_idx-4][k]=0 ; 
+       step.datas[step.nb_idx-3][k]=step.datas[step.nb_idx-2][k]=step.datas[step.nb_idx-1][k]=0 ; 
+     }
+   }
+return 0 ; 
+}
 
 
 

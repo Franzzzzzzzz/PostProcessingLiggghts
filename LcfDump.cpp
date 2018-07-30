@@ -338,6 +338,7 @@ if (actions["grainforce-by-angle"].set && actions["mean"].set)
 	  }
 
 // Boucle sur les ts
+double coordinance=0 ; 
 byangle=actions["grainforce-by-angle"].set ; 
 bytot=actions["grainforce"].set ; 
 byduration=actions["grainforce-duration"].set ; 
@@ -347,6 +348,8 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
 {
   actions.valeur=i ;
   check_timestep(i) ;
+  
+  coordinance+=(steps[i].nb_atomes+steps[i].nb_atomes_supp) ; 
   
   if (byduration)
     for (multimap<int,int>::iterator it=contact_duration.begin(); it!=contact_duration.end(); it++)
@@ -408,6 +411,8 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   }
   
 }
+
+printf("Coordinance = %g\n", coordinance/(double((loop[2]-loop[0])/loop[1]))) ; 
 
 if (bytot) out2.close() ; 
 //out.close() ;
@@ -736,32 +741,28 @@ int LcfDump::forcetank(string chemin, LucDump & ldump)
  return 0 ; 
 }
 
+//---------------------------------------------------------
+int LcfDump::energy(string chemin, LucDump & ldump)
+{
+ long int loop[3] ; map <string, double> res ;
+ FILE * out ; out=fopen(chemin.c_str(), "w") ; 
+ if (out==NULL) {DISP_Err("Cannot open output file\n") ; return 0 ; }
+ loopdat(loop) ;
+ actions.total=(loop[2]-loop[0])/loop[1] ; actions.disp_progress() ;  
 
+ fprintf(out, "ts Ek Er Wkn Wgn dEktgrain dEktvirtual Wgt Wmu \n") ; 
+ for (int i=loop[0] ; i<loop[2] ; i+=loop[1])
+ {
+   actions.valeur=(i-loop[0])/loop[1] ;
+   check_timestep(i) ;
+   res=steps[i].LCFenergy(ldump.steps[i]) ; 
+   fprintf(out, "%d %g %g %g %g %g %g %g %g\n", steps[i].timestep, res["NRJkinetic"], res["NRJrotation"], res["NRJkn"], res["NRJgn"], res["NRJktgrain"], res["NRJktvritual"], res["NRJgt"], res["NRJmu"]) ; 
+ }
 
+ fclose(out) ;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ return 0 ; 
+}
 
 
 

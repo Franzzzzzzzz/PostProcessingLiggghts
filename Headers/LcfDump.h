@@ -12,6 +12,7 @@ public :
   int write_radiuscontact (void) ;
   int coupletot (string chemin, LucDump & ldump) ;
   int forcetank(string chemin, LucDump & ldump) ;
+  int energy(string chemin, LucDump & ldump) ; 
 
 private :
   // Fonctions

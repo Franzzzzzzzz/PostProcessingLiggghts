@@ -726,6 +726,7 @@ if ((type==1 || type==2) && actions["w/kinetic"].set)
  {
  for (j=0 ; j<natomescompt ; j++)
   {
+  if (isnan(stepatm.datas[idxatm[0]][j])) continue ;  
   position(1)=stepatm.datas[idxatm[0]][j] ; position(2)=stepatm.datas[idxatm[1]][j] ; position(3)=stepatm.datas[idxatm[2]][j] ; 
   if (idxatm[6]!=-1) {rayon=stepatm.datas[idxatm[6]][j] ;}
   calc_bornes_v2(position(1), position(2), position(3), rayon, 1, bornes) ; 
@@ -788,6 +789,7 @@ if (type==0 || type==2)
      coeff=Volume[idxclosest] ; 
      fenetre(coeff,xa, xb, sigmafenetre) ; 
      if (isnan(coeff)) DISP_Warn("Coeff a pris une valeur NAN\n") ; 
+     //printf("%g ", r.dot(f)) ; 
      sigma=(r.multiply(f))*coeff*(-1) ;
      addto_sigma (idxclosest, sigma) ;
      if (bool_coarse&1) (*(cfother[0]))[idxclosest]+=step.datas[idx[9]][j]*coeff ; //printf("%g ", (*cfbreak)[idxclosest]) ; 

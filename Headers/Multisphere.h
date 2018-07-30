@@ -28,6 +28,8 @@ public :
   void check() ; 
   int prepare_Writing (Step & step)  ;
   int remove_atoms (Step &step) ; 
+  int data2atomes (Step &step) ; 
+  int gp_from_atmid (int id) ; 
   
   // Variables
   int ngp ;  // Nombre de groupes
