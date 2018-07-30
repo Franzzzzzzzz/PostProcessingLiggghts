@@ -426,7 +426,7 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   check_timestep(i) ;   
   steps[i].xray_projection(dir, width, height, img, box) ;
   
-  sprintf(num, "%04d", (i-loop[0])/loop[1]) ;
+  sprintf(num, "%04ld", (i-loop[0])/loop[1]) ;
 #ifdef USETIFF
   chem=chemin ; chem.append("-") ; chem.append(num) ; chem.append(".tif") ; 
   Writing::TIFF_bw_write(chem, width, height, img) ;
@@ -447,7 +447,8 @@ int LucDump::write_multisphere_dumbell (string chemin)
   
   long int loop[3] ; string chem ; 
   int i, j, k ; FILE *out,*out2 ; 
-  double theta=5, angular[72], angular2[72], nangular, tmptheta ; int tmpidxtheta ; // All these for the icosahedre thing
+  double theta=5, angular[72], angular2[72], tmptheta ; int tmpidxtheta ; // All these for the icosahedre thing
+  int nangular=0 ;
   Vector seg, vect ;
   Matrix3d K ; 
   
@@ -510,7 +511,7 @@ int LucDump::write_multisphere_dumbell (string chemin)
     chem.append("-") ; chem.append("multisphere-2Dorient") ; chem.append(".txt") ; 
     out2=fopen(chem.c_str(), "w") ; 
     //theta=theta*180/M_PI ; 
-    fprintf(out2, "# Informations on the average - loop parameters : %d:%d:%d\n", loop[0],loop[1],loop[2]) ; 
+    fprintf(out2, "# Informations on the average - loop parameters : %ld:%ld:%ld\n", loop[0],loop[1],loop[2]) ; 
     double sumangular2=0 ; 
     for (i=0 ; i<72 ; i++) sumangular2+=angular2[i] ; 
     for (i=0 ; i<72 ; i++) fprintf(out2, "%g %g %g %d\n", i*theta, angular[i]/nangular/(theta), angular2[i]/sumangular2/theta, nangular) ; 
@@ -529,6 +530,27 @@ int LucDump::write_multisphere_dumbell (string chemin)
   
 }
 
+int LucDump::write_Voronoi (string chemin)
+{
+  long int loop[3] ; 
+  loopdat(loop) ;
+  actions.set_progress(loop) ; actions.disp_progress() ; 
+  check_timestep(loop[0]) ;    
+  
+  auto out=fopen((chemin+"-voro.txt").c_str(), "w") ; if (out==NULL) {DISP_Err("Cannot create file\n") ; return 1 ; }
+  
+  for (int i=loop[0] ; i<loop[2] ; i+=loop[1]) 
+  {
+    actions.valeur=i ; 
+    check_timestep(i) ; 
+    
+    double res=steps[i].GetVoronoi() ; 
+    if (res>=0)
+      fprintf(out, "%d %g\n", steps[i].timestep, res) ; 
+  }
+fclose (out) ; 
+return 0 ; 
+}
 
 // =====================================================
 // Fonctions de la classe LcpDump ========================
@@ -760,7 +782,8 @@ return true ;
 int LcpDump::uncompress()
 {
 char chemintempor[500]; string chemintmp ;
-sprintf(chemintempor,"%s.uc",nomoriginal) ;
+DISP_Err("DO NOT USE THIS") ; 
+//sprintf(chemintempor,"%s.uc",nomoriginal) ;
 chemintmp=chemintempor ;
 if (steps[0].Type==TL)
    {cout << "Décompression d'un dump atomique\n" ; write_asDUMP(chemintmp) ; }

@@ -169,167 +169,167 @@ else if (actions["chainforce"].set)
      }
 
 else 									//Atom dump (chainforce not set)
+{     
+/*     if (actions["cp"].set)   // C'est un dump compressé // TODO remove that ... gunzip est bien mieux ...
      {
-     
-     if (actions["cp"].set)   // C'est un dump compressé // TODO remove that ... gunzip est bien mieux ...
-       {
        LcpDump dump ;
        // if (filtre_tmp.lst_op.size()>0) {dump.filtre=filtre_tmp.lst_op ; } 
        dump.dumpinc=fopen(actions.dumpnames[0].c_str(), "rb") ;
        res=dump.open(actions.dumpnames[0]) ;
        dump.disp() ; 
        if (actions["uncompress"].set)
-        {
+       {
         dump.uncompress() ; 
         std::exit(EXIT_SUCCESS) ; 
-	    }
+       }
        if (actions["dump2vtk"].set)
         { dump.write_asVTK(actions.dumpnames[0]) ; }
        if (actions["coarse-graining"].set)
         {
-	CoarseDump dcor ; LcfDump nulldump ; 
-        dcor.do_coarse(dump, nulldump, 1) ; 
-       // dcor.write(chemin) ; 
-        if (actions["mean"].set)
+         CoarseDump dcor ; LcfDump nulldump ; 
+         dcor.do_coarse(dump, nulldump, 1) ; 
+         // dcor.write(chemin) ; 
+         if (actions["mean"].set)
            {
-	   dcor.mean() ;
-           dcor.write(actions.dumpnames[0]) ;
-           }
-         //dcor.write_asMatlab(chemin) ;
-         } 
-       if (actions["surface"].set)
+	       dcor.mean() ;
+         dcor.write(actions.dumpnames[0]) ;
+        }
+        //dcor.write_asMatlab(chemin) ;
+        } 
+        if (actions["surface"].set)
         {
-        Surface surf ; 
-        surf.detect_surface (dump) ; 
+         Surface surf ; 
+         surf.detect_surface (dump) ; 
         surf.write_asmatlab (actions.dumpnames[0])  ; 
         }
        if (actions["justtmp"].set) {} // Do nothing 
        }
 
      else			// C'est un dump décompressé
-       {
-       LucDump dump; LcfDump walldump ;
-       
-       if (actions["multisphere"].set)
-       {
-     	 Filter filtre_tmp ; char filterdo[50] ;
-	 sprintf(filterdo, "id::sort::null;id::fill::null") ;
-       	 dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-       }
-       else if (actions["multisphereflux"].set)
-       {
-         Filter filtre_tmp ; char filterdo[50] ;
-         sprintf(filterdo, "id_multisphere::sort::null") ;
-         dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-       }
-     
-       if (actions["wallchainforce"].set) // Wallchainforce sans chainforce. If faut filtrer le dump de test avec le wallchainforce
-       {
-         Filter filtre_tmp ; char filterdo[50] ;
-         sprintf(filterdo, "null::.wallforceatm.::null") ;
-         dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-         dump.prefiltre[0].wall_dump=&(walldump) ;
-         walldump.open(actions.dumpnames[1]) ;
-       }
-     
-       res=dump.open(actions.dumpnames[0]) ;
-       if (res==-1) {std::exit(EXIT_FAILURE) ; }
-       //dump.disp();
-       //Stats stat ; stat.compute_step(dump, dump.nbsteps-10) ; stat.disp() ;  
-       if (actions["dstminmax"].set) 
-       	   {
-    	   Stats stat ;
-    	   stat.minmaxdst(dump, (int) actions["dstminmax"]["timestep"]) ;
-       	   }
-       if (actions["compress"].set)
-        {
-    	FILE * out ;
-        string temp ; 
-        temp=actions.dumpnames[0]+".cp" ; 
-        out=fopen(temp.c_str(), "wb") ; 
-        Compresser tmp ; 
-        tmp.compress (dump, actions.dumpnames[0], out) ;
-        }
-       if (actions["dump2vtk"].set)
-        {
-	  if (actions["multisphere"].set) 
-	  {
-	    Filter filtre_tmp ; char filterdo[50] ;
-	    sprintf(filterdo, "id::sort::null;id::fill::null") ;
-	    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-	  }
-	  if (actions["multisphereflux"].set) 
-          {
-            Filter filtre_tmp ; char filterdo[50] ;
-            sprintf(filterdo, "id_multisphere::sort::null") ;
-            dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-          }
-	  dump.write_asVTK(actions.dumpnames[0]) ;
-	}
-       if (actions["dump2restart"].set)
-	    {dump.write_asRESTART(actions.dumpnames[0]) ; }
-       if (actions["coarse-graining"].set)
-        {
-	LcfDump nulldump ; 
-	CoarseDump dcor ;
-        dcor.do_coarse(nulldump, dump, 1) ; 
-        if (actions["mean"].set)
-          { 
-	  dcor.mean() ;
-          dcor.write(actions.dumpnames[0]) ;
-          }
-        else if (actions["meanweighted"].set)
-          {
-          dcor.mean(1) ; 
-          dcor.write(actions.dumpnames[0]) ;
-          }
-        else
-          dcor.write(actions.dumpnames[0]) ; 
-         //dcor.write_asMatlab(chemin) ; 
-        }
-       if (actions["coarse-graining-basic"].set)
-        {
-	CoarseDump dcor ;
-        dcor.do_coarse_basic(dump, actions.dumpnames[0]) ;
-        }
-       if (actions["surface"].set || actions["surfaces"].set)
-        {
-        Surface surf ;
-        if (actions["surfaces"].set) {actions.copyarg("surfaces", "surface") ; }
-        surf.detect_surface (dump) ; 
-        surf.write_asmatlab (actions.dumpnames[0])  ; 
-        if (actions["surfaces"].set) surf.write_asmatlab_bottom(actions.dumpnames[0]) ;
-        }
-       if (actions["surface2D"].set)
-               {
-               Surface surf ;
-               surf.detect_surface2D (dump) ;
-               surf.write_asmatlab2D (actions.dumpnames[0])  ;
-               }
-       //if (actions["downsampling"].set)
-       //  dump.write_asDUMP(actions.dumpnames[0]) ;
-       if (actions["w/forcetot"].set)
-	 dump.write_forcestot(actions.dumpnames[0]) ; 
-       if (actions["wallforce-by-angle"].set)
-         dump.write_wallforce(actions.dumpnames[0]) ; 
-       if (actions["xray"].set)
-	 dump.write_xray(actions.dumpnames[0]) ; 
-       if (actions["multisphere"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set)
-       {     
-	 Filter filtre_tmp ; char filterdo[50] ;
-	 sprintf(filterdo, "id::sort::null;id::fill::null") ;
-     	 dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-	 dump.write_multisphere_dumbell(actions.dumpnames[0]) ; 
-       }
-       if (actions["multisphereflux"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set) 
-          {
-            Filter filtre_tmp ; char filterdo[50] ;
-            sprintf(filterdo, "id_multisphere::sort::null") ;
-            dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
-          }
-       if (actions["justtmp"].set) {} //do nothing
-       }
-     }
+       {*/
+  LucDump dump; LcfDump walldump ;
+  
+  if (actions["multisphere"].set)
+  {
+    Filter filtre_tmp ; char filterdo[50] ;
+    sprintf(filterdo, "id::sort::null;id::fill::null") ;
+    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+  }
+  else if (actions["multisphereflux"].set)
+  {
+    Filter filtre_tmp ; char filterdo[50] ;
+    sprintf(filterdo, "id_multisphere::sort::null") ;
+    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+  }
+    
+  if (actions["wallchainforce"].set) // Wallchainforce sans chainforce. If faut filtrer le dump de test avec le wallchainforce
+  {
+    Filter filtre_tmp ; char filterdo[50] ;
+    sprintf(filterdo, "null::.wallforceatm.::null") ;
+    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+    dump.prefiltre[0].wall_dump=&(walldump) ;
+    walldump.open(actions.dumpnames[1]) ;
+  }
+    
+  res=dump.open(actions.dumpnames[0]) ;
+  if (res==-1) {std::exit(EXIT_FAILURE) ; }
+  //dump.disp();
+  //Stats stat ; stat.compute_step(dump, dump.nbsteps-10) ; stat.disp() ;  
+  if (actions["dstminmax"].set) 
+  {
+    Stats stat ;
+    stat.minmaxdst(dump, (int) actions["dstminmax"]["timestep"]) ;
+  }
+  if (actions["compress"].set)
+  {
+    FILE * out ;
+    string temp ; 
+    temp=actions.dumpnames[0]+".cp" ; 
+    out=fopen(temp.c_str(), "wb") ; 
+    Compresser tmp ; 
+    tmp.compress (dump, actions.dumpnames[0], out) ;
+  }
+  if (actions["dump2vtk"].set)
+  {
+    if (actions["multisphere"].set) 
+    {
+      Filter filtre_tmp ; char filterdo[50] ;
+      sprintf(filterdo, "id::sort::null;id::fill::null") ;
+      dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+    }
+    if (actions["multisphereflux"].set) 
+    {
+      Filter filtre_tmp ; char filterdo[50] ;
+      sprintf(filterdo, "id_multisphere::sort::null") ;
+      dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+    }
+    dump.write_asVTK(actions.dumpnames[0]) ;
+  }
+  if (actions["dump2restart"].set)
+    {dump.write_asRESTART(actions.dumpnames[0]) ; }
+  if (actions["coarse-graining"].set)
+  {
+    LcfDump nulldump ; 
+    CoarseDump dcor ;
+    dcor.do_coarse(nulldump, dump, 1) ; 
+    if (actions["mean"].set)
+    { 
+      dcor.mean() ;
+      dcor.write(actions.dumpnames[0]) ;
+    }
+    else if (actions["meanweighted"].set)
+    {
+      dcor.mean(1) ; 
+      dcor.write(actions.dumpnames[0]) ;
+    }
+    else 
+      dcor.write(actions.dumpnames[0]) ; 
+      //dcor.write_asMatlab(chemin) ; 
+  }
+  if (actions["coarse-graining-basic"].set)
+  {
+    CoarseDump dcor ;
+    dcor.do_coarse_basic(dump, actions.dumpnames[0]) ;
+  }
+  if (actions["surface"].set || actions["surfaces"].set)
+  {
+    Surface surf ;
+    if (actions["surfaces"].set) {actions.copyarg("surfaces", "surface") ; }
+    surf.detect_surface (dump) ; 
+    surf.write_asmatlab (actions.dumpnames[0])  ; 
+    if (actions["surfaces"].set) surf.write_asmatlab_bottom(actions.dumpnames[0]) ;
+  }
+  if (actions["surface2D"].set)
+  {
+    Surface surf ;
+    surf.detect_surface2D (dump) ;
+    surf.write_asmatlab2D (actions.dumpnames[0])  ;
+  }
+  //if (actions["downsampling"].set)
+  //  dump.write_asDUMP(actions.dumpnames[0]) ;
+  if (actions["w/forcetot"].set)
+    dump.write_forcestot(actions.dumpnames[0]) ; 
+  if (actions["wallforce-by-angle"].set)
+    dump.write_wallforce(actions.dumpnames[0]) ; 
+  if (actions["xray"].set)
+    dump.write_xray(actions.dumpnames[0]) ; 
+  if (actions["voronoi"].set)
+    dump.write_Voronoi(actions.dumpnames[0]) ;
+  if (actions["multisphere"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set)
+  {     
+    Filter filtre_tmp ; char filterdo[50] ;
+    sprintf(filterdo, "id::sort::null;id::fill::null") ;
+    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+    dump.write_multisphere_dumbell(actions.dumpnames[0]) ; 
+  }
+  if (actions["multisphereflux"].set && !actions["dump2vtk"].set && !actions["coarse-graining"].set) 
+  {
+    Filter filtre_tmp ; char filterdo[50] ;
+    sprintf(filterdo, "id_multisphere::sort::null") ;
+    dump.prefiltre=filtre_tmp.parse_arg(filterdo,TL) ;
+  }
+  if (actions["justtmp"].set) {} //do nothing
+}
 
 actions.write_history(1, argc, argv) ;
 printf("\n") ; // Plus joli à la fin...
@@ -484,6 +484,9 @@ actions.new_arg("grainforce", "répartition angulaire des forces sur un grain", 
 dep[1]=actions["grainforce"].id ; 
 actions.new_arg("grainforce-duration", "histogramme des durées de contact", 0, 2, dep) ;
 
+args[0]=(char *) "id" ; 
+actions.new_arg("voronoi", "Get the voronoi volume around a grain", 1, args, 0) ; 
+
 actions.new_arg("grain-rayon-around", "répartition des rayons autour d'un grain", 1, args, 1, dep) ;
 dep[0]=actions["coarse-graining"].id ; 
 actions.new_arg("is2D", "indique qu'il s'agit d'un coarse 2D", 0, 0) ;
@@ -537,7 +540,7 @@ while (v<99)
      {
      v=(actions.valeur-actions.loop[0])/((double)(actions.loop[2]-actions.loop[0]))*100. ; 
      if (actions.valeur > actions.loop[2]+actions.loop[1] ) {DISP_Warn ("Boucle de progression incohérente") ;}
-     if (actions.valeur < actions.loop[0]-actions.loop[1] ) {printf("%g %d %d %d\n", actions.valeur, actions.loop[0], actions.loop[1], actions.loop[2]); DISP_Warn ("Boucle de progression incohérente") ; v=0 ;}
+     if (actions.valeur < actions.loop[0]-actions.loop[1] ) {printf("%g %ld %ld %ld\n", actions.valeur, actions.loop[0], actions.loop[1], actions.loop[2]); DISP_Warn ("Boucle de progression incohérente") ; v=0 ;}
      } 
     else
      v=actions.valeur/actions.total*100. ;  

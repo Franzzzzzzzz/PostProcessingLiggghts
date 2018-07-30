@@ -25,6 +25,7 @@ public :
   int write_wallforce (string chemin) ;
   int write_xray (string chemin) ; 
   int write_multisphere_dumbell(string chemin) ; 
+  int write_Voronoi (string chemin) ;
 
 private :
   // Fonctions

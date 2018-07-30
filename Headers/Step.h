@@ -169,6 +169,7 @@ public :
   int wall_force(ofstream & out, double ** meanforces, int * meangrains) ;
   double gravite (int atm) ; 
   int xray_projection (int dir, int w, int h, double **img, double * box) ; 
+  double GetVoronoi() ; 
   Multisphere * multisphere ; 
   
   // Fonctions orientées CF

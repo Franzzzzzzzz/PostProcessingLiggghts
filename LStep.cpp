@@ -250,7 +250,7 @@ for (i=0 ; i<boites ; i++)
 idx[0]=find_idx(IDS("FORCEWALLX")) ; idx[1]=find_idx(IDS("FORCEWALLY")) ; idx[2]=find_idx(IDS("FORCEWALLZ")) ;
 idx[3]=find_idx(IDS("POSX")) ; idx[4]=find_idx(IDS("POSY")) ; idx[5]=find_idx(IDS("POSZ")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1||idx[3]==-1||idx[4]==-1||idx[5]==-1)
-   {printf("%d %d %d %d %d ||", idx[0], idx[1], idx[2], idx[3], idx[4], idx[5] ) ;  
+   {printf("%d %d %d %d %d %d||", idx[0], idx[1], idx[2], idx[3], idx[4], idx[5] ) ;  
      DISP_Err("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump") ; return 1 ; }
 
 if (actions["wallforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau") ; info=false ; } } // Fenêtre créneau
@@ -359,6 +359,76 @@ for (j=0 ; j<w ; j++) for (k=0 ; k<h ; k++)
   img[j][k]=exp(-2*img[j][k]) ;
 }
 return 0 ; 
+}
+
+//---------------------------------------------------------
+double Step::GetVoronoi()
+{
+#ifndef VORONOI
+DISP_Err("Program not compiled with voronoi support, no result computed.\n") ; 
+return 0 ; 
+#else
+
+int id = actions["voronoi"]["id"] ; 
+int i ; 
+vector <int> idx ; 
+
+idx.push_back(find_idx(IDS("ID"))) ;
+idx.push_back(find_idx(IDS("POSX"))) ;
+idx.push_back(find_idx(IDS("POSY"))) ;
+idx.push_back(find_idx(IDS("POSZ"))) ;
+idx.push_back(find_idx(IDS("RAYON"))) ;
+
+for (auto v:idx) if (v==-1) DISP_Warn("WARN: one of the expected index was not found in Step::GetVoronoi()\n") ; 
+
+for (i=0 ; i<nb_atomes ; i++)
+    if (datas[idx[0]][i]==id) 
+        break ; 
+
+id=i ; // Use the data index instead of the particle id to identify the particle
+double radius=datas[idx[4]][id] ;
+double x=datas[idx[1]][id], y=datas[idx[2]][id], z=datas[idx[3]][id] ; 
+double zmin, zmax ; 
+if (actions["is2D"].set)
+{
+    if (x-2*radius<box[0][0] || x+2*radius>box[0][1] || y-2*radius<box[1][0] || y+2*radius>box[1][1])
+        return -1 ; // Too close to a boundary ...
+    zmin=-0.5 ; 
+    zmax= 0.5 ; 
+}
+else
+{
+    if (x-2*radius<box[0][0] || x+2*radius>box[0][1] || y-2*radius<box[1][0] || y+2*radius>box[1][1] || z-2*radius<box[0][0] || z+2*radius>box[0][1])
+        return -1 ; // Too close to a boundary ...
+    zmin=z-5*radius ; 
+    zmax=z+5*radius ; 
+    
+}
+
+voro::container_poly cont(x-5*radius,x+5*radius,y-5*radius,y+5*radius, zmin, zmax,3,3,3,false,false,false,8);
+
+for (int i=0,n=0 ; i<nb_atomes ; i++,n++)
+{
+    double dst=(x-datas[idx[1]][i])*(x-datas[idx[1]][i])+(y-datas[idx[2]][i])*(y-datas[idx[2]][i])+(z-datas[idx[3]][i])*(z-datas[idx[3]][i]) ; 
+    if (dst<3*3*radius*radius)
+    {
+        cont.put(n,datas[idx[1]][i],datas[idx[2]][i],datas[idx[3]][i],datas[idx[4]][i]);
+    }
+}
+
+voro::c_loop_all lp(cont); 
+bool test ; 
+for (lp.start(), test=true ; test ; test=lp.inc())
+{
+ if (lp.x()==x && lp.y()==y && lp.z()==z)
+ {
+     voro::voronoicell a ; 
+     cont.compute_cell(a,lp) ;
+     return (a.volume()) ; 
+ }  
+}
+return -2 ; 
+#endif
 }
 
 

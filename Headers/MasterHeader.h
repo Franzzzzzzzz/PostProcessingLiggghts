@@ -41,6 +41,10 @@
 #include "Eigen/Eigenvalues"
 #include "Eigen/Unsupported/KroneckerProduct"
 
+#ifdef VORONOI
+#include "voro++.hh"
+#endif
+
 using namespace std ; 
 using namespace Eigen ;
 

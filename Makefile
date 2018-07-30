@@ -21,10 +21,14 @@ all: LDFLAGS=
 all: LIBS=-lstdc++ -lm -lpthread -lz
 all: info $(SOURCES) $(EXECUTABLE)
 
+voronoi: CFLAGS=-c -O3 -DVORONOI -I./Headers -I./voro++-0.4.6/src
+voronoi: LDFLAGS=-L./voro++-0.4.6/src
+voronoi: LIBS=-lstdc++ -lm -lpthread -lz -lvoro++
+voronoi: $(SOURCES) $(EXECUTABLE)
 
-advanced: CFLAGS=-c -O3 -DMATLAB -DBOOST -DUSETIFF -I./Headers -I/opt/local/include -I/Applications/MATLAB_R2015b.app/extern/include
-advanced: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2015b.app/bin/maci64
-advanced: LIBS=-lstdc++ -lm -lpthread -lmat -lmx -lz -ltiff
+advanced: CFLAGS=-c -O3 -DVORONOI -DMATLAB -DBOOST -DUSETIFF -I./Headers -I./voro++-0.4.6/src -I/opt/local/include -I/Applications/MATLAB_R2015b.app/extern/include
+advanced: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2015b.app/bin/maci64 -L./voro++-0.4.6/src
+advanced: LIBS=-lstdc++ -lm -lpthread -lmat -lmx -lz -ltiff -lvoro++
 advanced: $(SOURCES) $(EXECUTABLE)
 
 debug: CFLAGS=-c -g -DMATLAB -DBOOST -DUSETIFF -I./Headers -I/opt/local/include -I/Applications/MATLAB_R2015b.app/extern/include
