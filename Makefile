@@ -1,4 +1,5 @@
-CC=g++
+#CC=g++
+CC=/opt/local/bin/g++-mp-6
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include

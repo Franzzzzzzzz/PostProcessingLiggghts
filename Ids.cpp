@@ -21,6 +21,7 @@ idname[26]="FORCEWALLX" ; idname[27]="FORCEWALLY" ; idname[28]="FORCEWALLZ" ;
 idname[29]="ATMPRESSURE" ; idname[30]="IDMULTISPHERE" ;
 idname[31]="KX" ; idname[32]="KY" ; idname[33]="KZ" ; 
 idname[34]="CENTROIDX" ; idname[35]="CENTROIDY" ; idname[36]="CENTROIDZ" ;
+idname[37]="QUATERNION1" ; idname[38]="QUATERNION2" ; idname[39]="QUATERNION3" ; idname[40]="QUATERNION4" ; 
 
 //idname[63]="CELLDATAMIN" ;
 idname[64]="CFID1" ; idname[65]="CFID2" ;
@@ -69,7 +70,8 @@ idalias[14].push_back("omegax") ; idalias[15].push_back("omegay") ; idalias[16].
 idalias[17].push_back("sigmaxx") ; idalias[18].push_back("sigmaxy") ; idalias[19].push_back("sigmaxz") ; 
 idalias[20].push_back("sigmayx") ; idalias[21].push_back("sigmayy") ; idalias[22].push_back("sigmayz") ; 
 idalias[23].push_back("sigmazx") ; idalias[24].push_back("sigmazy") ; idalias[25].push_back("sigmazz") ; 
-idalias[29].push_back("atmpressure") ; idalias[30].push_back("id_multisphere") ; idalias[30].push_back("idmultisphere") ; idalias[30].push_back("multisphere") ; 
+idalias[29].push_back("atmpressure") ; 
+idalias[30].push_back("id_multisphere") ; idalias[30].push_back("idmultisphere") ; idalias[30].push_back("multisphere") ; idalias[30].push_back("group") ; 
 idalias[31].push_back("kx") ; idalias[32].push_back("ky") ; idalias[33].push_back("kz") ; 
 idalias[34].push_back("centroidx") ; idalias[35].push_back("centroidy") ; idalias[36].push_back("centroidz") ;
 idalias[17].push_back("sigxx") ; idalias[18].push_back("sigxy") ; idalias[19].push_back("sigxz") ; 
@@ -79,7 +81,7 @@ idalias[26].push_back("forcewallx") ; idalias[27].push_back("forcewally") ; idal
 idalias[26].push_back("f_force_cyl[1]") ; idalias[27].push_back("f_force_cyl[2]") ; idalias[28].push_back("f_force_cyl[3]") ; 
 idalias[26].push_back("f_contactforces_cyl[2]") ; idalias[27].push_back("f_contactforces_cyl[3]") ; idalias[28].push_back("f_contactforces_cyl[4]") ; 
 idalias[1].push_back("f_contactforces_cyl[1]") ; 
-
+idalias[37].push_back("quat1") ; idalias[38].push_back("quat2") ; idalias[39].push_back("quat3") ; idalias[40].push_back("quat4") ; 
 
 idalias[64].push_back("cfid1") ; idalias[65].push_back("cfid2") ; 
 idalias[66].push_back("cfforcex") ; idalias[67].push_back("cfforcey") ; idalias[68].push_back("cfforcez") ; 

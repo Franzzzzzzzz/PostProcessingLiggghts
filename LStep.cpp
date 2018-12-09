@@ -369,7 +369,7 @@ DISP_Err("Program not compiled with voronoi support, no result computed.\n") ;
 return 0 ; 
 #else
 
-int id = actions["voronoi"]["id"] ; 
+int id = int(actions["voronoi"]["id"]) ; 
 int i ; 
 vector <int> idx ; 
 
@@ -385,13 +385,15 @@ for (i=0 ; i<nb_atomes ; i++)
     if (datas[idx[0]][i]==id) 
         break ; 
 
-id=i ; // Use the data index instead of the particle id to identify the particle
+id=i ; // Use the data index instead of the particle id to identify the particle 
 double radius=datas[idx[4]][id] ;
+double rd = actions.Cst["Radius"] ; 
 double x=datas[idx[1]][id], y=datas[idx[2]][id], z=datas[idx[3]][id] ; 
 double zmin, zmax ; 
+
 if (actions["is2D"].set)
 {
-    if (x-2*radius<box[0][0] || x+2*radius>box[0][1] || y-2*radius<box[1][0] || y+2*radius>box[1][1])
+    if (x-radius-2*rd<box[0][0] || x+radius+2*rd>box[0][1] || y-radius-2*rd<box[1][0] || y+radius+2*rd>box[1][1])
         return -1 ; // Too close to a boundary ...
     zmin=-0.5 ; 
     zmax= 0.5 ; 
@@ -464,5 +466,3 @@ if (idx[0]!=-1 && idx[1]!=-1 && idx[2]!=-1)
 
 return 1 ;
 }
-
-

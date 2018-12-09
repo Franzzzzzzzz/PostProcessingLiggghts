@@ -5,6 +5,15 @@
 class Calcul ; 
 
 //=================================================================
+/*class Quaternions {
+public:
+  Quaternion() {a[0]=a[1]=a[2]=a[3]=0 ; }
+  Quaternion(double i, double j, double k, double l) {a[0]=i ; a[1]=j ; a[2]=k ; a[3]=l; }
+  double & operator[] (int i) {return a[i] ; }
+  void set (double i, double j, double k, double l) {a[0]=i ; a[1]=j ; a[2]=k ; a[3]=l; }
+private: 
+  double a[4] ; 
+} ; */
 class Vector ;
 class Matrix3x3 {
 public :

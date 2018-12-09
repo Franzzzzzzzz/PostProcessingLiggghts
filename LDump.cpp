@@ -529,7 +529,7 @@ int LucDump::write_multisphere_dumbell (string chemin)
   }
   
 }
-
+//------------------------------------------------------
 int LucDump::write_Voronoi (string chemin)
 {
   long int loop[3] ; 
@@ -538,7 +538,7 @@ int LucDump::write_Voronoi (string chemin)
   check_timestep(loop[0]) ;    
   
   auto out=fopen((chemin+"-voro.txt").c_str(), "w") ; if (out==NULL) {DISP_Err("Cannot create file\n") ; return 1 ; }
-  
+
   for (int i=loop[0] ; i<loop[2] ; i+=loop[1]) 
   {
     actions.valeur=i ; 
@@ -551,6 +551,7 @@ int LucDump::write_Voronoi (string chemin)
 fclose (out) ; 
 return 0 ; 
 }
+
 
 // =====================================================
 // Fonctions de la classe LcpDump ========================

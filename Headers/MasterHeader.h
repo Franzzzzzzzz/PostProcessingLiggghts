@@ -40,6 +40,7 @@
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
 #include "Eigen/Unsupported/KroneckerProduct"
+#include "Eigen/Geometry"
 
 #ifdef VORONOI
 #include "voro++.hh"
