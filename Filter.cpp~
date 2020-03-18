@@ -1,0 +1,785 @@
+#include "Headers/Filter.h"
+
+Filter::Filter() 
+{
+// Liste des opérations à ajouter pour initialiser les filtres
+add_operation ("null",&Filter::do_nothing) ; 
+add_operation ("<", &Filter::op_compare) ; 
+add_operation (">", &Filter::op_compare) ; 
+add_operation ("<=", &Filter::op_compare) ; 
+add_operation (">=", &Filter::op_compare) ;
+add_operation ("=", &Filter::op_compare) ;
+add_operation ("!=", &Filter::op_compare) ;
+add_operation ("::+::", &Filter::op_operation) ;
+add_operation ("::-::", &Filter::op_operation) ;
+add_operation ("::/::", &Filter::op_operation) ;
+add_operation ("::*::", &Filter::op_operation) ;
+add_operation ("::pbc::", &Filter::swappbc) ;
+add_operation ("::changeref::", &Filter::translate_ref) ;
+add_operation ("::sort::", &Filter::quicksort_base) ; 
+add_operation ("::zrotate::", &Filter::zrotate) ; 
+add_operation ("::quartx+y+::", &Filter::moveto_xplusyplus) ;
+add_operation ("::%sup::", &Filter::pourcentage) ; 
+add_operation ("::%inf::", &Filter::pourcentage) ; 
+add_operation ("::.cfpp.::", &Filter::cf_postproc) ;
+add_operation ("::.cpplink.::", &Filter::copypartiallink) ;
+add_operation ("::.nopbc.::", &Filter::no_periodic_chain) ;
+}
+
+//============================================
+int Filter::add_operation (const char nom[], pf fonction)
+{string tmp ; tmp=nom ; Operations.insert ( pair <string,pf> (tmp,fonction) ); return 1 ; }
+
+//=============================================
+vector <struct Op> Filter::parse_arg (char arg[]) 
+{
+int nb_item, i, j ;
+char tmp_commande[500] ; 
+vector <struct Op> retour ; 
+j=0 ; nb_item=0 ; 
+for (i=0 ; i<2000 ; i++)
+  {
+  if (arg[i]==';' || arg[i]=='"' || arg[i]==0) 
+    {
+    nb_item++ ; 
+    tmp_commande[j]=0 ;
+    retour.push_back(parse_operation(tmp_commande, j)) ;
+    j=0 ; 
+    }
+  else
+    {
+    tmp_commande[j]=arg[i] ; 
+    j++ ; 
+    }
+  if (arg[i]==0) break ; 
+  }
+return retour ; 
+}
+//--------------------------------
+struct Op Filter::parse_operation (char com[500], int length)
+{
+int i, j=0, change=0 ; unsigned char type ;
+struct Op op_tmp ;
+char id[100], op[100], valeur[100] ;
+
+for (i=0 ; i<length ; i++)
+  {
+  if (com[i]=='<' || com[i]=='>' || com[i]=='=' || com[i]=='!')
+     {
+     if (change!=4) {change=4 ; id[j]=0 ; j=0 ;}
+     } 
+  else
+     {
+     if (change==4)
+        {change++ ; op[j]=0 ; j=0 ; } 
+     if (com[i]==':')
+       change++ ; 
+     if (change==1) {id[j]=0 ; j=0 ;}
+     }
+
+  switch (change)
+    {
+    case 0     : id[j]=com[i] ; break ;
+    case 1 ... 4 : op[j]=com[i] ; break ;
+    case 5     : valeur[j]=com[i] ; break ; 
+    }
+  j++ ; 
+  }
+valeur[j]=0 ; 
+
+// Atoms indexes
+if (!strcmp(id,"id"))          op_tmp.idx1=ID ;
+else if (!strcmp(id,"x"))      op_tmp.idx1=POSX ;
+else if (!strcmp(id,"y"))      op_tmp.idx1=POSY ;
+else if (!strcmp(id,"z"))      op_tmp.idx1=POSZ ;
+else if (!strcmp(id,"vx"))     op_tmp.idx1=VX ;
+else if (!strcmp(id,"vy"))     op_tmp.idx1=VY ;
+else if (!strcmp(id,"vz"))     op_tmp.idx1=VZ ;
+else if (!strcmp(id,"type"))   op_tmp.idx1=TYPE ;
+else if (!strcmp(id,"radius")) op_tmp.idx1=RAYON ;
+// Chainforce indexes
+else if (!strcmp(id,"periodicity")) op_tmp.idx1=CFPERIOD ;
+else if (!strcmp(id,"cfmag"))  op_tmp.idx1=CFMAG ; 
+else if (!strcmp(id,"cfr"))  op_tmp.idx1=CFR ; 
+else if (!strcmp(id,"cftheta"))  op_tmp.idx1=CFTHETA ; 
+else if (!strcmp(id,"cfphi"))  op_tmp.idx1=CFPHI ; 
+// Stress indexes
+else if (!strcmp(id,"centrex")) op_tmp.idx1=CENTREX ;
+else if (!strcmp(id,"centrey")) op_tmp.idx1=CENTREY ;
+else if (!strcmp(id,"centrez")) op_tmp.idx1=CENTREZ ;
+else if (!strcmp(id,"normalex")) op_tmp.idx1=NORMALEX ;
+else if (!strcmp(id,"normaley")) op_tmp.idx1=NORMALEY ;
+else if (!strcmp(id,"normalez")) op_tmp.idx1=NORMALEZ ;
+// Other
+else if (!strcmp(id,"null"))   op_tmp.idx1=UNKNOWN ; 
+else {cerr << "WARN2 : le type de données " << id <<" est inconnu pour le filtre\n" ; op_tmp.idx1=UNKNOWN ; }
+
+op_tmp.idx2=UNKNOWN ; 
+if ((valeur[0]>65 && valeur[0]<90) || (valeur[0]>97 && valeur[0]<122))
+  {
+  type=1 ; 
+  if (!strcmp(valeur,"id"))          op_tmp.idx2=ID ;
+  else if (!strcmp(valeur,"x"))      op_tmp.idx2=POSX ;
+  else if (!strcmp(valeur,"y"))      op_tmp.idx2=POSY ;
+  else if (!strcmp(valeur,"z"))      op_tmp.idx2=POSZ ;
+  else if (!strcmp(valeur,"vx"))     op_tmp.idx2=VX ;
+  else if (!strcmp(valeur,"vy"))     op_tmp.idx2=VY ; 
+  else if (!strcmp(valeur,"vz"))     op_tmp.idx2=VZ ;
+  else if (!strcmp(valeur,"type"))   op_tmp.idx2=TYPE ;
+  else if (!strcmp(valeur,"radius")) op_tmp.idx2=RAYON ;
+  else if (!strcmp(valeur,"null"))   {op_tmp.idx2=UNKNOWN ; type=0 ;}
+  else {cerr << "WARN2 : le type de données " << valeur <<" est inconnu pour le filtre\n" ; op_tmp.idx2=UNKNOWN ; }
+  }
+else
+  {
+  type=0 ; 
+  sscanf(valeur,"%lf",&op_tmp.valeur) ; 
+  }
+
+if (type==0)
+  {
+  if (Operations.count(op)>0) op_tmp.operation=op ; 
+  else {cerr << "WARN2 : le type d'operation" << op <<"est inconnu pour le filtre\n" ; } 
+  }
+else if (type==1)
+  {
+  if (Operations.count(op)>0) op_tmp.operation=op ; 
+  else {cerr << "WARN2 : le type d'operation" << op <<"est inconnu pour le filtre\n" ; }
+  }
+op_tmp.type=type ; 
+return op_tmp ;
+}
+//----------------------------------------------------
+void Filter::disp (vector <struct Op> lst_op)
+{
+unsigned int i ;
+for (i=0 ; i<lst_op.size() ; i++)
+  {
+  cout << "Operation ["<< lst_op[i].operation << "] sur [" << lst_op[i].idx1 << "] par [" << lst_op[i].idx2 << "] ou ["<< lst_op[i].valeur<<"]\n" ;  
+  }
+}
+
+//----------------------------------------------------
+int Filter::do_filter (Step &step, vector <struct Op> lst_op)
+{
+  unsigned int i ;
+  int retour ; 
+
+  for (i=0 ; i<lst_op.size() ; i++)
+  {
+  // Execution de la commande nécessaire
+  retour = (this->*(Operations[lst_op[i].operation]))(step, lst_op[i]) ; 
+  }
+return 1 ;
+}
+//=======================================================
+int Filter::swappbc (Step &step, struct Op op)
+{
+int i, idx ;
+
+idx=step.find_idx(op.idx1) ;
+for (i=0 ; i<step.nb_atomes; i++)
+    {
+	if (step.datas[idx][i]>op.valeur)
+		step.datas[idx][i]-=2*op.valeur ;
+	else if (step.datas[idx][i]<-op.valeur)
+		step.datas[idx][i]+=2*op.valeur ;
+    }
+return 1 ;
+}
+//-------------------------------------------------------
+int Filter::translate_ref (Step &step, struct Op op)
+{
+double pos[3] ;
+int idx[4] ;
+int i ; bool ok=false ;
+
+idx[0]=step.find_idx(POSX) ;
+idx[1]=step.find_idx(POSY) ;
+idx[2]=step.find_idx(POSZ) ;
+idx[3]=step.find_idx(op.idx1) ;
+for (i=0 ; i<step.nb_atomes ; i++)
+ {
+ if (step.datas[idx[3]][i]==op.valeur)
+    {
+	ok=true ;
+	pos[0]=step.datas[idx[0]][i] ;
+	pos[1]=step.datas[idx[1]][i] ;
+	pos[2]=step.datas[idx[2]][i] ;
+	break ;
+    }
+ }
+
+if (ok==false)
+ {
+ DISP_Warn("Erreur : impossible d'effectuer la translation de referentiel")  ;
+ return 0 ;
+ }
+//printf("%f %f %f|", pos[0], pos[1], pos[2]) ;
+
+for (i=0 ; i<step.nb_atomes ; i++)
+ {
+ step.datas[idx[0]][i]-=pos[0] ;
+ step.datas[idx[1]][i]-=pos[1] ;
+ step.datas[idx[2]][i]-=pos[2] ;
+ }
+return 1 ;
+}
+//-------------------------------------------------------
+int Filter::op_operation (Step &step, struct Op op)
+{
+int idx, i ;
+idx=step.find_idx(op.idx1) ;
+for (i=0 ; i<step.nb_atomes ; i++)
+    {
+    if (op.operation=="::+::") {step.datas[idx][i]+=op.valeur ; }
+    if (op.operation=="::-::") {step.datas[idx][i]-=op.valeur ; }
+    if (op.operation=="::/::") {step.datas[idx][i]/=op.valeur ; }
+    if (op.operation=="::*::") {step.datas[idx][i]*=op.valeur ; }
+    }
+return 1;
+}
+//-------------------------------------------------------
+int Filter::zrotate (Step &step, struct Op op)
+{
+int i;
+int idx[3] ; 
+Matrix3x3 rot ; Vector pt1, axe ; 
+
+//if (step.Type != TF) { cout << "ERR : le filtre ::zrotate:: ne peut être appliqué qu'au FDump\n" ; return -1 ; }
+axe(1)=axe(2)= 0.0 ; axe(3)=1.0 ; 
+rot=Geometrie::get_rot_matrix(op.valeur, axe) ; 
+// Pour les type F
+if (step.Type==TF)
+ {
+ for (i=0 ; i<step.nb_pts ; i++)
+   step.atm_rotate(rot, i+step.nb_pts) ;
+ for(i=0 ; i<step.nb_triangles ; i++)
+   step.atm_rotate(rot, i) ;
+ }
+else
+ {
+ for(i=0 ; i<step.nb_atomes ; i++)
+    step.atm_rotate(rot, i) ;
+ }
+
+return 1 ;
+}
+
+//----------------------------------------------------
+int Filter::op_compare (Step &step, struct Op op)
+{
+int i,j=0 ; 
+int idx, idx2 ; 
+if (op.idx1>=128 && op.idx1<192) step.nb_atomes=step.nb_triangles ;
+if (op.type==0)
+  {
+  idx=step.find_idx(op.idx1) ; 
+  for (i=0 ; i<step.nb_atomes-j ; i++)
+    {
+    if (op.operation=="<") {if (step.datas[idx][i]>=op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
+    if (op.operation==">") {if (step.datas[idx][i]<=op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation=="<="){if (step.datas[idx][i]>op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation==">="){if (step.datas[idx][i]<op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation=="=") {if (step.datas[idx][i]!=op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
+    if (op.operation =="!="){if (step.datas[idx][i]==op.valeur) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
+    }
+  }
+
+else if (op.type==1)
+  { 
+  idx=step.find_idx(op.idx1) ; idx2=step.find_idx(op.idx2) ;
+  for (i=0 ; i<step.nb_atomes-j ; i++)
+    {
+    if (op.operation=="<") {if (step.datas[idx][i]>=step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
+    if (op.operation==">") {if (step.datas[idx][i]<=step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation=="<=") {if (step.datas[idx][i]> step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation==">=") {if (step.datas[idx][i]< step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation=="=") {if (step.datas[idx][i]!=step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }} 
+    if (op.operation=="!=") {if (step.datas[idx][i]==step.datas[idx2][i]) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
+    }
+  }
+else
+  {
+  cout << "ERR : le nom de l'opération à effectuer n'est pas correct\n" ;
+  }
+
+if (j>0)
+   {
+   step.del_end_atms(j) ; 
+   step.nb_atomes-=j ; 
+   if (op.idx1>=128 && op.idx1<192) step.nb_triangles=step.nb_atomes ;
+   }
+return 1 ;
+}
+//=====================================================
+
+void Filter::echanger (vector< vector<double> > &tableau, int idx1, int idx2, int nbidx)
+{
+int i ; double tmp ; 
+
+for (i=0 ; i<nbidx ; i++)
+ {
+ tmp=tableau[i][idx1] ; 
+ tableau[i][idx1]=tableau[i][idx2] ; 
+ tableau[i][idx2]=tmp ;
+ }
+}
+
+//-----------------------------------
+int Filter::partitionner (vector< vector<double> > &tableau, int premier, int dernier, int pivot, int idx, int nbidx)
+{
+ int i, j;
+ 
+ j=premier ; 
+ echanger (tableau, pivot, dernier, nbidx) ; 
+ for (i=premier ; i<dernier ; i++)
+ {
+  if (tableau[idx][i]<=tableau[idx][dernier])
+  {
+    echanger(tableau, i, j, nbidx) ; 
+    j++ ;
+  }
+ }
+ echanger (tableau, j, dernier, nbidx) ; 
+ return j ;
+}
+
+//------------------------------------
+int Filter::quicksort_base (Step & step, struct Op op)
+{
+int tmp_idx1 ; tmp_idx1=step.find_idx(op.idx1) ; 
+int maxrecurse ; 
+maxrecurse=ceil(log2(step.nb_atomes))*10 ;
+quicksort (step.datas, 0, step.nb_atomes-1, tmp_idx1, step.nb_idx, maxrecurse) ; 
+
+// Check temporaire
+int i ;
+for (i=1 ; i<step.nb_atomes ; i++)
+ {
+ if(step.datas[tmp_idx1][i-1]>step.datas[tmp_idx1][i]) {printf("ERR SORT\n") ; fflush(stdout) ; }
+ }
+
+return 0 ;
+} 
+
+int Filter::quicksort (vector<vector<double> > &tableau, int premier, int dernier, int idx, int nbidx, int recurseleft)
+{
+ int pivot ;
+ //pivot=round((premier+(rand()/(double)RAND_MAX)*(dernier-premier))) ; 
+ if (recurseleft<1)
+   {
+   //DISP_Info("Too many nested quicksort. Let's Heapsort !\n") ;
+   heapsort(tableau, premier, dernier, idx, nbidx) ; 
+   return 1 ; 
+   }
+
+ if (premier<dernier)
+ {
+ //pivot=premier+(dernier-premier)/2 ;
+ pivot=premier ;
+ pivot=partitionner(tableau, premier, dernier, pivot, idx, nbidx) ; 
+ //if (pivot-1-premier>15)
+ quicksort(tableau, premier, pivot-1, idx, nbidx, recurseleft-1) ;
+ //else selectsort(tableau, premier, pivot-1, idx, nbidx) ;
+ //if (dernier-pivot-1>15)
+ quicksort(tableau, pivot+1, dernier, idx, nbidx, recurseleft-1) ;
+ //else selectsort(tableau, pivot+1, dernier, idx, nbidx) ;
+ }
+return 0 ;
+}
+
+int Filter::tamiser(vector <vector<double> > &tableau, int noeud, int max, int deb, int idx, int nbidx)
+{
+int k=noeud ; 
+int j=2*k ;
+while (j<=max)
+  {
+  if (j<max && tableau[idx][j-1+deb]<tableau[idx][j+deb])
+    j++ ; 
+  
+  if(tableau[idx][k-1+deb]<tableau[idx][j-1+deb])
+    {
+    echanger(tableau, k-1+deb, j-1+deb, nbidx) ; 
+    k=j ; 
+    j=2*k ;
+    }
+  else
+    return 0;
+  }
+return 1 ; 
+}
+
+int Filter::heapsort(vector <vector<double> > &tableau, int deb, int fin, int idx, int nbidx)
+{
+int i, n ;
+n=fin-deb+1 ;  
+for (i=n/2 ; i>=1 ; i--)
+  tamiser(tableau,i,n,deb,idx,nbidx) ;
+  
+for (i=n ; i>=2 ; i--) 
+ {
+ echanger(tableau, i-1+deb, 0+deb,nbidx) ;
+ tamiser(tableau, 1, i-1, deb,idx,nbidx) ;
+ }
+return 1 ; 
+}
+
+
+int Filter::selectsort (vector<vector<double> > &tableau, int premier, int dernier, int idx, int nbidx)
+{// Tri basique par sélection dès que le tableau est suffisament petit (pour éviter de dxfaire quicksort jusqu'au bout, d'après wikipedia c'est plus rapide)
+int i, j, min ;
+
+for (i=premier ; i<dernier ; i++)
+ {
+	min=i ;
+	for (j=i+1 ; j<dernier ; j++)
+	{ if (tableau[idx][j]<tableau[idx][min]) min=j ;}
+	if (min>i) {echanger (tableau, i, min, nbidx) ; }
+ }
+return 0 ;
+}
+
+//=======================================
+int Filter::do_nothing(Step & step, struct Op op)
+{
+// This function do nothing (just to initialize the operation NULL for forward compatibility).
+return 0 ; 
+}
+//=========================================
+int Filter::pourcentage (Step & step, struct Op op)
+{
+// Dans tous les cas on commence par ranger la colonne demandée
+struct Op range ; 
+range.operation="::sort::" ; 
+range.idx1=op.idx1 ; range.idx2=UNKNOWN ; range.valeur=0 ; 
+quicksort_base(step, range) ; 
+
+// Ensuite on ne garde que ce qui intéresse
+unsigned int i ; int stop ;
+stop=round(step.datas[0].size()*op.valeur/100) ; 
+if (op.operation=="::%inf::")
+ {
+ for (i=0 ; i<step.datas.size() ; i++)
+   {
+   step.datas[i].resize(stop) ; 
+   }
+ }
+else if (op.operation=="::%sup::")
+ {
+ for (i=0 ; i<step.datas.size() ; i++)
+   {
+   step.datas[i].erase(step.datas[i].begin(),step.datas[i].begin()+stop) ; 
+   } 
+ }
+return 1 ;
+}
+//=========================================
+int Filter::cf_postproc (Step &step, struct Op op)
+{
+unsigned int i,j, ts ; int idx[17] ; //Matrix cart(3,1), sph(3,1) ;
+Vector r, f, fnv, x1, x2, xch ;
+double fn, ft ;
+static bool first=true ; static double samplingcf, intersampling  ;
+Step * atmstep ; 
+
+// Ajoute des données à celles extraites pour les chaînes de force.
+//step.idx_col.push_back(CFMAG) ; 
+step.idx_col.push_back(POSX) ; 
+step.idx_col.push_back(POSY) ; 
+step.idx_col.push_back(POSZ) ;
+step.idx_col.push_back(CFX) ;  
+step.idx_col.push_back(CFY) ; 
+step.idx_col.push_back(CFZ) ;
+step.idx_col.push_back(CFMAG) ;  
+//step.idx_col.push_back(CFR) ; 
+//step.idx_col.push_back(CFTHETA) ; 
+//step.idx_col.push_back(CFPHI) ; 
+step.nb_idx+=7 ; 
+step.datas.resize(step.idx_col.size()) ; 
+//step.datas[step.find_idx(CFR)].resize(step.nb_atomes) ; 
+//step.datas[step.find_idx(CFTHETA)].resize(step.nb_atomes) ; 
+//step.datas[step.find_idx(CFPHI)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(CFMAG)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(POSX)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(POSY)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(POSZ)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(CFX)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(CFY)].resize(step.nb_atomes) ; 
+step.datas[step.find_idx(CFZ)].resize(step.nb_atomes) ; 
+// Récupère le bon pas de dump atomique
+//i=0 ; plutôt que de partir de i=0, on va essayer de se rapprocher en supposant que le coefficient de downsampling est constant
+// Attention, ne fonctionne que si le,premier appel est effectué avec le step[0] du cfdump.
+
+// Si la position des atomes n'est pas dans le dump des contacts, onutilise le dump atomique pour les trouver
+
+if (step.find_idx(CFID1X)!=-1 && step.find_idx(CFID1Y)!=-1 && step.find_idx(CFID1Z)!=-1 &&
+	step.find_idx(CFID2X)!=-1 && step.find_idx(CFID2Y)!=-1 && step.find_idx(CFID2Z)!=-1 )
+ {
+ idx[0]=step.find_idx(CFID1X) ; idx[1]=step.find_idx(CFID1Y) ; idx[2]=step.find_idx(CFID1Z) ;
+ idx[3]=step.find_idx(CFFORCEX) ; idx[4]=step.find_idx(CFFORCEY) ; idx[5]=step.find_idx(CFFORCEZ) ;
+ idx[6]=step.find_idx(CFID2X) ; idx[7]=step.find_idx(CFID2Y) ; idx[16]=step.find_idx(CFID2Z) ;
+
+ idx[8]=step.find_idx(POSX) ; idx[9]=step.find_idx(POSY) ; idx[10]=step.find_idx(POSZ) ;
+ idx[11]=step.find_idx(CFX) ; idx[12]=step.find_idx(CFY) ; idx[13]=step.find_idx(CFZ) ;
+ idx[14]=step.find_idx(CFMAG) ;// idx[9]=step.find_idx(CFR) ; idx[10]=step.find_idx(CFTHETA) ; idx[11]=step.find_idx(CFPHI) ;
+ idx[15]=step.find_idx(CFPERIOD) ;
+
+ for (i=0 ; i<step.nb_atomes ; i++)
+   {
+   step.datas[idx[14]][i]=sqrt(pow(step.datas[idx[3]][i],2)+pow(step.datas[idx[4]][i],2)+pow(step.datas[idx[5]][i],2)) ;
+   step.datas[idx[11]][i]=step.datas[idx[6]][i] -step.datas[idx[0]][i] ;
+   step.datas[idx[12]][i]=step.datas[idx[7]][i] -step.datas[idx[1]][i] ;
+   step.datas[idx[13]][i]=step.datas[idx[16]][i]-step.datas[idx[2]][i] ;
+   step.datas[idx[8]][i]=(step.datas[idx[6]][i]+step.datas[idx[0]][i])/2. ;
+   step.datas[idx[9]][i]=(step.datas[idx[7]][i]+step.datas[idx[1]][i])/2. ;
+   step.datas[idx[10]][i]=(step.datas[idx[16]][i]+step.datas[idx[2]][i])/2. ;
+   }
+
+ }
+// Si la position des atomes n'est pas dans le dump des contacts, onutilise le dump atomique pour les trouver
+else
+ {
+ if (first==true)
+  {
+  op.alter_dump->check_timestep(0) ;
+  intersampling=step.timestep/(double)op.alter_dump->steps[0].timestep ; 
+  samplingcf=step.timestep ; 
+  first=false ; i=0 ; 
+  }
+ else
+  {
+  i=floor(step.timestep/samplingcf)*intersampling-1 ; // Le -1 donne une marge de maneuvre, c'est mieux ...
+  }
+//op.alter_dump->check_timestep(i) ;
+ while (op.alter_dump->steps[i].timestep != step.timestep)
+   {
+   if (op.alter_dump->steps[i].timestep > step.timestep)
+     {cout << "ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump" ; return -1 ; }
+    //else
+    //   {i++ ; op.alter_dump->check_timestep(i) ;}
+   i++ ;
+   }
+   op.alter_dump->check_timestep(i) ;
+   ts=i ;
+
+ // Check que les ID dans le dump atomique avancent par pas de 1
+ atmstep=&(op.alter_dump->steps[i]) ;
+ idx[0]=atmstep->find_idx(ID) ;
+ int warnings=0 ; static bool warn=true ;
+ std::vector<double>::iterator it;
+ for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
+    { if (atmstep->datas[idx[0]][i]!=i+1)
+    	{
+    	warnings++ ;
+    	if (warn==true)
+    	  { warn=false ;
+    	  DISP_Warn("WARN : les ID n'augmentent pas par pas de 1 dans le LucDump. Tentative de correction par ajout d'un atome nul, qui ne devrait normalement pas être appelé") ;
+    	  }
+    	for (j=0; j<atmstep->nb_idx ; j++)
+    	  {
+    	  it = atmstep->datas[j].begin()+i;
+    	  atmstep->datas[j].insert(it,0) ;
+    	  }
+    	it = atmstep->datas[idx[0]].begin()+i;
+    	atmstep->datas[idx[0]][i]=i+1 ;
+    	atmstep->nb_atomes++ ;
+    	}
+    }
+ // Second check, ne devrait plus y avoir de problème !
+ if (warnings>0)
+  {
+  for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
+    { if (atmstep->datas[idx[0]][i]!=i+1)
+    	{DISP_Err("ERR : les ID n'augmentent pas par pas de 1 dans le LucDump. Cela aurait dû être corrigé à la boucle précédente !") ;}
+    }
+  }
+
+ idx[0]=atmstep->find_idx(POSX) ; idx[1]=atmstep->find_idx(POSY) ; idx[2]=atmstep->find_idx(POSZ) ;
+ idx[3]=step.find_idx(CFFORCEX) ; idx[4]=step.find_idx(CFFORCEY) ; idx[5]=step.find_idx(CFFORCEZ) ;
+ idx[6]=step.find_idx(CFID1) ; idx[7]=step.find_idx(CFID2) ;
+ idx[8]=step.find_idx(POSX) ; idx[9]=step.find_idx(POSY) ; idx[10]=step.find_idx(POSZ) ;
+ idx[11]=step.find_idx(CFX) ; idx[12]=step.find_idx(CFY) ; idx[13]=step.find_idx(CFZ) ;
+ idx[14]=step.find_idx(CFMAG) ;// idx[9]=step.find_idx(CFR) ; idx[10]=step.find_idx(CFTHETA) ; idx[11]=step.find_idx(CFPHI) ;
+ idx[15]=step.find_idx(CFPERIOD) ;
+
+ for (i=0 ; i<step.nb_atomes ; i++)
+   {
+   step.datas[idx[14]][i]=sqrt(pow(step.datas[idx[3]][i],2)+pow(step.datas[idx[4]][i],2)+pow(step.datas[idx[5]][i],2)) ;
+   step.datas[idx[11]][i]=(atmstep->datas[idx[0]][(int)step.datas[idx[7]][i]-1])-(atmstep->datas[idx[0]][(int)step.datas[idx[6]][i]-1]) ;
+   step.datas[idx[12]][i]=(atmstep->datas[idx[1]][(int)step.datas[idx[7]][i]-1])-(atmstep->datas[idx[1]][(int)step.datas[idx[6]][i]-1]) ;
+   step.datas[idx[13]][i]=(atmstep->datas[idx[2]][(int)step.datas[idx[7]][i]-1])-(atmstep->datas[idx[2]][(int)step.datas[idx[6]][i]-1]) ;
+   step.datas[idx[8]][i]=(atmstep->datas[idx[0]][(int)step.datas[idx[7]][i]-1]+atmstep->datas[idx[0]][(int)step.datas[idx[6]][i]-1])/2. ;
+   step.datas[idx[9]][i]=(atmstep->datas[idx[1]][(int)step.datas[idx[7]][i]-1]+atmstep->datas[idx[1]][(int)step.datas[idx[6]][i]-1])/2. ;
+   step.datas[idx[10]][i]=(atmstep->datas[idx[2]][(int)step.datas[idx[7]][i]-1]+atmstep->datas[idx[2]][(int)step.datas[idx[6]][i]-1])/2.;
+   // TEST
+   //printf("%.15f ", sqrt(step.datas[idx[11]][i]*step.datas[idx[11]][i]+step.datas[idx[12]][i]*step.datas[idx[12]][i])
+   //		        -atmstep->datas[atmstep->find_idx(RAYON)][(int)step.datas[idx[7]][i]-1]-atmstep->datas[atmstep->find_idx(RAYON)][(int)step.datas[idx[6]][i]-1]) ;
+   }
+
+ // Si on veut prendre en compte les wallforce, il est temps de le faire !!!!
+ if (actions["wallchainforce"].set)
+  {
+  Step * wallstep ; double chaineforce[3], position[3], norme ;
+  int idxwall[7], added=0 ;
+  op.wall_dump->check_timestep(ts) ; // Nécessite le même sampling entre tous les dump. On va supposer que le Ldump et le Walldump ont les même ts
+  wallstep=&(op.wall_dump->steps[ts]) ;
+
+  idxwall[0]=wallstep->find_idx(POSX) ; idxwall[1]=wallstep->find_idx(POSY) ; idxwall[2]=wallstep->find_idx(POSZ) ;
+  idxwall[3]=wallstep->find_idx(FORCEWALLX) ; idxwall[4]=wallstep->find_idx(FORCEWALLY) ; idxwall[5]=wallstep->find_idx(FORCEWALLZ) ;
+  idxwall[6]=wallstep->find_idx(ID) ;
+
+  for (i=0 ; i<wallstep->nb_atomes ; i++)
+ 	 {
+	 if (wallstep->datas[idxwall[3]][i]==0 && wallstep->datas[idxwall[4]][i]==0 && wallstep->datas[idxwall[5]][i]==0) continue ;
+	 norme=sqrt(pow(wallstep->datas[idxwall[0]][i]-actions["wallchainforce"]["xcyl"],2)+pow(wallstep->datas[idxwall[2]][i]-actions["wallchainforce"]["zcyl"],2)) ;
+	 chaineforce[0]=2*actions.Radius*(wallstep->datas[idxwall[0]][i]-actions["wallchainforce"]["xcyl"])/norme ;
+	 chaineforce[1]=0 ;
+	 chaineforce[2]=2*actions.Radius*(wallstep->datas[idxwall[2]][i]-actions["wallchainforce"]["zcyl"])/norme ;
+	 position[0]=wallstep->datas[idxwall[0]][i]-chaineforce[0]/2 ;
+	 position[1]=wallstep->datas[idxwall[1]][i] ;
+	 position[2]=wallstep->datas[idxwall[2]][i]-chaineforce[2]/2 ;
+
+	 for (j=0 ; j<step.nb_idx ; j++)
+	 	 {
+		 switch (step.idx_col[j])
+		 	 {
+		 	 case CFID1 : step.datas[j].push_back(wallstep->datas[idxwall[6]][i]) ; break ;
+		 	 case CFID2 : step.datas[j].push_back(-1) ; break ; // ID d'un mur mis à -1 par soucis de reconnaissance
+		 	 case CFPERIOD : step.datas[j].push_back(0) ; break ;
+		 	 case CFFORCEX : step.datas[j].push_back(-wallstep->datas[idxwall[3]][i]) ; break ;
+		 	 case CFFORCEY : step.datas[j].push_back(-wallstep->datas[idxwall[4]][i]) ; break ;
+		 	 case CFFORCEZ : step.datas[j].push_back(-wallstep->datas[idxwall[5]][i]) ; break ;
+		 	 case CFMAG : step.datas[j].push_back(sqrt(pow(wallstep->datas[idxwall[3]][i],2)+pow(wallstep->datas[idxwall[4]][i],2)+pow(wallstep->datas[idxwall[5]][i],2))) ; break ;
+		 	 case CFX : step.datas[j].push_back(chaineforce[0]) ; break ;
+		 	 case CFY : step.datas[j].push_back(chaineforce[1]) ; break ;
+		 	 case CFZ : step.datas[j].push_back(chaineforce[2]) ; break ;
+		 	 case POSX : step.datas[j].push_back(position[0]) ; break ;
+		 	 case POSY : step.datas[j].push_back(position[1]) ; break ;
+		 	 case POSZ : step.datas[j].push_back(position[2]) ; break ;
+		 	 default : DISP_Err("Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli") ; break ;
+		 	 }
+	 	 }
+	 added++ ;
+ 	 }
+  // Check
+  for (j=1 ; j<step.nb_idx ; j++)
+ 	 {
+	 if (step.datas[j].size()!=step.datas[0].size()) DISP_Err("Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur tous les indexes.") ;
+ 	 }
+  printf("Ajoutés : %d %d %d \n", step.nb_atomes, added, (int) step.datas[0].size()) ; fflush(stdout) ;
+  if (step.nb_atomes+added != step.datas[0].size()) DISP_Err ("Erreur : l'ajout de wallforce a généré un problème ! ") ;
+  step.nb_atomes+=added ;
+  }
+ }
+
+return 1 ;
+}
+//=========================
+int Filter::no_periodic_chain (Step & step, struct Op op)
+{
+int idx, i, j, tmp, old;
+	// Suppression de toutes les chaînes periodiques
+idx=step.find_idx(CFPERIOD) ;
+
+old=step.nb_atomes ;
+
+i=0 ; j=step.nb_atomes-1 ;
+while(i<j)
+	{
+	while (j>0 && step.datas[idx][j]==1) j-- ;
+	while (i<step.nb_atomes && step.datas[idx][i]==0) i++ ;
+	if (i<j) { step.crush_atm(i,j) ; step.datas[idx][j]=1 ; }
+	}
+
+for (j=0 ; j < step.nb_idx ; j++)
+	{step.datas[j].erase (step.datas[j].begin()+i, step.datas[j].end()) ; }
+step.nb_atomes=i ;
+
+//printf("%d atomes supprimés sur %d initiaux.\n", old-step.nb_atomes, old) ;
+
+if (step.nb_atomes==old)
+ step.has_periodic_chains=false ;
+else
+ step.has_periodic_chains=true ;
+
+for (i=0 ; i<step.nb_atomes ; i++) {if (step.datas[idx][i]==1) { printf(".") ; fflush(stdout) ; }}
+return 0 ;
+}
+
+//=========================
+int Filter::moveto_xplusyplus (Step & step, struct Op op)
+{
+int i ;
+int idx[3] ;
+Matrix3x3 rot90, rotm90, rot180 ; 
+Vector axe=(0.0,0.0,1.0) ;
+
+idx[0]=step.find_idx(POSX) ; idx[1]=step.find_idx(POSY) ; idx[2]=step.find_idx(POSZ) ;
+
+rot90=Geometrie::get_rot_matrix(M_PI/2.0, axe) ;
+rotm90=Geometrie::get_rot_matrix(-M_PI/2.0, axe) ;
+rot180=Geometrie::get_rot_matrix(M_PI, axe) ;
+
+for (i=0 ; i<step.nb_atomes ; i++)
+	{
+	if (step.datas[idx[0]][i]<0 && step.datas[idx[1]][i]>0) // rotation de -90deg
+	   step.atm_rotate(rotm90, i) ;
+	else if (step.datas[idx[0]][i]>0 && step.datas[idx[1]][i]<0) // rotation de +90deg
+       step.atm_rotate(rot90,i) ;
+	else if (step.datas[idx[0]][i]<0 && step.datas[idx[1]][i]<0) // rotation de 180deg
+       step.atm_rotate(rot180,i) ;
+	}
+return 1 ;
+}
+//---------------------------------
+int Filter::copypartiallink (Step & step, struct Op op)
+{
+int i ;
+int idx[6] ;
+
+idx[0]=step.find_idx(POSX) ; idx[1]=step.find_idx(POSY) ; idx[2]=step.find_idx(POSZ) ;
+idx[3]=step.find_idx(CFX) ; idx[4]=step.find_idx(CFY) ; idx[5]=step.find_idx(CFZ) ;
+Matrix3x3 rot90, rotm90, rot180 ;
+Vector axe=(0.0,0.0,1.0) ;;
+
+idx[0]=step.find_idx(POSX) ; idx[1]=step.find_idx(POSY) ; idx[2]=step.find_idx(POSZ) ;
+axe << 0.0 << 0.0 << 1.0 ;
+rot90=Geometrie::get_rot_matrix(M_PI/2.0, axe) ;
+rotm90=Geometrie::get_rot_matrix(-M_PI/2.0, axe) ;
+rot180=Geometrie::get_rot_matrix(M_PI, axe) ;
+
+int nb_atomes_old=step.nb_atomes ;
+for (i=0 ; i<nb_atomes_old ; i++)
+	{
+	if (step.datas[idx[1]][i]<actions.Radius)
+	   {
+	   if (step.datas[idx[1]][i]-step.datas[idx[4]][i]/2<0 || step.datas[idx[1]][i]+step.datas[idx[4]][i]/2<0)
+		   {step.copy_atm_end(i) ; step.nb_atomes++ ; step.atm_rotate(rot90, step.nb_atomes-1) ; }
+	   }
+	else if (step.datas[idx[0]][i]<actions.Radius)
+	   {
+	   if (step.datas[idx[0]][i]-step.datas[idx[3]][i]/2<0 || step.datas[idx[0]][i]+step.datas[idx[3]][i]/2<0)
+		   {step.copy_atm_end(i) ; step.nb_atomes++ ; step.atm_rotate(rotm90, step.nb_atomes-1) ; }
+	   }
+	}
+return 1 ;
+}
+
+
+
+//-------------------------------------------------------------------
+/*
+void reorder_atm (int timestep) 
+{
+  int idx ; 
+  
+  // On va essayer d'utiliser un QuickSort pour le rangement ...
+  
+(".. En cours de rangement, ts %d -->", timestep) ; fflush(stdout) ; 
+  idx=find_idx(timestep, ID) ;    
+  quicksort(steps[timestep].datas, 0, steps[timestep].nb_atomes-1, idx, steps[timestep].nb_idx) ;   
+  printf("Done.    ") ; fflush(stdout) ; 
+  
+  return ;  
+}*/

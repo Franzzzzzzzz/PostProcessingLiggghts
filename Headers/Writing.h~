@@ -1,0 +1,128 @@
+#ifndef MASTERH
+#include "MasterHeader.h"
+
+#else
+
+#define READY 1
+#define ASKING 2
+#define WAITING 3
+
+
+enum WSignal {WHATAREYOU, FIRSTTS, NEXTTS, 
+  ASKING1D, ASKING2D, ASKING3D,
+  LDUMP, CFDUMP, COARSEDUMP, VTKDUMP, OTHERDUMP,
+  OK, FINI, UNABLE
+} ; 
+#define WFORMAT_NUMBER 4
+enum WFormat {VTK=1, MAT, ASCII, NONE} ; 
+enum WVTKType {POLYDATA, STRUCTUREDGRID, UNSTRUCTUREDGRID} ; 
+
+class Writing {
+
+// Gestion de threads 
+public : 
+WSignal Signal ; 
+pthread_t th_ecrire ;
+pthread_mutex_t mutex;
+pthread_cond_t sigin, sigout;
+void * mfp() ; 
+
+int *i ; double **d ; 
+string *chemin ; 
+
+private:
+   static void * InternalThreadEntryFunc(void * This) {((Writing *)This)->start(NULL);}
+
+// Variables  
+public:
+  map <string, int> vardef;
+  map <string, int> dim ; 
+  map <string, WFormat> formats ; 
+  
+private:  
+  int format_writing ; 
+  vector < unsigned char * > varset ;   
+  int charbysubsp ;
+    
+// Fonctions
+private: 
+  WFormat get_nextwritingformat() ; 
+  int * get_barcode (string space, string subspace, string var) ;
+  int * get_barcode (string space, string var) ;  
+  void set_varset(string space, string var) ;
+  void unset_varset(string space, string var) ;
+  void set_varset(string space, string var, bool value) ;
+  int  function_call(string function, string var) ;
+  int generate_coarsemap (Coarse & C) ;
+  int generate_coarsemap (Boites & B) ;
+  void disp() ;
+  void sendout (WSignal sig) ;
+  
+public :
+  Writing() ;
+  int startall(void) ;
+  int parse (string commande) ; 
+  int generate_coarsemap (CoarseDump & C) ; 
+  bool get_varset(string space, string var) ;  
+  bool get_typeset(string space) ;
+  int  get_nextfield (string space) ;
+  int  get_nextfield (string space, string sp) ;
+  string get_nextname (string var) ;
+  int get_nextvardef (string var) ;
+  int get_nextvardef (string var, string sp) ; 
+  int get_numelem (string var) ; 
+  int get_numelem (int var) ; 
+  
+  void sendin (WSignal sig) ;
+  void * start (void * rien) ;
+  int ldump () ;
+  int VTKFile (WVTKType f, string nom) ; 
+  
+  int VTKPolyData (ofstream & out, double **datas, int n) ;
+  int VTKStructuredGrid(ofstream &out, double **datas, int n, int * sizes) ;
+  int VTKUnstructuredGrid (ofstream & out, double **datas, int n) ;
+  int VTKCellLines (ofstream & out, double **datas, int nb) ; 
+  int VTKField (ofstream & out, string name, double **datas, int dim, int n);  
+  int VTKStartPointData (ofstream & out, int n) ;
+  int VTKStartCellData (ofstream & out, int nb) ;
+  
+  bool init ; 
+  
+  int ASCIIwrite (ofstream & out, double **datas, int ndim, int n) ;
+  
+#ifdef MATLAB
+  int MATMatrix (MATFile * out, string name, double *datas, int ndim, ...) ;
+#endif
+
+// Cette classe permet de parcourir les boîtes des coarses dans l'ordre x le plus rapide, y, z le moins rapide
+// alors que par construction les boites sont dans l'ordre z le plus rapide ... x le moins rapide
+// id. idxboit=x*sy*sz+y*sz+z.
+public :   
+class IterStructGrid
+{
+private :   
+  int sx, sy, sz ;
+  int ix, iy, iz ; 
+  bool state ; 
+  void add_one (void) {ix++ ; if (ix>=sx) {ix=0 ; iy++ ; } if (iy>=sy) {iy=0 ; iz++ ; } if (iz>=sz) {iz=0 ; state=false ;}}
+  void min_one (void) {ix-- ; if (ix<0) {ix=sx-1 ; iy-- ; } if (iy<0) {iy=sy-1 ; iz-- ; } if (iz<0) {iz=sz-1 ; state=false ;}}
+  
+public : 
+  IterStructGrid () : sx(1), sy(1), sz(1), ix(0), iy(0), iz(0) {}
+  IterStructGrid (int a, int b, int c) :ix(0), iy(0), iz(0) {sx=a ; sy=b ; sz=c ; }
+  IterStructGrid (int *a) :ix(0), iy(0), iz(0) {sx=a[0] ; sy=a[1] ; sz=a[2] ; }
+  bool operator-= (int n) {for (int i=0 ; i<n ; i++) min_one() ; return state ;}
+  bool operator-- (int i) {min_one() ; return state ; } 
+  bool operator+= (int n) {for (int i=0 ; i<n ; i++) add_one() ; return state ;}
+  bool operator++ (int i) {add_one() ; return state ; }
+  bool operator== (bool v) {return (state==v) ; }
+  bool operator=  (int i)  {ix=i/(sy*sz) ; iy=(i%(sy*sz))/sz ; ix=(i%(sy*sz)%sz) ; 
+			    if (ix<sx && iy<sy && iz<sz) state=true ; else state=false ; return state ; }
+  operator bool () { return state ; }
+  operator int () {return (ix*sy*sz + iy*sz +iz) ; }
+  int idx() {return (iz*sx*sy+ iy*sx + ix) ; }
+} ;
+
+} ;
+
+#endif

@@ -1,0 +1,32 @@
+Digraph G {
+node [shape=box] ;
+
+Dump [rank=source, label="Dump\n\nClasse de base", color=limegreen, style=filled]
+FDump [label="FDump\n\nClasse pour les forces sur mesh\nIssu d'un fichier VTK", color=greenyellow, style=filled]
+LDump [label="LDump\n\nClasse générale\nIssu d'un fichier de dump de Liggghts", color=greenyellow, style=filled]
+LucDump [label="LucDump\n\nClasse générale quand le dump n'est pas compressé", color=greenyellow, style=filled]
+LcfDump [label="LcfDump\n\nClasse pour les chainforces", color=greenyellow, style=filled]
+LcpDump [label="LcpDump\n\nClasse compressée", color=peru, style=filled]
+AtomDump [label="AtomDump\n\nDump des données atomiques de Liggghts", color=yellow, style=filled]
+WallForceDump [label="WallForceDump\n\nDump des données d'interaction grains-objet", color=yellow, style=filled]
+ChainForceDump [label="ChainForceDump\n\nDump des données d'interacrion grains-grains", color=yellow, style=filled]
+MeshDump [label="MeshDump\n\nDump des données de force sur triangle mesh", color=yellow, style=filled]
+
+ 
+Dump -> FDump ;
+FDump -> LcpDump  [style=dashed, taillabel="avoid", labelfontcolor=red, color=red];
+Dump -> LDump -> LucDump ; 
+LucDump -> LcpDump ;
+LcpDump -> LucDump ; 
+LucDump -> LcfDump ;
+LcfDump -> LcpDump ; 
+
+AtomDump -> LucDump [style=dotted]; 
+AtomDump -> LcpDump [style=dotted]; 
+WallForceDump -> LucDump [style=dotted]; 
+ChainForceDump -> LcfDump [style=dotted] ; 
+ChainForceDump -> LcpDump [style=dotted] ; 
+MeshDump -> FDump [style=dotted] ; 
+
+
+} 

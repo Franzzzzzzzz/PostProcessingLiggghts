@@ -1,0 +1,26 @@
+#!/opt/local/bin/gawk -f
+
+BEGIN{start=0 ;i=1 ;}
+
+/atoms/ {nbatm=$1}
+/Atoms/ {start=1}
+
+{
+if ((NF==7 && start==1))
+{
+id[i]=$1 ; type[i]=$2; rad[i]=$3 ; rho[i]=$4 ; x[i]=$5 ; y[i]=$6 ; z[i]=$7 ;
+i=i+1 ;
+}
+}
+
+END{print "# vtk DataFile Version 2.0" ; print "Made by PostProcessing (CC-BY-NC)" ;
+ print "ASCII" ; 
+ print "DATASET POLYDATA" ; print "POINTS",nbatm,"double" ; 
+ for (i=1;i<=nbatm;i++) print x[i],y[i],z[i] ; 
+ print "VERTICES",nbatm,2*nbatm ; 
+ for (i=1;i<=nbatm;i++) print "1",i ; 
+ print "POINT_DATA", nbatm ; 
+ print "SCALARS rayon double 1";
+print "LOOKUP_TABLE default" ; 
+for (i=1;i<=nbatm;i++) print rad[i] ;
+}

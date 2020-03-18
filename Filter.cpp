@@ -915,12 +915,13 @@ else
 
  (op.alter_dump)->steps[i].otherstep=&step ;
  step.otherstep=&((op.alter_dump->steps)[i]) ;
-
  // Check que les ID dans le dump atomique avancent par pas de 1
  atmstep=&(op.alter_dump->steps[i]) ;
  idx[0]=atmstep->find_idx(IDS("ID")) ;
  int warnings=0 ; static bool warn=true ;
+ if (idx[0] == -1 && warn) DISP_Warn("The ID column was not found in the atmstep") ;
  std::vector<double>::iterator it;
+
  for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
     { if (atmstep->datas[idx[0]][i]!=i+1)
     	{
@@ -941,6 +942,7 @@ else
     	}
     }
  // Second check, ne devrait plus y avoir de problème !
+
  if (warnings>0)
   {
   for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
@@ -1318,7 +1320,7 @@ int Filter::quat2orient (Step &step, struct Op op)
  idx[0]=step.find_idx(IDS("QUATERNION1")) ; idx[1]=step.find_idx(IDS("QUATERNION2")) ; idx[2]=step.find_idx(IDS("QUATERNION3")) ; idx[3]=step.find_idx(IDS("QUATERNION4")) ;
  idx[5]=step.find_idx(IDS("TYPE")) ; idx[6]=step.find_idx(IDS("RAYON")) ;
  if (idx[5]!=-1 && idx[6]!=-1 && first) DISP_Info("If any atom has a type > 1, they are considered as spherical with the radius given by the dump\n") ;
- if (idx[5]!=-1 && idx[6]==-1 && first) DISP_Warn ("If some superquadric have type>1, things will break as the radius are not available\n") ; 
+ if (idx[5]!=-1 && idx[6]==-1 && first) DISP_Warn ("If some superquadric have type>1, things will break as the radius are not available\n") ;
  if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 || idx[3]==-1 || idx[4]==-1) DISP_Err("IDX not found Filter::quat2orient\n") ;
  for (int i=0 ;i<step.nb_atomes ; i++)
  {

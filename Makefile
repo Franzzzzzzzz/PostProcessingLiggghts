@@ -1,11 +1,11 @@
 #CC=g++
-CC=/opt/local/bin/g++-mp-6
+CC=/opt/local/bin/g++-mp-9
 
 # Basic compilation
 #CFLAGS=-c -O3 -I./Headers -I/opt/local/include
-#LDFLAGS=-L./newmat10 
+#LDFLAGS=-L./newmat10
 #LDFLAGS=-L/opt/local/lib
-#LIBS=-lm -lpthread 
+#LIBS=-lm -lpthread
 
 # Compilation incluant le support matlab
 #CFLAGS=-c -O3 -m32 -DMATLAB -I./Headers -I/opt/local/include -I/home/franz/Logiciels/matlab2009/extern/include
@@ -17,7 +17,7 @@ SOURCES=Ids.cpp Gunzip.cpp Writing.cpp Calculs.cpp Coarse.cpp Compress.cpp Dump.
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=PostProcessing
 
-all: CFLAGS=-c -O3 -I./Headers 
+all: CFLAGS=-c -O3 -I./Headers
 all: LDFLAGS=
 all: LIBS=-lstdc++ -lm -lpthread -lz
 all: info $(SOURCES) $(EXECUTABLE)
@@ -27,13 +27,13 @@ voronoi: LDFLAGS=-L./voro++-0.4.6/src
 voronoi: LIBS=-lstdc++ -lm -lpthread -lz -lvoro++
 voronoi: $(SOURCES) $(EXECUTABLE)
 
-advanced: CFLAGS=-c -O3 -DVORONOI -DMATLAB -DBOOST -DUSETIFF -I./Headers -I./voro++-0.4.6/src -I/opt/local/include -I/Applications/MATLAB_R2015b.app/extern/include
-advanced: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2015b.app/bin/maci64 -L./voro++-0.4.6/src
+advanced: CFLAGS=-c -O3 -DVORONOI -DMATLAB -DBOOST -DUSETIFF -I./Headers -I./voro++-0.4.6/src -I/opt/local/include -I/Applications/MATLAB_R2017a.app/extern/include
+advanced: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2017a.app/bin/maci64 -L./voro++-0.4.6/src
 advanced: LIBS=-lstdc++ -lm -lpthread -lmat -lmx -lz -ltiff -lvoro++
 advanced: $(SOURCES) $(EXECUTABLE)
 
-debug: CFLAGS=-c -g -DMATLAB -DBOOST -DUSETIFF -I./Headers -I/opt/local/include -I/Applications/MATLAB_R2015b.app/extern/include
-debug: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2015b.app/bin/maci64
+debug: CFLAGS=-c -g -DMATLAB -DBOOST -DUSETIFF -I./Headers -I/opt/local/include -I/Applications/MATLAB_R2017a.app/extern/include
+debug: LDFLAGS=-L/opt/local/lib -L/Applications/MATLAB_R2018a.app/bin/maci64
 debug: LIBS=-lstdc++ -lm -lpthread -lmat -lmx -lz -ltiff
 debug: $(SOURCES) $(EXECUTABLE)
 
@@ -46,5 +46,5 @@ $(EXECUTABLE): $(OBJECTS)
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
 
-clean : 
+clean :
 	rm *.o

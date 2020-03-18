@@ -1,0 +1,41 @@
+#define MASTERH
+#include <math.h>
+#include <cstdio>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <string>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdarg.h>
+
+#include "../newmat10/newmat.h"
+
+#ifdef MATLAB 
+#include <mat.h>
+#include <matrix.h>
+#endif
+
+class Step ; 
+class Dump ; 
+
+//#define Debug(a) printf(a);fflush(stdout)
+
+#include "Calculs.h"
+#include "Coarse.h"
+#include "Writing.h"
+#include "Main.h"
+#include "Step.h"
+#include "Dump.h" // Inclus aussi Compress.h et Stat.h
+#include "FDump.h"
+#include "LDump.h"
+#include "LcfDump.h"
+#include "Surface.h"
+#include "Filter.h"
+//#include "Ssh.h"

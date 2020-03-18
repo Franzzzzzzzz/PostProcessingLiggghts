@@ -1,0 +1,842 @@
+#include "Headers/Writing.h"
+
+Writing::Writing () 
+{
+  int i, j, nb ; 
+  map<string,int>::iterator it ; 
+  init=false ;
+ 
+ // Chaines correspondant aux DEFINE de step.h (non complète, //TODO)
+ vardef["id"]=ID ; vardef["type"]=TYPE ;  vardef["rayon"]=RAYON ; vardef["masse"]=MASSE ; 
+ vardef["x"]=POSX ; vardef["y"]=POSY ; vardef["z"]=POSZ ;
+ vardef["posx"]=POSX ; vardef["posy"]=POSY ; vardef["posz"]=POSZ ;
+ vardef["vx"]=VX ; vardef["vy"]=VY ; vardef["vz"]=VZ ; 
+ vardef["fx"]=FX ; vardef["fy"]=FY ; vardef["fz"]=FZ ; 
+ vardef["omegax"]=OMEGAX ; vardef["omegax"]=OMEGAY ; vardef["omegax"]=OMEGAZ ;
+ vardef["sigmaxx"]=SIGMAXX ; vardef["sigmaxy"]=SIGMAXY ; vardef["sigmaxz"]=SIGMAXZ ; 
+ vardef["sigmayx"]=SIGMAYX ; vardef["sigmayy"]=SIGMAYY ; vardef["sigmayz"]=SIGMAYZ ; 
+ vardef["sigmazx"]=SIGMAZX ; vardef["sigmazy"]=SIGMAZY ; vardef["sigmazz"]=SIGMAZZ ; 
+ vardef["forcewallx"]=FORCEWALLX ; vardef["forcewally"]=FORCEWALLY ; vardef["forcewallz"]=FORCEWALLZ ; 
+ 
+ vardef["cfid1"]=CFID1 ; vardef["cfid2"]=CFID2 ; 
+ vardef["cfforcex"]=CFFORCEX ; vardef["cfforcey"]=CFFORCEY ; vardef["cfforcez"]=CFFORCEZ ; 
+ vardef["cffx"]=CFFORCEX ; vardef["cffy"]=CFFORCEY ; vardef["cffz"]=CFFORCEZ ; 
+ vardef["cfmag"]=CFMAG ; vardef["cfr"]=CFR ;  vardef["cftheta"]=CFTHETA ; vardef["cfphi"]=CFPHI ; 
+ vardef["cfx"]=CFX ; vardef["cfy"]=CFY ;  vardef["cfz"]=CFZ ; vardef["cfperiod"]=CFPERIOD ; 
+ vardef["cfposx"]=CFX ; vardef["cfposy"]=CFY ;  vardef["cfposz"]=CFZ ;
+ 
+ vardef["sigmakxx"]=COARSIGKXX ; vardef["sigmakxy"]=COARSIGKXY ; vardef["sigmakxz"]=COARSIGKXZ ; 
+ vardef["sigmakyx"]=COARSIGKYX ; vardef["sigmakyy"]=COARSIGKYY ; vardef["sigmakyz"]=COARSIGKYZ ; 
+ vardef["sigmakzx"]=COARSIGKZX ; vardef["sigmakzy"]=COARSIGKZY ; vardef["sigmakzz"]=COARSIGKZZ ; 
+ vardef["sigmatotxx"]=COARTOTXX ; vardef["sigmatotxy"]=COARTOTXY ; vardef["sigmatotxz"]=COARTOTXZ ; 
+ vardef["sigmatotyx"]=COARTOTYX ; vardef["sigmatotyy"]=COARTOTYY ; vardef["sigmatotyz"]=COARTOTYZ ; 
+ vardef["sigmatotzx"]=COARTOTZX ; vardef["sigmatotzy"]=COARTOTZY ; vardef["sigmatotzz"]=COARTOTZZ ; 
+ vardef["mean_radius"]=COARRAD ; vardef["nb_atomes"]=COARATM ; vardef["nb_contacts"]=COARCONTACTS ; vardef["phi"]=COARPHI ;
+ 
+
+ dim=vardef ;
+ for (it=dim.begin() ; it != dim.end() ; it++) it->second=1 ; 
+ dim["pos"]=dim["v"]=dim["f"]=dim["omega"]=2 ;
+ dim["sigma"]=3 ; dim["cff"]=2 ; dim["cfforce"]=2 ;
+ //dim["sigmakxx"]=1 ; dim["sigmakxy"]=1 ; dim["sigmakxz"]=1 ; 
+ //dim["sigmakyx"]=1 ; dim["sigmakyy"]=1 ; dim["sigmakyz"]=1 ; 
+ //dim["sigmakzx"]=1 ; dim["sigmakzy"]=1 ; dim["sigmakzz"]=1 ; 
+ dim["sigmak"]=3 ; 
+ //dim["sigmatotxx"]=1 ; dim["sigmatotxy"]=1 ; dim["sigmatotxz"]=1 ; 
+ //dim["sigmatotyx"]=1 ; dim["sigmatotyy"]=1 ; dim["sigmatotyz"]=1 ; 
+ //dim["sigmatotzx"]=1 ; dim["sigmatotzy"]=1 ; dim["sigmatotzz"]=1 ; 
+ dim["sigmatot"]=3 ; 
+ //dim["mean_radius"]=1 ; dim["nb_atomes"]=1 ; dim["nb_contacts"]=1 ; dim["phi"]=1 ;
+ 
+ formats["vtk"]=VTK ; 
+ formats["mat"]=MAT ; 
+ formats["ascii"]=ASCII ; 
+ 
+ varset.resize(formats.size() , NULL) ;
+ charbysubsp=ceil(dim.size()/8.0) ; 
+ nb=charbysubsp*2 ; 
+ for (i=0 ; i<formats.size() ; i++)
+ {varset[i]=(unsigned char *) malloc(nb) ;
+  for (j=0 ; j<nb ; j++) varset[i][j]=0 ; 
+ } 
+ 
+ nodef=false ; 
+}
+
+//==============================================
+void Writing::sendout (WSignal sig)
+{
+//pthread_mutex_lock(&mutex);
+Signal=sig ; //printf("->%d %d) ", Signal, WHATAREYOU) ; fflush(stdout) ; 
+pthread_cond_signal(&sigout);
+//pthread_mutex_unlock(&mutex);  
+}
+
+void Writing::sendin (WSignal sig)
+{
+//pthread_mutex_lock(&mutex);
+Signal=sig ; //printf("<-%d) ", Signal) ; fflush(stdout) ; 
+pthread_cond_signal(&sigin);
+//pthread_mutex_unlock(&mutex);  
+}
+//======================================================
+int Writing::startall(void)
+{pthread_create(&th_ecrire, NULL, InternalThreadEntryFunc, this); return 1 ; }
+
+void * Writing::start (void * rien)
+{
+pthread_mutex_lock(&mutex);  
+sendout(WHATAREYOU) ; 
+pthread_cond_wait(&sigin, &mutex);
+ 
+if (nodef==false) {set_def() ; }
+switch(Signal)
+{
+  case LDUMP : ldump() ; break ; 
+  case CFDUMP : lcfdump() ; break ; 
+  case COARSEDUMP : coarsedump() ; break ;
+  case VTKDUMP : break ;
+  case OTHERDUMP : DISP_Warn("Writing : Je ne sais pas traiter ce dump.\n") ; break ;
+  default : DISP_Err("Writing : signal inattendu.\n") ;   
+}
+sendout(FINI) ; pthread_mutex_unlock(&mutex); 
+return NULL ; 
+}
+//=========================================
+int Writing::ldump ()
+{
+WFormat format ; string chemin2 ;
+char strnum[10] ; 
+ while ((format=get_nextwritingformat())!=NONE) 
+ {
+  switch(format)
+  {
+    case VTK :  
+       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex); 
+       while (Signal==OK)
+       {
+        sprintf(strnum, "%d", *i) ; chemin2=(*chemin)+"-"+strnum+".vtk" ; 
+        VTKFile(POLYDATA, chemin2) ;
+	sendout(NEXTTS) ; pthread_cond_wait(&sigin, &mutex);
+       }
+      break ;
+    case MAT : 
+      #ifdef MATLAB  
+      DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ; 
+      chemin2=(*chemin) + ".mat" ; 
+      MATFichier(chemin2) ;       
+      #else
+      DISP_Warn ("Le programme n'a pas été compilé avec le support matlab. Pas de fichier mat écrit.\n") ; 
+      #endif
+      break ; 
+    default : DISP_Warn("Writing : Unsupported format\n") ; 
+  }
+ }
+ return 1 ; 
+}
+//=========================================
+int Writing::lcfdump ()
+{
+WFormat format ; string chemin2 ;
+char strnum[10] ; 
+ while ((format=get_nextwritingformat())!=NONE) 
+ {
+  switch(format)
+  {
+    case VTK :  
+       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex); 
+       while (Signal==OK)
+       {
+        sprintf(strnum, "%d", *i) ; chemin2=(*chemin)+"-"+strnum+".vtk" ; 
+        VTKFile(UNSTRUCTUREDGRID, chemin2) ;
+	sendout(NEXTTS) ; pthread_cond_wait(&sigin, &mutex);
+       }
+      break ;
+    case MAT : 
+      #ifdef MATLAB  
+      DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ; 
+      chemin2=(*chemin) + ".mat" ; 
+      MATFichier(chemin2) ;       
+      #else
+      DISP_Warn ("Le programme n'a pas été compilé avec le support matlab. Pas de fichier mat écrit.\n") ; 
+      #endif
+      break ; 
+    default : DISP_Warn("Writing : Unsupported format\n") ; 
+  }
+ }
+ return 1 ; 
+}
+//=========================================
+int Writing::coarsedump ()
+{
+WFormat format ; string chemin2 ;
+char strnum[10] ; 
+ while ((format=get_nextwritingformat())!=NONE) 
+ {
+  switch(format)
+  {
+    case VTK :  
+       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex); 
+       while (Signal==OK)
+       {printf("g") ; fflush(stdout) ; 
+        sprintf(strnum, "%d", *i) ; chemin2=(*chemin)+"-"+strnum+"-coarse.vtk" ; 
+        VTKFile(STRUCTUREDGRID, chemin2) ;
+	sendout(NEXTTS) ; pthread_cond_wait(&sigin, &mutex);
+       }
+      break ;
+    case MAT : 
+      #ifdef MATLAB  
+      DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ; 
+      chemin2=(*chemin) + "-coarse.mat" ; 
+      MATFichier(chemin2) ;       
+      #else
+      DISP_Warn ("Le programme n'a pas été compilé avec le support matlab. Pas de fichier mat écrit.\n") ; 
+      #endif
+      break ; 
+    default : DISP_Warn("Writing : Unsupported format\n") ; 
+  }
+ }
+ return 1 ; 
+}
+
+//=============================================
+int Writing::VTKFile (WVTKType f, string nom)
+{
+ofstream out ; 
+int idx[9] ; 
+int j, res, res2, nbpt, nbcell ; 
+map<string,int>::iterator it ; 
+bool firstcell, iscell ; 
+
+d=(double **) malloc(9*sizeof(double)) ; 
+
+sendout(CHOOSELDUMP) ; pthread_cond_wait(&sigin, &mutex);
+out.open(nom.c_str(), ios::out) ;
+idx[0]=POSX ; idx[1]=POSY ; idx[2]=POSZ ; 
+i=idx ; 
+sendout(ASKING2D) ; pthread_cond_wait(&sigin, &mutex);
+
+if (Signal==UNABLE) {DISP_Err("Writing: Les données de position sont indispensables") ; }
+if (f==POLYDATA) {VTKPolyData(out, d, *i) ; nbpt=*i ; }
+else if (f==UNSTRUCTUREDGRID) {VTKUnstructuredGrid(out, d, *i) ; nbpt=*i ; }
+else if (f==STRUCTUREDGRID)   
+{ nbpt=*i ; 
+  sendout(ASKINGGRID) ; pthread_cond_wait(&sigin, &mutex);
+  VTKStructuredGrid(out, d, nbpt, i) ; 
+}
+else DISP_Err("Writing : not implemented") ;
+
+sendout(CHOOSECFDUMP) ; pthread_cond_wait(&sigin, &mutex);
+if (Signal==OK)
+{
+idx[0]=CFID1 ; idx[1]=CFID2 ; idx[2]=-1 ; 
+i=idx ; 
+sendout(ASKINGND) ; pthread_cond_wait(&sigin, &mutex);
+if (Signal==UNABLE) {DISP_Err("Writing: Les données de CFID sont indispensables en CFDUMP") ; }
+VTKCellLines(out, d, *i) ; nbcell=*i ; 
+}
+  
+// Point datas
+
+firstcell=false ; iscell=false ; 
+
+for (int dos=0 ; dos<2 ; dos++)
+{
+  if (dos==0) 
+  {
+    sendout(CHOOSELDUMP) ; pthread_cond_wait(&sigin, &mutex);
+    VTKStartPointData(out, nbpt) ; 
+  }
+  else
+  {
+    sendout(CHOOSECFDUMP) ; pthread_cond_wait(&sigin, &mutex);
+    if (Signal==UNABLE) { break ; }
+    VTKStartCellData(out, nbcell) ; 
+  }  
+  while ( (res=get_nextfield("vtk"))  != -1)
+  {
+    // Construction des données 
+    it=dim.begin() ; std::advance(it,res);
+
+    for (j=0 ; (res2=get_nextvardef(it->first)) != -1 ; j++ )
+      idx[j]=res2 ;
+
+    if (dos == 0 && idx[0]>=CELLDATAMIN && idx[0]<CELLDATAMAX)  continue ; 
+    if (dos == 1 && (idx[0]<CELLDATAMIN || idx[0]>CELLDATAMAX))  continue ; 
+    
+    i=idx ;
+    switch(it->second)
+    {
+      case 1 : sendout(ASKING1D) ; break ; 
+      case 2 : sendout(ASKING2D) ; break ;
+      case 3 : sendout(ASKING3D) ; break ; 
+      default : DISP_Warn("Writing: Dimension inconnue") ; 
+    }
+    pthread_cond_wait(&sigin, &mutex); 
+
+    VTKField(out, it->first, d,it->second, *i) ; 
+  }
+}
+out.close() ; 
+free(d) ; 
+return 1 ; 
+}
+
+
+//--------------------------------------------
+int Writing::parse (string commande)
+{
+int i, j ; 
+int ptoc ; 
+bool newoc, newvar ; 
+string tok, space, var, function ; 
+int type ; 
+// On enlève tous les blancs :
+//commande.erase(remove_if( commande.begin(), commande.end(), ::isspace ), commande.end() ); WARNING
+commande.push_back(';') ;  // Just to be sure ...
+
+newoc=false ; newvar=false ; 
+
+ptoc=0 ;
+for (i=1 ; i<commande.length() ; i++)
+{
+ if (commande[i]=='[' || commande[i]==']' ||
+     commande[i]=='{' || commande[i]=='}' ||
+     commande[i]==',' || commande[i]==';') // The end of a commande, the beginning of another
+ {
+   if (i-ptoc-1>0) tok=commande.substr(ptoc+1, i-ptoc-1) ; 
+   if      (commande[i]=='}') {type=1 ; function=tok ; } // Functions
+   else if (commande[i]==']') {type=2 ; space=tok ;} // spaces
+   else 
+   {
+     var=tok ; // variables
+     if (type==1)
+       function_call (function, var) ; 
+     else if (type==2)
+       set_varset(space,var) ; 
+     else
+       DISP_Warn("Writing : pas d'espace ou de fonction definie") ; 
+   }
+   ptoc=i ; 
+ }
+}
+// disp() ; 
+return 0 ; 
+}
+
+int Writing::set_print(string nom, bool val)
+{
+ map<string,WFormat>::iterator it2 ;
+ it2=formats.find(nom) ; 
+ 
+ if (it2==formats.end()) {DISP_Warn("Writing : chaine de print non trouvée") ; printf("%s/", nom.c_str()) ; }
+ 
+ if (val==true) format_writing=(format_writing | (1<<(std::distance(formats.begin(), it2)))) ;  
+ else format_writing=(format_writing & (~(1<<(std::distance(formats.begin(), it2))))) ; 
+ return 1 ; 
+}
+
+
+int Writing::set_varset (string nom, string var)
+{
+bool set ; string nom2;  
+ if (nom[0]=='-')      {nom2=nom.substr(1, string::npos) ; set_print(nom2, false) ;}
+ else if (nom[0]=='+') {nom2=nom.substr(1, string::npos) ; set_print(nom2, true) ; }
+ else nom2=nom ; 
+ 
+ if (!var.compare("nodef")) {nodef=true ; return 1 ; }
+ if (!var.compare("def")) {nodef=false ; return 1; }
+ if (var[0]=='-') set_var (nom2, var.substr(1, string::npos), false) ; 
+ else set_var(nom2, var, true) ; 
+ return 1 ; 
+}
+
+int Writing::set_var(string nom, string var, bool val)
+{
+ int form, v ; 
+ if (dim.find(var) == dim.end()) {DISP_Warn("Writing:variable inconnue") ; printf("%s.\n", var.c_str()) ;  return -1 ; }
+ v=std::distance(dim.begin(), dim.find(var)) ;
+ form=std::distance(formats.begin(), formats.find(nom)) ; 
+ if (val==true) varset[form][v/8]=(varset[form][v/8] | (1<<v%8)) ;
+ else 		varset[form][v/8]=(varset[form][v/8] & (~(1<<v%8))) ;
+ return v ; 
+}
+
+int Writing::set_def()
+{
+ switch (Signal) {
+   case LDUMP : set_print("vtk", true) ; set_varset("mat", "pos") ; break ;
+   case CFDUMP: set_print("vtk", true) ; break ; 
+   case COARSEDUMP : parse("[+vtk]phi,v,sigma[mat]pos,phi,v,sigma") ;break ; 
+   case VTKDUMP : break ; 
+   case OTHERDUMP : DISP_Info("Writing : pas de mise à défaut pour OTHERDUMP\n") ; break ;
+   default : DISP_Warn("Writing : signal incohérent pour setdef\n") ; 
+ }
+ return 1 ; 
+}
+
+//---------------------------------------
+int Writing::function_call(string function, string var)
+{
+int val ; 
+DISP_Warn("Writing : pas de fonctions définies pour l'instant") ; 
+/*
+if (!function.compare("print"))
+ {
+  if (!var.compare("all")) {typewrite=0 ; typewrite=(~typewrite) ; }
+  else if (!var.compare("all:vtk")) {parse("{print}ldump:vtk,cfdump:vtk,coarse:vtk") ; }
+  else if (!var.compare("all:mat")) {parse("{noprint}ldump:mat,cfdump:mat,coarse:mat") ; }
+  else
+  {
+    try {
+      val=types.at(var) ;
+      typewrite=(typewrite|(1<<val)) ; 
+    }
+    catch (...) { DISP_Warn("Writing: Variable de fonction inconnue \n") ; }
+  }
+ }  
+ 
+ else if (!function.compare("noprint"))
+ {
+  if (!var.compare("all")) {typewrite=0 ; }
+  else if (!var.compare("all:vtk")) {parse("{noprint}ldump:vtk,cfdump:vtk,coarse:vtk") ; }
+  else if (!var.compare("all:mat")) {parse("{noprint}ldump:mat,cfdump:mat,coarse:mat") ; }
+  else
+  {
+    try {
+      val=types.at(var) ;
+      typewrite=(typewrite&(~(1<<val))) ; 
+    }
+    catch (...) { DISP_Warn("Writing: Variable de fonction inconnue \n") ; }
+  }
+ }  
+ 
+ else if (!function.compare("default"))
+ {
+ parse("{print} all:vtk [ldump:vtk] id [ldump:mat] id, pos [cfdump:vtk] f [cfdump:mat] f [coarse:vtk] v, sigma, phi [coarse:mat] pos, v, sigma, phi") ;
+ }
+ 
+ else
+   DISP_Warn("Writing: Fonction inconnue") ; 
+ */
+return 1 ; 
+}
+
+void Writing::disp()
+{
+for (vector<unsigned char *>::iterator it=varset.begin() ; it<varset.end() ; it++) 
+{
+ printf("\n") ; 
+ for (int j=0 ; j<dim.size()/8 ; j++)
+   printf("%02x|", (*it)[j]) ; 
+} 
+}
+
+int Writing::get_nextfield (string format)
+{
+ static int numero=-1 ;
+ int form ; 
+ form=std::distance(formats.begin(), formats.find(format)) ; 
+ if (numero==-1) numero=0 ;
+ while (numero<charbysubsp*8)
+ { 
+  if ((varset[form][0*charbysubsp+numero/8] & (1<<(numero%8)))>0) 
+   {
+    numero++ ; 
+    return (numero-1) ; 
+   }
+  numero++ ; 
+ }
+ numero=-1 ; 
+ return numero ; 
+}
+
+WFormat Writing::get_nextwritingformat()
+{
+ static int i=-1 ; 
+ map<string,WFormat>::iterator it ; 
+ if (i==-1) i=0 ; 
+ 
+ it=formats.begin() ; 
+ for (i=i ; i<formats.size() ; i++)
+ {if ((format_writing & (1<<i))>0) {std::advance(it, i) ; i++ ; return it->second ; } }
+ i=-1 ; 
+ return NONE ; 
+}
+
+/*int Writing::get_nextfield (string space, string sp) // Using an alternative subspace than the linked one 
+{
+ static int numero=-1 ;
+ if (numero==-1) numero=0 ;
+ while (numero<charbysubsp*8)
+ {
+  if ((varset[types[space]][subspaces[sp]*charbysubsp+numero/8] & (1<<(numero%8)))>0) 
+   {
+    //printf("[%d %d %d]", types[space], lntypessubsp[space]*charbysubsp+numero/8, numero%8) ; 
+    numero++ ; 
+    return (numero-1) ; 
+   }
+  numero++ ; 
+ }
+ numero=-1 ; 
+ return numero ; 
+}*/
+
+
+int Writing::get_numelem (string var)
+{
+ if (dim[var]==1) return 1 ; 
+ else if (dim[var]==2) return 3 ; 
+ else if (dim[var]==3) return 9 ; 
+ else {DISP_Warn ("Writing : dimension inconnue") ; return 0 ;} 
+}
+int Writing::get_numelem (int var)
+{
+ if (var==1) return 1 ; 
+ else if (var==2) return 3 ; 
+ else if (var==3) return 9 ; 
+ else {DISP_Warn ("Writing : dimension inconnue") ; return 0 ;} 
+}
+
+string Writing::get_nextname (string var)
+{
+ static int num=-1 ; 
+ if (num==-1) num=0 ;  
+ if (dim[var]==1) 
+ {
+   if (num==0) {num++ ; return (var) ; } 
+   else {num=-1 ; return "false" ; }
+ }
+ else if (dim[var]==2)
+ {
+   switch(num)
+   {
+     case 0 : num++ ; return  (var+"x") ; 
+     case 1 : num++ ; return  (var+"y") ; 
+     case 2 : num++ ; return  (var+"z") ;
+     case 3 : num=-1 ;return  ("false") ;
+     default : DISP_Warn("Writing : should not happen\n") ; break ; 
+  }
+ }
+ else if (dim[var]==3)
+ {
+   switch(num)
+   {
+     case 0 : num++ ; return  (var+"xx") ; 
+     case 1 : num++ ; return  (var+"xy") ; 
+     case 2 : num++ ; return  (var+"xz") ;
+     case 3 : num++ ; return  (var+"yx") ; 
+     case 4 : num++ ; return  (var+"yy") ; 
+     case 5 : num++ ; return  (var+"yz") ;
+     case 6 : num++ ; return  (var+"zx") ; 
+     case 7 : num++ ; return  (var+"zy") ; 
+     case 8 : num++ ; return  (var+"zz") ;
+     case 9 : num=-1 ;return  ("false") ;
+     default : DISP_Warn("Writing : should not happen\n") ; break ; 
+  }
+ }
+ else
+   DISP_Warn("Writing : dimension inconnue \n") ;
+num=-1 ; 
+return "false" ;  
+}
+
+int Writing::get_nextvardef (string var)
+{
+return(get_nextvardef(var, "atm")) ; 
+}
+
+int Writing::get_nextvardef (string var, string sp)
+{
+  string a=get_nextname (var) ;
+  if (!a.compare("false")) return -1 ; 
+  if (!sp.compare("cf")) a="cf"+a ; 
+  return (vardef.at(a)) ; 
+}
+
+//=========================================================
+//-------------- ACTUAL VTK WRITING FUNCTIONS -----------------
+//=========================================================
+int Writing::VTKPolyData (ofstream & out, double **datas, int n)
+{
+  int i, j ; 
+  out << "# vtk DataFile Version 2.0\n" << "Made by PostProcessing (CC-BY-NC)\n" << "ASCII \n" ;
+  out << "DATASET POLYDATA\n" ; 
+  out << "POINTS " << n << " double\n" ;
+  
+  for (i=0 ; i<n ; i++)
+  {
+   for (j=0 ; j<3 ; j++)
+     out << datas[j][i] << " " ; 
+   out << "\n" ; 
+  }
+
+  out << "VERTICES " <<n << " "<< n*2 << "\n" ;
+  for (i=0 ; i<n ; i++)
+  {out << "1 " << i <<"\n" ;}
+  return 1 ;
+}
+
+int Writing::VTKUnstructuredGrid (ofstream & out, double **datas, int n)
+{
+  int i, j ; 
+  out << "# vtk DataFile Version 2.0\n" << "Made by PostProcessing (CC-BY-NC)\n" << "ASCII \n" ;
+  out << "DATASET UNSTRUCTURED_GRID\n" ; 
+  out << "POINTS " << n << " double\n" ;
+  
+  for (i=0 ; i<n ; i++)
+  {
+   for (j=0 ; j<3 ; j++)
+     out << datas[j][i] << " " ; 
+   out << "\n" ; 
+  }
+  return 1 ; 
+}
+
+int Writing::VTKStructuredGrid(ofstream &out, double **datas, int n, int * sizes)
+{
+int i,j,k ;
+out << "# vtk DataFile Version 2.0\n" << "Made by PostProcessing (CC-BY-NC)\nASCII\n" << "DATASET STRUCTURED_GRID\n" ; 
+out << "DIMENSIONS " <<sizes[0] << " " << sizes[1] << " " << sizes[2] << "\n" ; 
+out << "POINTS " << n << " double\n" ; 
+for (i=0 ; i<n; i++)
+  {
+    for (j=0 ; j<3 ; j++)
+      out << datas[j][i] << " " ; 
+    out << "\n" ; 
+  }
+return 1 ;   
+}
+
+int Writing::VTKCellLines (ofstream & out, double **datas, int nb) 
+{
+  int i, j ;
+  out << "CELLS " << nb << " " << (nb*3) << "\n" ; 
+  for (i=0 ; i<nb ; i++)
+  {out << "2 " << (int)datas[0][i]-1 << " " << (int)datas[1][i]-1 << "\n" ; }
+  out << "CELL_TYPES " << nb << "\n" ; 
+  for (i=0 ; i<nb ; i++) out << "3\n" ; 
+  out << "\n" ;
+return 1 ;  
+}
+
+int Writing::VTKField (ofstream & out, string name, double **datas, int dim, int n)
+{
+ int i, j ; 
+ int nbcomp ;
+ 
+ nbcomp=get_numelem(dim);  
+ 
+ if (dim==1)  out << "SCALARS " ;
+ else if (dim==2) out << "VECTORS " ;
+ else if (dim==3) out << "TENSORS " ;
+ else DISP_Warn("Writing: dimension annormale pour les données à écrire VTK") ; 
+    
+ out << name <<" double " ;
+ if (dim==1)  out << "1 \nLOOKUP_TABLE default\n" ;
+ 
+ for (i=0 ; i<n ; i++)
+ {
+  for (j=0 ; j<nbcomp ; j++)
+  {
+   out<< datas[j][i] << " "; 
+  } 
+  if (dim>1) out << "\n" ; 
+ }
+ out << "\n" ;
+ return 1 ;  
+}
+
+int Writing::VTKStartPointData (ofstream & out, int n)
+{
+out << "POINT_DATA " << n << "\n" ;  
+return 1 ;   
+}
+
+int Writing::VTKStartCellData (ofstream & out, int nb) 
+{
+out << "CELL_DATA " << nb << "\n" ;
+return 1 ;  
+}
+
+//=========================================================
+//-------------- ACTUAL WRITING MATLAB FUNCTIONS ----------
+//=========================================================
+#ifdef MATLAB
+int Writing::MATFichier (string nom)
+{
+  MATFile * mout ; 
+  double ** datas ;
+  int *idx, *dims, j, k, l, cpt, cptvar, ts, natm, ncell, res, res2, cfiddeb ; 
+  int **nbelem ; string * noms ; 
+  map<string,int>::iterator it ; 
+
+  DISP_Info("L'écriture matlab à nombre de grains variable n'est pas supportée\n") ;
+  
+  idx=(int *)malloc(1*sizeof(int)) ; dims=(int *)malloc(1*sizeof(int)) ; 
+  nbelem=(int **)malloc(1*sizeof(int)) ; noms =(string *) malloc(1*sizeof(string)) ;  
+  cpt=0 ; cptvar=0 ; 
+  while ( (res=get_nextfield("mat")) != -1 )
+  {
+    it=dim.begin() ; std::advance(it,res) ;
+    cptvar++ ;
+    nbelem=(int**)realloc(nbelem, cptvar*sizeof(int)) ; 
+    noms=(string *)realloc(noms, cptvar*sizeof(int)) ; 
+    dims=(int*)realloc(dims, cptvar*sizeof(int)) ;
+    noms[cptvar-1]=it->first ; 
+    dims[cptvar-1]=get_numelem(it->second) ; 
+    while ((res2=get_nextvardef(it->first)) != -1)
+    { cpt++ ;
+      idx=(int*)realloc(idx, cpt*sizeof(int)) ;
+      idx[cpt-1]=res2 ; 
+      if (res2>CELLDATAMIN && res2<CELLDATAMAX) nbelem[cptvar-1]=&ncell ; 
+      else nbelem[cptvar-1]=&natm ;
+    }
+  }
+  idx=(int*)realloc(idx, (cpt+1)*sizeof(int)) ; idx[cpt]=-1 ; 
+  
+  // reordering par ordre croissant (les différentes composantes d'une variable de dimension 2 ou 3 se suivent toujours !!!
+  int deplacements, tmp ; int * tmpptr ; string tmpstr ;
+  do
+  {
+    deplacements=0 ; k=1 ; 
+    for (j=dim[0] ; j<cpt ; j+=dims[k-1])
+    {
+     if (idx[j]<idx[j-1]) // il faut permuter, et ça c'est pas drôle
+      { deplacements++ ; 
+	for (l=0 ; l<dims[k] ; l++)
+	{
+	  for (int m=0 ; m<dims[k-1] ; m++)
+	  {
+	   tmp=idx[j+l-m] ; idx[j+l-m]=idx[j+l-m-1] ; idx[j+l-m-1]=tmp ;
+	  }
+	}
+	j-=dims[k-1] ;
+	tmp=dims[k] ; dims[k]=dims[k-1] ; dims[k-1]=tmp ; 
+	j+=dims[k-1] ;
+	tmpptr=nbelem[k] ; nbelem[k]=nbelem[k-1] ; nbelem[k-1]=tmpptr ; 
+	tmpstr=noms[k] ; noms[k]=noms[k-1] ; noms[k-1]=tmpstr ; 
+      }
+      k++ ; 
+    }
+  } while (deplacements>0) ; 
+  
+  datas=(double **)malloc(cptvar*sizeof(double *)) ; 
+  d=(double **) malloc(cpt*sizeof(double)) ; 
+  
+  sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
+  ts=0 ; 
+  while (Signal==OK)
+  {
+    int tmp, val ; 
+    for (int dos=0 ; dos<2 ; dos++)
+    {
+    if (cfiddeb==-1) {if(dos==1) continue ; sendout(CHOOSELDUMP) ; pthread_cond_wait(&sigin, &mutex); i=idx ;}
+    else if (cfiddeb== 0) {if(dos==1) continue ; sendout(CHOOSECFDUMP) ; pthread_cond_wait(&sigin, &mutex); i=idx ;}
+    else {
+        if (dos==0) {sendout(CHOOSECFDUMP) ; pthread_cond_wait(&sigin, &mutex); i=idx+cfiddeb ; }
+        else {for (k=cpt-cfiddeb-1 ; k>=0 ; k--) d[cfiddeb+k]=d[k] ; 
+	  ncell=val ; 
+	  sendout(CHOOSELDUMP) ; pthread_cond_wait(&sigin, &mutex); i=idx ; tmp=idx[cfiddeb] ; idx[cfiddeb]=-1 ; }
+      }
+    sendout(ASKINGND) ; pthread_cond_wait(&sigin, &mutex);
+    val=*i ; 
+    }
+    if (cfiddeb>0) {idx[cfiddeb]=tmp ; natm=val ; }
+    if (cfiddeb==-1) {ncell=val ;}
+    if (cfiddeb==0) {natm=val ;} 
+
+    cpt=0 ; 
+    for (j=0 ; j<cptvar ; j++)
+    { 
+      if (ts==0) {datas[j]=(double *)mxCalloc((*nbelem[j])*(ts+1)*dims[j], sizeof(double)) ; }
+      else 	 datas[j]=(double *)mxRealloc(datas[j], (*nbelem[j])*(ts+1)*dims[j]*sizeof(double)) ; 
+      if (datas[j]==NULL) {DISP_Err("Writing: pas assez de mémoire à allouer") ; }
+      for (k=0 ; k<dims[j] ; k++)
+      {
+	for (l=0 ; l<natm ; l++)
+	  datas[j][ts* (*nbelem[j]) *dims[j]+k*(*nbelem[j])+l]=d[cpt][l] ;
+        cpt++ ; 
+      }
+    }    
+    ts++ ; 
+    sendout(NEXTTS) ; pthread_cond_wait(&sigin, &mutex);
+  }
+  
+ mout=matOpen(nom.c_str(), "w");
+ j=0 ; 
+ while ((res=get_nextfield("mat")) != -1 )
+  {
+  it=dim.begin() ; std::advance(it,res);
+  MATMatrix (mout, it->first, datas[j], 3, (*nbelem[j]), get_numelem(it->second), ts) ; 
+  j++ ; 
+  }
+ matClose(mout) ; 
+ return 1 ; 
+}
+//--------------------------------------------
+int Writing::MATMatrix (MATFile * out, string name, double *datas, int ndim, ...)
+{
+mxArray *pm ; 
+mwSize n, *dims ; 
+va_list dimsizes;
+int i, tmp ; 
+
+n=ndim ;
+dims=(mwSize *) malloc(ndim*sizeof(mwSize)) ; 
+va_start(dimsizes, ndim);
+for (i=0 ; i<ndim ; i++)
+{
+  tmp=va_arg(dimsizes,int);
+  dims[i]=tmp ; 
+}
+va_end(dimsizes) ;
+
+pm=mxCreateNumericArray(n, dims, mxDOUBLE_CLASS, mxREAL);
+
+mxSetData (pm, datas) ; 
+matPutVariable(out, name.c_str() , pm);
+
+return 1 ; 
+//out=matOpen("Test.mat", "w");
+//const unsigned long int one=1 ; 
+//pm=mxCreateStructArray(1, &one, 3, field_names);
+
+//matClose(out) ; 
+}
+
+#endif
+
+//=========================================================
+//-------------- ACTUAL WRITING ASCII FUNCTION ----------
+//=========================================================
+int Writing::ASCIIwrite (ofstream & out, double **datas, int ndim, int n)
+{
+  int i, j ; 
+  
+  for (i=0 ; i<n ; i++)
+  {
+    for (j=0 ; j<ndim ; j++)
+    {
+     out << datas[j][i] << " " ; 
+    }
+    out << "\n" ; 
+  }
+return 1 ; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

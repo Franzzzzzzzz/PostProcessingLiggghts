@@ -1,0 +1,106 @@
+#ifndef MASTERH
+#include "MasterHeader.h"
+
+#else
+// Classe commune à tous les type de dump
+class Dump {
+public : 
+   // Variables
+   int nbsteps ;
+   ifstream dumpin ; 
+   long int inscrit ;   
+   vector <Step> steps ;
+   vector <struct Op> prefiltre ;
+   vector <struct Op> postfiltre ;
+
+   // Fonctions
+   Dump (void) ;  
+   virtual void disp(void) ; 
+   int open (string chemin) ;  
+   int write_asVTK (string chemin) {return(write_asVTKBase(chemin, 0));}
+   int write_asOneVTK (string chemin) {return(write_asVTKBase(chemin, 1)) ; }
+   int check_timestep (long int timestep);
+   virtual int free_timestep (long int inscrit) ;
+protected :
+   virtual int read (unsigned char read_type, int index) = 0 ;
+   int write_asVTKBase (string chemin, char type) ; 
+};
+
+// Classe pour les pas de force (lecture de VTK
+class FDump : virtual public Dump {
+public : 
+  // Fonctions 
+  virtual void disp(void) ;
+  int write_forcestot(string chemin) ;  
+  int write_coupletot(string chemin) ;  
+  virtual int read (unsigned char read_type, int index) ;
+  int mean_stress(string chemin) ; 
+
+private : 
+  // Fonctions
+  int identify_ligne_vtk (string ligne) ; 
+};
+
+// Classe pour les dump atomiques de base de liggghts
+class LDump : virtual public Dump {
+public : 
+  // Variables
+  // Fonctions
+  int write_asDUMP(string chemin) ;
+  int write_asRESTART(string chemin) ;
+  bool operator == (LDump &dmp) ; 
+  // Fonctions masquantes
+  virtual void disp(void) ; 
+};
+
+
+// Classe pour les dump atomiques non compressés
+class LucDump : public LDump
+{    
+public :
+  bool operator == (Dump &dmp) ;
+private :
+  // Fonctions
+  int isitem (string ligne) ; 
+  int sparselabels(Step &step , string ligne) ;
+  int write_forcestot(string chemin) ;
+  virtual int read (unsigned char read_type, int index);
+};
+
+// Classe pour les dump par pair de contact non compressé (chain forces)
+class LcfDump : public LDump {
+public :
+  int write_asVTK (string chemin, LucDump &dump) ; // remplace la fonction write_asVTK de la classe mère.
+
+private :
+  // Fonctions
+  int isitem (string ligne) ; 
+  int sparselabels(Step &step , string ligne) ;
+  virtual int read (unsigned char read_type, int index);
+} ; 
+
+
+#include "Statistics.h"
+#include "Compress.h"
+// Classe pour les dump atomiques compressés
+
+class LcpDump : public LDump, public FDump
+{
+public : 
+  LcpDump() : isfirst(true),dumpinc(NULL) {}
+  virtual int free_timestep (long int inscrit) ;
+  virtual void disp(void) ;
+  int uncompress () ; 
+  Compresser cp_dat ; 
+  bool isfirst ; 
+  FILE * dumpinc ; 
+  char nomoriginal[500] ; 
+private :
+  virtual int read (unsigned char read_type, int index);
+  bool checkfile (void) ; 
+};
+
+#endif
+
+
+
