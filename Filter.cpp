@@ -780,7 +780,7 @@ int Filter::fill(Step & step, struct Op op)
     	}
     }
 
-
+return 0 ;
 }
 
 //=======================================
@@ -826,6 +826,15 @@ double fn, ft ;
 static bool first=true ; static double samplingcf, intersampling  ;
 Step * atmstep = NULL ;
 
+// Fill the period array if it is not presentm
+if (step.find_idx(IDS("CFPERIOD"))==-1)
+{
+  step.idx_col.push_back(IDS("CFPERIOD")) ;
+  step.nb_idx++ ;
+  step.datas.resize(step.idx_col.size()) ;
+  idx[0]=step.find_idx(IDS("CFPERIOD")) ;
+  step.datas[idx[0]].resize(step.nb_atomes, 0) ;
+}
 // Ajoute des données à celles extraites pour les chaînes de force.
 //step.idx_col.push_back(CFMAG) ;
 step.idx_col.push_back(IDS("CFPOSX")) ;
@@ -866,7 +875,6 @@ if (!actions["donotusecfpos"].set && (step.find_idx(IDS("CFID1X"))!=-1 && step.f
  idx[11]=step.find_idx(IDS("CFX")) ; idx[12]=step.find_idx(IDS("CFY")) ; idx[13]=step.find_idx(IDS("CFZ")) ;
  idx[14]=step.find_idx(IDS("CFMAG")) ;// idx[9]=step.find_idx(IDS("CFR")) ; idx[10]=step.find_idx(IDS("CFTHETA")) ; idx[11]=step.find_idx(IDS("CFPHI")) ;
  idx[15]=step.find_idx(IDS("CFPERIOD")) ;
- fflush(stdout) ;
  for (i=0 ; i<step.nb_atomes ; i++)
    {
    step.datas[idx[14]][i]=sqrt(pow(step.datas[idx[3]][i],2)+pow(step.datas[idx[4]][i],2)+pow(step.datas[idx[5]][i],2)) ;
@@ -1053,7 +1061,6 @@ if (atmstep)
    //DISP_Info("Nombre de chaînes internes aux multisphere supprimées :") ; printf("%d sur %d totales\n", todelete, step.nb_atomes+todelete) ;
  }
 }
-
 return 1 ;
 }
 //--------------------------------------------------------------------------
@@ -1115,7 +1122,7 @@ for (int i=0 ; i<step.nb_atomes ; i++)
    }
  }
 }
-
+return 0 ;
 }
 
 //=========================
@@ -1282,7 +1289,7 @@ int Filter::make2D3D (Step & step, struct Op op)
     step.datas.resize(step.datas.size()+1) ;
     step.datas[step.datas.size()-1].resize(step.nb_atomes,0) ;
  }
-
+return 0 ;
 }
 
 //--------------------------------------------------------------------
@@ -1337,6 +1344,7 @@ int Filter::quat2orient (Step &step, struct Op op)
    }
  }
 first=false ;
+return 0 ;
 }
 //============================================================
 int Filter::cluster (Step &step, struct Op op)
@@ -1386,6 +1394,7 @@ return 0 ;
 int Filter::multisphere (Step &step, struct Op op)
 {
   DISP_Err("REMOVED FROM IMPLEMENTATION:DO NO USE (filter::multisphere)") ;
+  return -1 ;
 /*  int i, j, k, l, n ;
   int idx[8] ; static vector < vector <int> > gps ; static bool first=true ; static int ngp=-1 ;
   static vector < bool > activegp ;

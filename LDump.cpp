@@ -14,7 +14,7 @@ cout <<"--------------------\n\n" ;
 //------------------------------------------------------
 int LDump::write_asDUMP (string chemin)
 {
-long int i ; long int loop[2] ; 
+long int i ; long int loop[2] ;
 ofstream out ;
 stringstream chemin2 ;
 
@@ -65,31 +65,31 @@ int LucDump::read (unsigned char read_type, int index)
   string ligne;
   Step null_step ;
   int i, j, type, stop=0, idx ;
-  char *ligneC, *actu,*suiv ; 
-  bool istriclinic=false ; static bool first_naninf=true ; 
+  char *ligneC, *actu,*suiv ;
+  bool istriclinic=false ; static bool first_naninf=true ;
 
   // Function pointer readline(ifstream dumpin, string ligne)
   // if compress => the function decompress and write the ligne string
   // else: the function is just a wrapper for getline
-  // idem 
-  
-  ligneC=(char*)malloc(5000) ; 
-  Type=TL ; 
-  
+  // idem
+
+  ligneC=(char*)malloc(5000) ;
+  Type=TL ;
+
   if (read_type & 4) {nbsteps=0; printf("Lecture initiale du dump, peut prendre du temps ...\n") ; }
   if (read_type & 2) idx=index ;
 
   while (!dumpin.eof() && stop<2 )
   {
-   dumpin.getline(ligne) ; 
-   type=isitem(ligne) ; 
+   dumpin.getline(ligne) ;
+   type=isitem(ligne) ;
    switch (type)
    {
      case 1 : if (read_type & 4)
 		{
 		 nbsteps++ ; // Create new step and read 1 line to have timestep number.
 		 steps.resize(nbsteps, null_step) ;
-		 steps[nbsteps-1].multisphere=&multisphere ; 
+		 steps[nbsteps-1].multisphere=&multisphere ;
 		 steps[nbsteps-1].nb_atomes=0 ; steps[nbsteps-1].Type=TL ;
 		 steps[nbsteps-1].posinfile=dumpin.tellg()-(streampos)1 -(streampos)ligne.length() ;
                  if (index==-1) idx=nbsteps-1 ;
@@ -106,10 +106,10 @@ int LucDump::read (unsigned char read_type, int index)
      case 3 : if (read_type & 1)
 	      {
 	       // Taking care of triclinic boxes ...
-	       istriclinic = (ligne.find("xy") != string::npos) ; 
-	       dumpin >> steps[idx].box[0][0] >> steps[idx].box[0][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[0] ; 
-	       dumpin >> steps[idx].box[1][0] >> steps[idx].box[1][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[1] ; 
-	       dumpin >> steps[idx].box[2][0] >> steps[idx].box[2][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[2] ; 
+	       istriclinic = (ligne.find("xy") != string::npos) ;
+	       dumpin >> steps[idx].box[0][0] >> steps[idx].box[0][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[0] ;
+	       dumpin >> steps[idx].box[1][0] >> steps[idx].box[1][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[1] ;
+	       dumpin >> steps[idx].box[2][0] >> steps[idx].box[2][1] ; if (istriclinic) dumpin >> steps[idx].triclinic[2] ;
 	      }
 	      break ;
 
@@ -125,41 +125,41 @@ int LucDump::read (unsigned char read_type, int index)
 	       for (i=0 ; i<steps[idx].nb_atomes ; i++)
 	       {
 		dumpin.getline(&ligneC,5000) ;
-	        actu=ligneC ; 
+	        actu=ligneC ;
 		for (j=0 ; j<steps[idx].nb_idx ; j++)
 		{
 		  steps[idx].datas[j][i]=strtod(actu, &suiv) ;
-		  if (actu==suiv) 
-		  { 
-		    DISP_Err("Conversion to double failed dans LDump! Something really bad happened. Going to next field...\n") ; 
-		    while (*actu!=' ' && *actu!=0) actu++ ; 
+		  if (actu==suiv)
+		  {
+		    DISP_Err("Conversion to double failed dans LDump! Something really bad happened. Going to next field...\n") ;
+		    while (*actu!=' ' && *actu!=0) actu++ ;
 		  }
-		  else 
-		    actu=suiv ; 
+		  else
+		    actu=suiv ;
 		  if ( !isfinite(steps[idx].datas[j][i]) && first_naninf)
 		  {
-		    DISP_Warn("\n\n!!! Une valeur lue dans LDump est inf ou nan. ") ;  
+		    DISP_Warn("\n\n!!! Une valeur lue dans LDump est inf ou nan. ") ;
 		    DISP_Warn("Elle n'a PAS été supprimée.\n") ;
-                    first_naninf=false ; 
+                    first_naninf=false ;
 		      //steps[idx].datas[j][i]=0 ;
 		  }
 		}
 	       }
-	       
-	       
+
+
 	       /*for (i=0 ; i<steps[idx].nb_atomes ; i++)
 	       {
 		for (j=0 ; j<steps[idx].nb_idx ; j++)
 		{
-		  dumpin >> steps[idx].datas[j][i]; 
+		  dumpin >> steps[idx].datas[j][i];
 		  if (dumpin.fail())
 			{
 			 int st=dumpin.rdstate() ;
-			 dumpin.clear() ; 
-			 DISP_Warn("Une erreur de lecture (L) est apparue à l'octet : ") ; 
+			 dumpin.clear() ;
+			 DISP_Warn("Une erreur de lecture (L) est apparue à l'octet : ") ;
 			 printf("%d (error number %d, ts %d). ", (int)dumpin.tellg(), st, index) ;
 			 DISP_Warn("Elle a été supprimée et la valeur est mise à 0.\n") ;
-			 steps[idx].datas[j][i]=0 ; 
+			 steps[idx].datas[j][i]=0 ;
 			}
 		}
                }*/
@@ -230,27 +230,27 @@ int LucDump::sparselabels(Step &step , string ligne)
 
     step.idx_col.resize(compteur+1) ;
     res=IDS(item) ;
-    
-    if (res==-1) 
-    {DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter\n") ; 
 
-     res=IDS.new_id(item, TL) ; 
+    if (res==-1)
+    {DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter\n") ;
+
+     res=IDS.new_id(item, TL) ;
      if (res!=-1) step.idx_col[compteur]=res ;
-     else 
+     else
      {
-       DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n"); 
-       step.idx_col[compteur]=IDS("UNKNOWN") ; 
+       DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n");
+       step.idx_col[compteur]=IDS("UNKNOWN") ;
      }
     }
     else
      step.idx_col[compteur]=res ;
-    
+
     compteur++ ;
   }
   step.nb_idx=compteur ;
   return compteur ;
 }
-    
+
     /*if (item=="id")            step.idx_col[compteur]=ID ;
     else if (item == "x")      step.idx_col[compteur]=POSX ;
     else if (item == "y")      step.idx_col[compteur]=POSY ;
@@ -373,183 +373,183 @@ return 0 ;
 //==========================================
 int LucDump::write_xray (string chemin)
 {
-long int loop[3] ; string chem ; char num[50] ; 
-int i, dir ; int width, height ; 
-double box[6] ; double **img ; 
+long int loop[3] ; string chem ; char num[50] ;
+int i, dir ; int width, height ;
+double box[6] ; double **img ;
 
 loopdat(loop) ;
 cout << "\nLucDump::write_xray          " ;
-actions.set_progress(loop) ; actions.disp_progress() ; 
+actions.set_progress(loop) ; actions.disp_progress() ;
 
 // Box setting up
-check_timestep(loop[0]) ; 
-i=loop[0] ; 
+check_timestep(loop[0]) ;
+i=loop[0] ;
 if (! actions["use-box"].set)
 {
-  actions["use-box"].manual_set("box_xmin",-1e15) ; actions["use-box"].manual_set("box_xmax",1e15) ; 
-  actions["use-box"].manual_set("box_ymin",-1e15) ; actions["use-box"].manual_set("box_ymax",1e15) ; 
-  actions["use-box"].manual_set("box_zmin",-1e15) ; actions["use-box"].manual_set("box_zmax",1e15) ; 
+  actions["use-box"].manual_set("box_xmin",-1e15) ; actions["use-box"].manual_set("box_xmax",1e15) ;
+  actions["use-box"].manual_set("box_ymin",-1e15) ; actions["use-box"].manual_set("box_ymax",1e15) ;
+  actions["use-box"].manual_set("box_zmin",-1e15) ; actions["use-box"].manual_set("box_zmax",1e15) ;
 }
-// No usebox in the direction of averaging ; 
+// No usebox in the direction of averaging ;
 dir=(int)actions["xray"]["dir"] ;
 switch(dir) {
-  case 0:     
-    box[0]=fmax(actions["use-box"]["box_ymin"], steps[i].box[1][0]) ; 
-    box[1]=fmin(actions["use-box"]["box_ymax"], steps[i].box[1][1]) ; 
-    box[2]=fmax(actions["use-box"]["box_zmin"], steps[i].box[2][0]) ; 
-    box[3]=fmin(actions["use-box"]["box_zmax"], steps[i].box[2][1]) ; 
+  case 0:
+    box[0]=fmax(actions["use-box"]["box_ymin"], steps[i].box[1][0]) ;
+    box[1]=fmin(actions["use-box"]["box_ymax"], steps[i].box[1][1]) ;
+    box[2]=fmax(actions["use-box"]["box_zmin"], steps[i].box[2][0]) ;
+    box[3]=fmin(actions["use-box"]["box_zmax"], steps[i].box[2][1]) ;
     box[4]=steps[i].box[0][0] ; box[5]=steps[i].box[0][1] ;
-    break ; 
-  case 1:     
-    box[0]=fmax(actions["use-box"]["box_xmin"], steps[i].box[0][0]) ; 
-    box[1]=fmin(actions["use-box"]["box_xmax"], steps[i].box[0][1]) ; 
-    box[2]=fmax(actions["use-box"]["box_zmin"], steps[i].box[2][0]) ; 
-    box[3]=fmin(actions["use-box"]["box_zmax"], steps[i].box[2][1]) ; 
+    break ;
+  case 1:
+    box[0]=fmax(actions["use-box"]["box_xmin"], steps[i].box[0][0]) ;
+    box[1]=fmin(actions["use-box"]["box_xmax"], steps[i].box[0][1]) ;
+    box[2]=fmax(actions["use-box"]["box_zmin"], steps[i].box[2][0]) ;
+    box[3]=fmin(actions["use-box"]["box_zmax"], steps[i].box[2][1]) ;
     box[4]=steps[i].box[1][0] ; box[5]=steps[i].box[1][1] ;
-    break ; 
-  case 2: 
-    box[0]=fmax(actions["use-box"]["box_xmin"], steps[i].box[0][0]) ; 
-    box[1]=fmin(actions["use-box"]["box_xmax"], steps[i].box[0][1]) ; 
-    box[2]=fmax(actions["use-box"]["box_ymin"], steps[i].box[1][0]) ; 
-    box[3]=fmin(actions["use-box"]["box_ymax"], steps[i].box[1][1]) ; 
-    box[4]=steps[i].box[2][0] ; box[5]=steps[i].box[2][1] ; 
-    break ; 
-  default: DISP_Warn("Direction de moyennage xray inconnue\n") ; 
-} 
-width=actions["xray"]["width"] ; height=actions["xray"]["height"] ; 
+    break ;
+  case 2:
+    box[0]=fmax(actions["use-box"]["box_xmin"], steps[i].box[0][0]) ;
+    box[1]=fmin(actions["use-box"]["box_xmax"], steps[i].box[0][1]) ;
+    box[2]=fmax(actions["use-box"]["box_ymin"], steps[i].box[1][0]) ;
+    box[3]=fmin(actions["use-box"]["box_ymax"], steps[i].box[1][1]) ;
+    box[4]=steps[i].box[2][0] ; box[5]=steps[i].box[2][1] ;
+    break ;
+  default: DISP_Warn("Direction de moyennage xray inconnue\n") ;
+}
+width=actions["xray"]["width"] ; height=actions["xray"]["height"] ;
 img=(double**)malloc(sizeof(double*)*width) ;
-for (i=0 ; i<width ; i++) img[i]=(double*)malloc(sizeof(double)*height) ; 
+for (i=0 ; i<width ; i++) img[i]=(double*)malloc(sizeof(double)*height) ;
 
 for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   {
   actions.valeur=i ;
-  check_timestep(i) ;   
+  check_timestep(i) ;
   steps[i].xray_projection(dir, width, height, img, box) ;
-  
+
   sprintf(num, "%04ld", (i-loop[0])/loop[1]) ;
 #ifdef USETIFF
-  chem=chemin ; chem.append("-") ; chem.append(num) ; chem.append(".tif") ; 
+  chem=chemin ; chem.append("-") ; chem.append(num) ; chem.append(".tif") ;
   Writing::TIFF_bw_write(chem, width, height, img) ;
 #else
-  printf("USETIFF not set when compiled => cannot export to tiff") ; 
+  printf("USETIFF not set when compiled => cannot export to tiff") ;
 #endif
   }
 
-for (i=0 ; i<width ; i++) free(img[i]) ; 
+for (i=0 ; i<width ; i++) free(img[i]) ;
 free(img) ;
-return 0 ; 
+return 0 ;
 }
 //---------------------------------------
 int LucDump::write_multisphere_dumbell (string chemin)
 {
-  Icosahedre Ico ; 
-  if (actions["mean"].set) Ico.subdivide(3) ; 
-  
-  long int loop[3] ; string chem ; 
-  int i, j, k ; FILE *out,*out2 ; 
+  Icosahedre Ico ;
+  if (actions["mean"].set) Ico.subdivide(3) ;
+
+  long int loop[3] ; string chem ;
+  int i, j, k ; FILE *out,*out2 ;
   double theta=5, angular[72], angular2[72], tmptheta ; int tmpidxtheta ; // All these for the icosahedre thing
   int nangular=0 ;
   Vector seg, vect ;
-  Matrix3d K ; 
-  
-  loopdat(loop) ; 
+  Matrix3d K ;
+
+  loopdat(loop) ;
   cout << "\nLucDump::multisphere_dumbell          \n" ;
-  
-  actions.set_progress(loop) ; actions.disp_progress() ; 
-  check_timestep(loop[0]) ; 
-  
-  chem=chemin ; 
-  chem.append("-") ; chem.append("multisphere-tensor") ; chem.append(".txt") ; 
-  out=fopen(chem.c_str(), "w") ; 
-  
-  for (i=0 ; i<360/theta ; i++) angular[i]=angular2[i]=0 ; 
-  theta=theta/180*M_PI ; 
-  
+
+  actions.set_progress(loop) ; actions.disp_progress() ;
+  check_timestep(loop[0]) ;
+
+  chem=chemin ;
+  chem.append("-") ; chem.append("multisphere-tensor") ; chem.append(".txt") ;
+  out=fopen(chem.c_str(), "w") ;
+
+  for (i=0 ; i<360/theta ; i++) angular[i]=angular2[i]=0 ;
+  theta=theta/180*M_PI ;
+
   int r ;
-  
+
   for (i=loop[0] ; i<loop[2] ; i+=loop[1])
   {
-    actions.valeur=i ; 
-    check_timestep(i) ; 
+    actions.valeur=i ;
+    check_timestep(i) ;
 
-    K=steps[i].multisphere->compute_K(steps[i]) ; 
-    fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ; 
- 
+    K=steps[i].multisphere->compute_K(steps[i]) ;
+    fprintf(out, "%d %g %g %g %g %g %g %g %g %g\n",steps[i].timestep, K(0,0), K(0,1), K(0,2),K(1,0), K(1,1), K(1,2),K(2,0), K(2,1), K(2,2)) ;
+
     for (j=1 ; j<=steps[i].multisphere->ngp ; j++)
     {
-     if ((steps[i].multisphere->data[0][j])!=GP_OK) continue ;  
-     seg.set(steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ; 
-     if (isnan(steps[i].multisphere->data[4][j])) printf("[%d %g %g %g %g]", j, steps[i].multisphere->data[0][j],steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ; 
-     tmptheta=Calcul::angle_0_2pi(atan2(seg(3), seg(1))) ; 
-     if (tmptheta>(2*M_PI-theta/2)) tmptheta-=(2*M_PI) ; 
-     tmpidxtheta=(int)(round(tmptheta/theta)) ; 
-     
+     if ((steps[i].multisphere->data[0][j])!=GP_OK) continue ;
+     seg.set(steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ;
+     if (isnan(steps[i].multisphere->data[4][j])) printf("[%d %g %g %g %g]", j, steps[i].multisphere->data[0][j],steps[i].multisphere->data[4][j], steps[i].multisphere->data[5][j], steps[i].multisphere->data[6][j]) ;
+     tmptheta=Calcul::angle_0_2pi(atan2(seg(3), seg(1))) ;
+     if (tmptheta>(2*M_PI-theta/2)) tmptheta-=(2*M_PI) ;
+     tmpidxtheta=(int)(round(tmptheta/theta)) ;
+
      if (tmpidxtheta>=0 && tmpidxtheta<=71)
      {
-     angular[tmpidxtheta]++ ; 
-     nangular++ ; 
+     angular[tmpidxtheta]++ ;
+     nangular++ ;
      }
      else
-       printf("!1") ; 
-     
+       printf("!1") ;
+
      for (k=0 ; k<72 ; k++)
      {
-      vect(1)=cos(2*M_PI/72.*k) ; vect(2)=0 ; vect(3)=sin(2*M_PI/72.*k) ; 
-      angular2[k]+=(seg.dot(vect))*(seg.dot(vect)) ;  
+      vect(1)=cos(2*M_PI/72.*k) ; vect(2)=0 ; vect(3)=sin(2*M_PI/72.*k) ;
+      angular2[k]+=(seg.dot(vect))*(seg.dot(vect)) ;
      }
-     r=Ico.belonging_tri(seg) ;  
+     r=Ico.belonging_tri(seg) ;
      if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!2[%g %g %g]", seg(1),seg(2),seg(3)) ;
-     r=Ico.belonging_tri(-seg) ; 
+     r=Ico.belonging_tri(-seg) ;
      if (r!=-1) Ico.data[r]=Ico.data[r]+1 ; else printf("!3[%g %g %g]", seg(1),seg(2),seg(3)) ;
     }
   }
-  fclose(out) ; 
-  
+  fclose(out) ;
+
   if (actions["mean"].set)
   {
-    chem=chemin ; 
-    chem.append("-") ; chem.append("multisphere-2Dorient") ; chem.append(".txt") ; 
-    out2=fopen(chem.c_str(), "w") ; 
-    //theta=theta*180/M_PI ; 
-    fprintf(out2, "# Informations on the average - loop parameters : %ld:%ld:%ld\n", loop[0],loop[1],loop[2]) ; 
-    double sumangular2=0 ; 
-    for (i=0 ; i<72 ; i++) sumangular2+=angular2[i] ; 
-    for (i=0 ; i<72 ; i++) fprintf(out2, "%g %g %g %d\n", i*theta, angular[i]/nangular/(theta), angular2[i]/sumangular2/theta, nangular) ; 
-    fprintf(out2, "%g %g %g %d\n", 0*theta, angular[0]/nangular/(theta), angular2[0]/sumangular2/theta, nangular) ; 
-    fclose(out2) ; 
-    
-    chem=chemin ; 
-    chem.append("-") ; chem.append("multisphere") ; chem.append(".vtk") ; 
-  
-    int tot=0 ; 
+    chem=chemin ;
+    chem.append("-") ; chem.append("multisphere-2Dorient") ; chem.append(".txt") ;
+    out2=fopen(chem.c_str(), "w") ;
+    //theta=theta*180/M_PI ;
+    fprintf(out2, "# Informations on the average - loop parameters : %ld:%ld:%ld\n", loop[0],loop[1],loop[2]) ;
+    double sumangular2=0 ;
+    for (i=0 ; i<72 ; i++) sumangular2+=angular2[i] ;
+    for (i=0 ; i<72 ; i++) fprintf(out2, "%g %g %g %d\n", i*theta, angular[i]/nangular/(theta), angular2[i]/sumangular2/theta, nangular) ;
+    fprintf(out2, "%g %g %g %d\n", 0*theta, angular[0]/nangular/(theta), angular2[0]/sumangular2/theta, nangular) ;
+    fclose(out2) ;
+
+    chem=chemin ;
+    chem.append("-") ; chem.append("multisphere") ; chem.append(".vtk") ;
+
+    int tot=0 ;
     for (i=0 ; i<Ico.nfaces ; i++) tot+=Ico.data[i] ;
     for (i=0 ; i<Ico.nfaces ; i++) Ico.data[i]/=(tot*Ico.solidangle[i]) ;
-    Ico.deform() ; 
+    Ico.deform() ;
     Ico.write_vtk(chem) ;
   }
-  
+return 0 ;   
 }
 //------------------------------------------------------
 int LucDump::write_Voronoi (string chemin)
 {
-  long int loop[3] ; 
+  long int loop[3] ;
   loopdat(loop) ;
-  actions.set_progress(loop) ; actions.disp_progress() ; 
-  check_timestep(loop[0]) ;    
-  
+  actions.set_progress(loop) ; actions.disp_progress() ;
+  check_timestep(loop[0]) ;
+
   auto out=fopen((chemin+"-voro.txt").c_str(), "w") ; if (out==NULL) {DISP_Err("Cannot create file\n") ; return 1 ; }
 
-  for (int i=loop[0] ; i<loop[2] ; i+=loop[1]) 
+  for (int i=loop[0] ; i<loop[2] ; i+=loop[1])
   {
-    actions.valeur=i ; 
-    check_timestep(i) ; 
-    
-    double res=steps[i].GetVoronoi() ; 
+    actions.valeur=i ;
+    check_timestep(i) ;
+
+    double res=steps[i].GetVoronoi() ;
     if (res>=0)
-      fprintf(out, "%d %g\n", steps[i].timestep, res) ; 
+      fprintf(out, "%d %g\n", steps[i].timestep, res) ;
   }
-fclose (out) ; 
-return 0 ; 
+fclose (out) ;
+return 0 ;
 }
 
 
@@ -566,11 +566,11 @@ char datas[500] ;  unsigned char UC ; unsigned short int USI ; unsigned int UI ;
 double D ; float F ; int I ; long int LI ;
 
 Step null_step ;
-int retour ; size_t res ; 
+int retour ; size_t res ;
 int i=0, j, k,l, idx ;
 FILE *in ; in=dumpinc ;
 
-Type=TL ; 
+Type=TL ;
 
 if (!checkfile()) {return -1 ;}
 
@@ -599,7 +599,7 @@ if (isfirst == true) // Lecture de l'header du fichier
    cp_dat.champs.denombrables.resize(steps[0].nb_idx) ;
    for (i=0 ; i<nbsteps ; i++)
      {
-     steps[i].multisphere=&multisphere ;   
+     steps[i].multisphere=&multisphere ;
      steps[i].idx_col.resize(steps[0].nb_idx) ;
      steps[i].nb_idx=steps[0].nb_idx ;
      }
@@ -783,7 +783,7 @@ return true ;
 int LcpDump::uncompress()
 {
 char chemintempor[500]; string chemintmp ;
-DISP_Err("DO NOT USE THIS") ; 
+DISP_Err("DO NOT USE THIS") ;
 //sprintf(chemintempor,"%s.uc",nomoriginal) ;
 chemintmp=chemintempor ;
 if (steps[0].Type==TL)
@@ -811,7 +811,7 @@ if (steps[inscrit].nb_atomes>0)
   }
 /* Créé des erreurs de segmentation dans certains cas pour une raison que je ne m'explique pas. On commente (c'est pas pour la place que ça prend ...)  mais c'est bizarre
 steps[inscrit].datas.clear() ; */
-steps[inscrit].filtered=false ; 
+steps[inscrit].filtered=false ;
 inscrit=-1 ;
 return inscrit ;
 }
