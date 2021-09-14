@@ -459,7 +459,7 @@ cstep->idx_col.push_back(IDS("COARSIGTOTXX") ); cstep->idx_col.push_back(IDS("CO
 cstep->idx_col.push_back(IDS("COARSIGTOTYX") ); cstep->idx_col.push_back(IDS("COARSIGTOTYY") ); cstep->idx_col.push_back(IDS("COARSIGTOTYZ") );
 cstep->idx_col.push_back(IDS("COARSIGTOTZX") ); cstep->idx_col.push_back(IDS("COARSIGTOTZY") ); cstep->idx_col.push_back(IDS("COARSIGTOTZZ") );
 
-if (actions["multisphere"].set || actions["multisphereflux"].set)
+if (actions["multisphere"].set || actions["multisphereflux"].set || actions["superquadric"].set)
 {
 cstep->idx_col.push_back(IDS("COARNBGP"));
 cstep->idx_col.push_back(IDS("COARORIENTXX") ); cstep->idx_col.push_back(IDS("COARORIENTXY") ); cstep->idx_col.push_back(IDS("COARORIENTXZ") );
@@ -603,8 +603,9 @@ int i, j, k, l ;
 double width, height, depth, rayon, masse, densite ;
 int idx[16], idxatm[8], idxlin[2] ;
 static bool infoonce=true ;
-int bool_coarse=0 ; bool domultisphere=false ;
+int bool_coarse=0 ;
 bool est2D ;
+bool superquadric=false ; 
 Vector r, f, xa, xb ;
 
 // 1 : checks du type de coarse 0 cfcoarse seulement (cannot do w/kinetic), 1 atmcoarse seul, 2 both
@@ -651,10 +652,16 @@ if (type==1 || type==2)
     }
     rayon=actions.Cst["Radius"] ;
     }
+  if (actions["superquadric"].set) superquadric = true ; 
+  if (superquadric)
+  {
+      idxatm[7]=stepatm.find_idx(IDS("orientxx")) ;
+      if (idxatm[7]==-1) 
+          printf("Cannot find orientation information in the dump atm");
+  }
   densite=actions.Cst["Rhograin"] ;
   est2D=actions["is2D"].set ;
   }
-
 
 // 3 : coarse graining pour vitesses si nécessaire pour commencer
 double coeff ; Vector position ;
@@ -670,6 +677,20 @@ vector <double> & vz=cstep->datas[cstep->find_idx(IDS("VZ"))] ;
 vector <double> & nb_atm=cstep->datas[cstep->find_idx(IDS("COARATM"))] ;
 vector <double> & mean_radius=cstep->datas[cstep->find_idx(IDS("COARRAD"))] ;
 vector <double> & phi=cstep->datas[cstep->find_idx(IDS("COARPHI"))] ;
+
+vector <vector<double>*> orient (9, nullptr) ; 
+if (superquadric) 
+{
+    orient[0] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTXX"))]) ;
+    orient[1] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTXY"))]) ;
+    orient[2] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTXZ"))]) ;
+    orient[3] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTYX"))]) ;
+    orient[4] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTYY"))]) ;
+    orient[5] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTYZ"))]) ;
+    orient[6] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTZX"))]) ;
+    orient[7] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTZY"))]) ;
+    orient[8] = &(cstep->datas[cstep->find_idx(IDS("COARORIENTZZ"))]) ;
+}
 if (type==1 || type==2)
  {
  for (j=0 ; j<natomescompt ; j++)
@@ -700,7 +721,9 @@ if (type==1 || type==2)
      vx[idxclosest]+=stepatm.datas[idxatm[3]][j]*coeff*masse ;
      vy[idxclosest]+=stepatm.datas[idxatm[4]][j]*coeff*masse ;
      vz[idxclosest]+=stepatm.datas[idxatm[5]][j]*coeff*masse ;
-
+     if (superquadric)
+         for (int d=0 ; d<9 ; d++)
+            (*orient[d])[idxclosest] += stepatm.datas[idxatm[7]+d][j]*coeff*masse ; 
      }
     }
    }
@@ -716,6 +739,10 @@ if (type==1 || type==2)
      vx[j]=vx[j]/(phi[j]*densite) ;
      vy[j]=vy[j]/(phi[j]*densite) ;
      vz[j]=vz[j]/(phi[j]*densite) ;
+     
+     if (superquadric)
+         for (int d=0 ; d<9 ; d++)
+             (*orient[d])[j] = (*orient[d])[j]/(phi[j]*densite) ; 
     }
   }
  }
