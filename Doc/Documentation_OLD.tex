@@ -1,0 +1,270 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[applemac]{inputenc}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[a4paper,left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{subfig}
+%\usepackage{siunitx}
+\usepackage{xcolor}
+%\usepackage{bbm}
+
+%opening
+\title{Documentation du logiciel de post-processing de Liggghts \\ Avancement du dévelopement}
+\author{F. G.}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Historique}
+28/03/2011 : création de la compression de base pour les dump atomiques (positions des atomes, rayons etc. La compression se fait sur les valeurs à chaque timestep. Si au cours du temps (sur le fichier complet), le nombre de valeur pris par un type de donnée est fini (1, 2, 4 ou 16), les données sont compressées en allouant un nombre de bit inférieur à l'octet pour la donnée en question.\\
+12/09/2011 : addition de la compression des dump de force sur les triangle de mesh. La compression se base le regroupement effectué auparavant dans le programme de post-processing des données de force et des données de dump atomique. Pour une backward compatibility correcte, les modifications à cette date sont en \textcolor{red}{rouge} dans ce fichier. Une extension apportée à la compression est la vérification s'il existe des modifications des données d'un timestep à l'autre, et l'ajout de type de données en lien avec cela.
+
+\begin{tabular}{|l|l|c|p{6cm}|}\hline
+Version majeure & Version mineure & Date & Modifications \\ \hline
+1 & 0 & 28/03/2011 & Cr\'ation de la compression des L dump (dump atomique de base) \\ \hline
+2 & 0 & 12/09/2011 & Ajout de la compression des F dump (dump de force sur objet) \\ \hline
+2 & 1 & 16/06/2012 & Correction d'un bug lors de l'\'ecriture des formats dénombrables (2 et +) \\ \hline
+%2 & 5 & 02/11/2013 & \'Elimination des bouts de codes pas finis. Modifications des chainforces \\ \hline
+\end{tabular}
+
+\begin{figure}
+ \includegraphics[width=\linewidth]{Dump.pdf}
+ \caption{Sch\'ema des relations de classes de dumps dans PostProcessing}
+\end{figure}
+
+
+
+
+\newpage
+\section{Fonctionnement gÈnÈral}
+Dans tous les cas, 
+
+\section{Exemple de quelques commandes ...}
+\subsection{Pour un coarse graining correct}
+Pour le coarse-graining, il peut y avoir jusqu'à 3 dump à fournir :
+\begin{itemize}
+\item Coarse-graining de vitesses et compacités : un seul dump de type Ldump avec les positions des atomes (appelé ATOMDUMP dans la suite).
+\item Coarse-graining de contrainte : 2 dump avec l'argument \verb{--chainforce{. Le dernier argument est un dump de type TCF (CFdump, CFDUMP dans la suite) et contient les forces particules-particules, l'avant dernier est un argument de type TL (Ldump) et contient les positions des atomes. Le coarse graining de vitesse est automatiquement effectué en même temps, mais il ne faut pas trop s'y fier je pense ...
+\item Coarse-graining incluant les interactions avec le mur : 3 dump avec les arguments \verb{--chainforce --wallchainforce x x x{. Le dernier et l'avant dernier argument sont les dumps indiqué au point précédent, l'avant-avant dernier argument est un dump de type TL (LDump, WALLFORCEDUMP dans la suite) contenant les interactions grains-cylindre (ne fonctionne qu'avec un cylindre pour l'instant). 
+\end{itemize}
+\bigskip 
+Problèmes à éviter : 
+\begin{itemize}
+\item Faire un clean de tous les tmp pour les dump utilisés (par mesure de précaution, les tmp n'enregistrant pas les types de dump ça peut causer problème).
+\item Les timestep de tous les dump devraient être identiques pour éviter les problèmes (même si une petite vérification est faite pour les 
+\item Il est conseillé d'utiliser toujours \verb{--winsphere{ en granulaire avec le ATOMDUMP, et de ne pas l'utiliser sinon (permet une mesure précise de la compacité). ATTENTION : il ne faut donc pas se fier aux compacités dans les coarse-graining de contrainte.
+\item Les contraintes sont TOUTES avec un signe MOINS (les données extraites sont donc $\sigma_{ij}=P\delta_{ij} - \tau_{ij}$.
+\end{itemize}
+
+Exemple de commandes : 
+\begin{verbatim}
+$ PostProcessing --coarse-graining 120 3 120 --use-box -0.1 0.1 -0.007 0.007 0 0.2 \ 
+--winsphere --v2 ATOMDUMP
+
+$ PostProcessing --chainforce --coarse-graining 120 3 120 \ 
+--use-box -0.1 0.1 -0.007 0.007 0 0.2 --periodicity ATOMDUMP CFDUMP
+
+$ PostProcessing --chainforce --coarse-graining 120 3 120 \
+--use-box -0.1 0.1 -0.007 0.007 0 0.2 --v2  \
+--wallchainforce 0 0.08 0.0025 WALLFORCEDUMP ATOMDUMP CFDUMP
+\end{verbatim}
+
+Rappel des arguments des options : 
+\begin{verbatim}
+--coarse-graining 120 3 120 : nb de boites en x, y, z
+--chainforce : pas d'arguments
+--use-box -0.1 0.1 -0.7 0.7 0 0.2 : limites de l'espace en -x, +x, -y, +y, -z, +z
+--periodicity : le CFDUMP indique si les interactions traversent 
+                 une condition limite periodique. (cf le tableau 1)
+--v2 : indique un liggghts version 2 (qques différences de syntaxe ...). 
+                 Implique periodicity
+--wallchainforce 0 0.08 0.0025 : position x, position z et rayon du cylindre 
+                 (rayon unused pour l'instant ...).
+\end{verbatim}
+
+\newpage
+
+\section{Description du format de fichier de compression de dump}
+Le format dump compressé permet de diminuer la taille utilisée par les dump, en gardant comme format de sortie de Liggghts des fichiers ASCII pour lesquels les traitements de base de fichiers caractères fonctionnent.
+Les différences entre le fichier après décompression et le fichier original doivent être nulles autant que faire ce peut (\textit{compression lossless}). 
+\textcolor{red}{}
+
+\subsection{Header}
+\begin{itemize}
+ \item String : ''AVFFLIGGGHTSDUMPCOMPRESSED'' (26 octets). \textcolor{red}{String "AVFFLIGGGHTSDUMPCOMPRES2.0" (26 octet)}.
+ \item Unsigned Short Integer : nombre de caractère dans le nom de fichier original (2 octets)
+ \item String : nom du fichier original
+ \item Integer : nombre de timestep (4 octets)
+ \item Unsigned Char : nombre de données dumped par par de temps (1 octet). \textbf{Les données écrites doivent \^etre les m\^emes pour tous les pas de temps}
+ \item Pour chaque donnée :
+   \begin{itemize}
+     \item Unsigned char : Type de donnée (id, radius, x ...) (1 octet). Table \ref{Types}.
+     \item Unsigned char : Format de donnée (float, double etc.). (1 octet)
+     \item Pour les formats dénombrables, s'ensuit la liste complète des valeurs. Toute la liste doit être renseignée, y compris les valeurs non utilisées (par exemple si seulement 3 valeurs sur 4 sont utiles pour un type FLOAT\_DENOM\_4, la 4e doit tout de même être renseignée avec un float quelconque).
+     \item \color{red} Si le format est un des format du tableau \ref{TypesD} avec le flag MASK\_ALWAYS\_THE\_SAME=128 (\textit{eg.} FLOAT $|$ MASK\_ALWAYS\_THE\_SAME) : tous les timestep ont les mêms valeur pour ce champ. Ce champ ne sera donc renseigné qu'au premier timestep, et il ne faudra pas le lire ensuite.
+   \end{itemize}
+\end{itemize}
+
+%\renewcommand{\thefnmark}{\alph{footnotemark}}
+\begin{table}
+\begin{minipage}{\linewidth}
+\renewcommand{\footnoterule}{}
+\renewcommand{\thefootnote}{\alph{footnote}}
+\begin{tabular}{|c|c|c|c|l|} \hline
+  \textbf{Constante c} & \textbf{Int. c} & \textbf{Txt dump} & \textbf{Nom commun} & \textbf{Format} \\ \hline
+   ID      &1   & id & Identifiant atome & UInt\\ \hline
+   TYPE    &2   & type & Type d'atome      & UChar\\ \hline
+   POSX    &3   & x & Position x        & Float / Double\\ \hline
+   POSY    &4   & y & Position y       & Float / Double\\ \hline
+   POSZ    &5   & z & Position z        & Float / Double\\ \hline
+   VX      &6   & vx & Vitesse x         & Float / Double\\ \hline
+   VY      &7   & vy & Vitesse y         & Float / Double\\ \hline
+   VZ      &8   & vz & Vitesse z         & Float / Double\\ \hline
+   RAYON   &9 & radius  & Rayon             & Float / Double\\ \hline
+   FX      &10  & fx & Force x           & Float / Double\\ \hline
+   FY      &11  & fy &Force y           & Float / Double\\ \hline
+   FZ      &12  & fz & Force z           & Float / Double\\ \hline   
+   MASSE      &13  & mass & Masse           & Float / Double  \footnotemark[2]\\ \hline
+   OMEGAX      &14  & omegax & Vitesse angulaire x \footnotemark[3]  & Float / Double \footnotemark[2] \\ \hline
+   OMEGAY      &15  & omegay & Vitesse angulaire y  \footnotemark[3]  & Float / Double \footnotemark[2]\\ \hline
+   OMEGAZ      &16  & omegaz & Vitesse angulaire z  \footnotemark[3]  & Float / Double \footnotemark[2]\\ \hline
+   SIGMA$[$XYZ$][$XYZ$]$      &17 à 25 & sigma$[$xyz$][$xyz$]$ & Contraintes \footnotemark[3] & Float / Double  \footnotemark[2]\\ \hline
+   FORCEWALLX   &26  & f\_force\_cyl$[$1$]$ & Force particule/mur           & Float / Double \footnotemark[2]\\ \hline
+   FORCEWALLY   &27  & f\_force\_cyl$[$2$]$ & Force particule/mur           & Float / Double \footnotemark[2]\\ \hline
+   FORCEWALLZ   &28  & f\_force\_cyl$[$3$]$ & Force particule/mur           & Float / Double \footnotemark[2]\\ \hline
+   \color{green} CFID1 & 64 & c\_cout$[$1$]$ & ID atm1 & UInt\\ \hline
+    \color{green}CFID2 & 65 & c\_cout$[$2$]$ &ID atm2 & UInt\\ \hline
+    \color{green}CFFORCEX & 66 & c\_cout$[$3$]$ / c\_cout$[$4$]$ \footnotemark[4] & Force x du lien &Float / Double\\ \hline
+    \color{green}CFFORCEY & 67 & c\_cout$[$4$]$ / c\_cout$[$5$]$ \footnotemark[4] & Force y du lien & Float / Double\\ \hline
+    \color{green}CFFORCEZ & 68 & c\_cout$[$5$]$ / c\_cout$[$6$]$ \footnotemark[4] &Force z du lien & Float / Double\\ \hline
+    \color{green}CFMAG & 69 & Construit &Magnitude du lien & \\ \hline
+    \color{green}CFR & 70 & Construit & Lien en polaire \footnotemark[1] & \\ \hline
+    \color{green}CFTHETA & 71 & Construit & Lien en polaire\footnotemark[1] & \\ \hline
+    \color{green}CFPHI & 72 & Construit & Lien en polaire\footnotemark[1] & \\ \hline
+    \color{green}CFX & 73 & Construit &Position x du lien\footnotemark[1]& \\ \hline
+    \color{green}CFY & 74 & Construit &Position y du lien\footnotemark[1]& \\ \hline
+    \color{green}CFZ & 75 & Construit &Position z du lien\footnotemark[1]& \\ \hline
+    \color{green}CFPERIOD & 76 & c\_cout$[$3$]$ \footnotemark[4] &Périodicité du lien & UChar\\ \hline   
+   UNKNOWN &255 & Undefined         & Undefined &\\ \hline
+ \end{tabular}
+ \footnotetext[1] {Ne doit pas être compressé.}
+ \footnotetext[2] {Compression non réellement testée.}
+ \footnotetext[3] {Unused. Leur utilisation devrait être vérifiée si besoin.} 
+ \footnotetext[4] {Dans les version récentes de liggghts, la périodicité est indiqué dans la coordonnée 3 (CFPERIOD). Les autres c\_cout sont donc décallés de 1.} 
+\end{minipage}
+\caption{Table des types de données définis au \today. En vert les données orientées sur le type CFDump (dump de chainforce).}\label{Types}
+\end{table}
+
+\begin{table}
+\begin{minipage}{\linewidth}
+\renewcommand{\footnoterule}{}
+\renewcommand{\thefootnote}{\alph{footnote}}
+\begin{tabular}{|c|c|c|c|l|} \hline
+  \textbf{Constante c} & \textbf{Int. c} & \textbf{Txt dump} & \textbf{Nom commun} & \textbf{Format} \\ \hline
+   \color{red} PRESSURE & 128 & pressure & Pression & float \\ \hline
+   \color{red}SHEARSTRESS & 129 & shearstress & Cisaillement & float \\ \hline
+   \color{red}FORCEX & 130 & forcesTri\footnotemark[1]  &Force X & float \\ \hline
+   \color{red}FORCEY & 131 & forcesTri\footnotemark[1]  & Force Y & float \\ \hline
+   \color{red}FORCEZ & 132 & forcesTri\footnotemark[1]  & Force Y & float \\ \hline
+   \color{red}NORMALEX & 133 & normales  & Normale X & float \\ \hline
+   \color{red}NORMALEY & 134 & normales & Normale Y & float \\ \hline
+   \color{red}NORMALEZ & 135 & normales &Normale Z & float \\ \hline
+   \color{red}POINTX & 136 & POINTS & Point X & float \\ \hline
+   \color{red}POINTY & 137 & POINTS & Point Y & float \\ \hline
+   \color{red}POINTZ & 138 & POINTS & Point Z & float \\ \hline
+   \color{red}POLY1 & 139 & POLYGONS & Nb de sommet du polygone & Int \\ \hline
+   \color{red}POLY2 & 140 & POLYGONS & Sommet 1 & Int \\ \hline
+   \color{red}POLY3 & 141 & POLYGONS & Sommet 2 & Int \\ \hline
+   \color{red}POLY4 & 142 & POLYGONS & Sommet 3 & Int \\ \hline 
+   \color{red}STRESSX & 143 & stress\footnotemark[2]  &Force X & float \\ \hline
+   \color{red}STRESSY & 144 & stress\footnotemark[2]  &Force Y & float \\ \hline
+   \color{red}STRESSZ & 145 & stress\footnotemark[2]  &Force Y & float \\ \hline
+   \color{red}CENTREX & 146 & CELL\footnotemark[2]  &  Normale X & float \\ \hline
+   \color{red}CENTREY & 147 & CELL\footnotemark[2]  & Normale Y & float \\ \hline
+   \color{red}CENTREZ & 148 & CELL\footnotemark[2]  & Normale Z & float \\ \hline
+\end{tabular}
+ \footnotetext[1] {Extraites d'une modification des sources de Liggghts 1. Plus utilisés.}
+ \footnotetext[2] {Pour la version 2 de liggghts. La commande \texttt{--rebuild} permet de reconstruire FORCE$[$XYZ$]$ et d'autres choses à partir des données de v2.}
+\end{minipage}
+\caption{Table des types de données définis au \today pour les FDump (dump de force sur les triangles d'un mesh, lus dans un fichier VTK).}
+\end{table}
+
+
+\begin{table}
+\hspace*{-2cm} \begin{tabular}{|l|c|c|l|} \hline
+  \textbf{Constante c} & \textbf{Numéro de définition c} & \textbf{Nom commun}  & \textbf{Taille (bit/octet)} \\ \hline
+   CHAR       &1   & char & 8 / 1\\ \hline
+   UCHAR      &2   & unsigned char& 8 / 1\\ \hline
+   SINT       &3   & short int & 16 / 2\\ \hline
+   USINT      &4   & unsigned short int & 16 / 2\\ \hline
+   INT        &5   & int & 32 / 4\\ \hline
+   UINT       &6   & unsigned int & 32 / 4\\ \hline
+   LINT       &7   & long int  & 64 / 8 \\ \hline
+   ULINT      &8   & unsigned long int & 64 / 8 \\ \hline
+   FLOAT      &9   & float  & 32 / 4 \\ \hline
+   DOUBLE     &10  & double & 64 / 8 \\ \hline
+   CHAR\_CST  &17  & char constant& 0\\ \hline
+   UCHAR\_CST &18  & unsigned char constant& 0\\ \hline
+   SINT\_CST  &19  & short int constant& 0\\ \hline
+   USINT\_CST &20  & unsigned short int constant & 0\\ \hline
+   INT\_CST   &21  & int constant & 0\\ \hline
+   UINT\_CST  &22  & unsigned int constant & 0\\ \hline
+   LINT\_CST  &23  & long int constant & 0 \\ \hline
+   ULINT\_CST &24  & unsigned long int constant & 0 \\ \hline
+   FLOAT\_CST &25  & float constant  & 0 \\ \hline
+   DOUBLE\_CST&26  & double constant & 0 \\ \hline
+   CHAR\_DENOM\_2  &33  & char constant& 1 / 0\\ \hline
+   UCHAR\_DENOM\_2 &34  & unsigned char constant& 1 / 0\\ \hline
+   SINT\_DENOM\_2  &35  & short int constant& 1 / 0\\ \hline
+   USINT\_DENOM\_2 &36  & unsigned short int constant & 1 / 0\\ \hline
+   INT\_DENOM\_2   &37  & int constant & 1 / 0\\ \hline
+   UINT\_DENOM\_2  &38  & unsigned int constant & 1 / 0\\ \hline
+   LINT\_DENOM\_2  &39  & long int constant & 1 / 0 \\ \hline
+   ULINT\_DENOM\_2 &40  & unsigned long int constant & 1 / 0 \\ \hline
+   FLOAT\_DENOM\_2 &41  & float constant  & 1 / 0 \\ \hline
+   DOUBLE\_DENOM\_2&42  & double constant & 1 / 0 \\ \hline
+   CHAR\_DENOM\_4  &49  & char constant& 2 / 0\\ \hline
+   UCHAR\_DENOM\_4 &50  & unsigned char constant& 2 / 0\\ \hline
+   SINT\_DENOM\_4  &51  & short int constant& 2 / 0\\ \hline
+   USINT\_DENOM\_4 &52  & unsigned short int constant & 2 / 0\\ \hline
+   INT\_DENOM\_4   &53  & int constant & 2 / 0\\ \hline
+   UINT\_DENOM\_4  &54  & unsigned int constant & 2 / 0\\ \hline
+   LINT\_DENOM\_4  &55  & long int constant & 2 / 0 \\ \hline
+   ULINT\_DENOM\_4 &56  & unsigned long int constant & 2 / 0 \\ \hline
+   FLOAT\_DENOM\_4 &57  & float constant  & 2 / 0 \\ \hline
+   DOUBLE\_DENOM\_4&58  & double constant & 2 / 0 \\ \hline
+   CHAR\_DENOM\_16  &65  & char constant& 4 / 0\\ \hline
+   UCHAR\_DENOM\_16 &66  & unsigned char constant& 4 / 0\\ \hline
+   SINT\_DENOM\_16  &67  & short int constant& 4 / 0\\ \hline
+   USINT\_DENOM\_16 &68  & unsigned short int constant & 4 / 0\\ \hline
+   INT\_DENOM\_16   &69  & int constant & 4 / 0\\ \hline
+   UINT\_DENOM\_16  &70  & unsigned int constant & 4 / 0\\ \hline
+   LINT\_DENOM\_16  &71  & long int constant & 4 / 0 \\ \hline
+   ULINT\_DENOM\_16 &72  & unsigned long int constant & 4 / 0 \\ \hline
+   FLOAT\_DENOM\_16 &73  & float constant  & 4 / 0 \\ \hline
+   DOUBLE\_DENOM\_16 &74  & double constant & 4 / 0 \\ \hline
+ \end{tabular}
+\caption{Table des formats de données définis au \today.}\label{TypesD}
+\end{table}
+
+\subsection{Corps du fichier}
+Le corps du fichier est plus simple que l'header.
+\begin{itemize}
+ \item Unsigned Integer : valeur du timestep (4 octets) \textcolor{red}{pour un TL. Pour un TF, nombre de points.}
+ \item Unsigned Integer : nombre de particules (4 octets) \textcolor{red}{pour un TL. Pour un TF, nombre de triangles.}
+ \item Float $\times6$ : les bords de boîtes. \textcolor{red} {Dans le cas d'un dump de type force (ie. un vtk), ces champs sont mis à 0.}
+ \item Données complètes dans l'ordre donné dans l'header. Les types définis constants dans l'header sont ignorés. \textcolor{red}{Les types ayant le MASK\_ALWAYS\_THE\_SAME ne sont donnés qu'au premier timestep}. Pour les types de taille inférieure à l'octet, le dernier octet entamé est completé par des bits de faible poids ignorés à la lecture, qui n'empiètent pas sur les données suivantes.
+\end{itemize}
+
+
+
+\end{document}

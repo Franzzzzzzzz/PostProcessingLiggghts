@@ -1,0 +1,15 @@
+\select@language {french}
+\contentsline {section}{\numberline {1}Historique}{2}
+\contentsline {section}{\numberline {2}Fonctionnement g\'en\'eral}{3}
+\contentsline {section}{\numberline {3}Exemple de quelques commandes ...}{4}
+\contentsline {subsection}{\numberline {3.1}Commandes g\'en\'erales}{4}
+\contentsline {subsection}{\numberline {3.2}Pour un coarse graining correct}{4}
+\contentsline {section}{\numberline {4}Extraction des donn\'ees : la classe writing.}{6}
+\contentsline {subsection}{\numberline {4.1}Fonctionnement}{6}
+\contentsline {subsection}{\numberline {4.2}Compilation, ex\'ecution}{6}
+\contentsline {subsection}{\numberline {4.3}Parler avec la classe Writing}{6}
+\contentsline {subsection}{\numberline {4.4}Dimensions}{7}
+\contentsline {section}{\numberline {5}La classe IDS}{8}
+\contentsline {section}{\numberline {6}Description du format de fichier de compression de dump}{13}
+\contentsline {subsection}{\numberline {6.1}Header}{13}
+\contentsline {subsection}{\numberline {6.2}Corps du fichier}{13}

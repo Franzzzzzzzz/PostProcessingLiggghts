@@ -1,0 +1,62 @@
+Digraph G {
+rankdir=LR ;
+node [shape=box] ;
+
+SourceCPP [label="Sources du logiciel \nen C++", color=limegreen, style=filled]
+SourceCPP2 [label="Sources du logiciel \nen C++", color=limegreen, style=filled]
+Liggghts [label="Liggghts", color=red, style=filled]
+PP [label="PostProcessingGamma", color=red, style=filled]
+Blender [label="Blender\n(par exemple)", color=red, style=filled]
+Paraview [label="Paraview", color=red, style=filled]
+Matlab [label="Matlab\n(nécessite parfois\nun reshape()", color=red, style=filled]
+
+dumpT [label="dump.test\nDump atomique", color=navajowhite2, style=filled]
+dumpCF [label="dump.force\nDump chaineforces", color=navajowhite2, style=filled]
+dumpVTK [label="dump.stress\nDump VTK de contraintes\nsur un objet STL", color=navajowhite2, style=filled]
+dumpWF [label="dump.wallforce\nDump de chaine de force\nentre mur primitif et grain", color=navajowhite2, style=filled]
+{ rank=same ; SourceCPP2 ; PP}
+{ rank=same ; SourceCPP ; Liggghts}
+
+in [label="in.test\nFichier de commandes", color=navajowhite2, style=filled]
+stl [label="mesh.stl\nObjet", color=navajowhite2, style=filled]
+restartdata [label="restart\nFichier ASCII de position \nLiggghts:read_data", color=navajowhite2, style=filled]
+restart [label="restart\nFichier de redemarrage de liggghts\nread_restart", color=navajowhite2, style=filled]
+
+VTK [label="Pile de fichiers VTK", color=navajowhite2, style=filled]
+TXT [label="Fichier TXT", color=navajowhite2, style=filled]
+
+SourceCPP -> Liggghts [style=dotted] ;
+SourceCPP2 -> PP [style=dotted] ;
+
+in -> Liggghts ; 
+Blender -> stl -> Liggghts ;
+restartdata -> Liggghts ; 
+restart -> Liggghts ; 
+
+Liggghts -> dumpT -> PP ;
+Liggghts -> dumpCF -> PP ;
+Liggghts -> dumpVTK -> PP ; 
+Liggghts -> dumpWF -> PP; 
+
+PP -> VTK -> Paraview ; 
+PP -> TXT -> Matlab ; 
+
+
+//Dump [rank=source, label="Dump\n\nClasse de base", color=limegreen, style=filled]
+//FDump [label="FDump\n\nClasse pour les forces sur mesh\nIssu d'un fichier VTK", color=greenyellow, style=filled]
+//LDump [label="LDump\n\nClasse générale\nIssu d'un fichier de dump de Liggghts", color=greenyellow, style=filled]
+//LucDump [label="LucDump\n\nClasse générale quand le dump n'est pas compressé", color=greenyellow, style=filled]
+//LcfDump [label="LcfDump\n\nClasse pour les chainforces", color=greenyellow, style=filled]
+//LcpDump [label="LcpDump\n\nClasse compressée", color=peru, style=filled]
+//AtomDump [label="AtomDump\n\nDump des données atomiques de Liggghts", color=yellow, style=filled]
+//WallForceDump [label="WallForceDump\n\nDump des données d'interaction grains-objet", color=yellow, style=filled]
+//ChainForceDump [label="ChainForceDump\n\nDump des données d'interacrion grains-grains", color=yellow, style=filled]
+//MeshDump [label="MeshDump\n\nDump des données de force sur triangle mesh", color=yellow, style=filled]
+
+ 
+//FDump -> LcpDump  [style=dashed, taillabel="avoid", labelfontcolor=red, color=red];
+
+//AtomDump -> LucDump [style=dotted]; 
+
+
+} 

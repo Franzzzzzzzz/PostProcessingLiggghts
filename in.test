@@ -1,0 +1,139 @@
+# Ecoulement autour d'un cylindre à différentes profondeurs
+
+# =================== Variables ===============
+variable d equal 0.0015
+variable h equal 0.025
+variable rho equal 2500
+variable N equal 1000
+variable seed1 equal 15835
+variable seed2 equal 1834
+#------------------- Variables calculées ---------------
+variable radius equal $d/2
+variable Lsimu equal 0.01
+variable Hsimu equal 0.1
+variable Dsimu equal 0.01
+variable peau equal  2*$d
+variable HinsertTop equal ${Hsimu}-$d
+variable HinsertBottom equal ${Hsimu}-0.02
+variable Linsert equal ${Lsimu}-$d
+variable Dinsert equal ${Dsimu}-$d
+variable IRAb equal $h+0.005
+variable IRAh equal $h+0.015
+variable IRBb equal ${Hsimu}-0.02
+variable IRBh equal ${Hsimu}-0.005
+variable NDebit equal $N*10
+variable NA equal floor(0.6*4*${Lsimu}*${Dsimu}*$h/(0.5235*$d^3))
+variable NB equal $N-${NA}
+variable cylsc equal 0.01
+variable cyloffZ equal ($h+0.02)/${cylsc}
+#==============================================
+
+atom_style      granular
+boundary        p p m
+newton          off
+communicate     single vel yes
+units           si
+
+region          reg block -${Lsimu} ${Lsimu} -${Dsimu} ${Dsimu} 0 ${Hsimu} units box
+create_box      1 reg
+neighbor        ${peau} bin
+neigh_modify    every 1 check yes
+neigh_modify    delay 0
+
+# ------------- définition des grains -----------------
+pair_style      gran/hertz/history tangential_damping on cohesion off rolling_friction off viscous off
+pair_coeff      * *
+fix             m1 all property/global youngsModulus peratomtype 5.e6
+fix             m2 all property/global poissonsRatio peratomtype 0.45
+fix             m3 all property/global coefficientRestitution peratomtypepair 1 0.2
+fix             m4 all property/global coefficientFriction peratomtypepair 1 0.5
+#fix            m5 all property/global characteristicVelocity scalar 2.
+#fix            m6 all property/global cohesionEnergyDensity peratomtypepair 1 500
+
+timestep        0.00001
+
+# ----------- Création du réseau au fond ----------------
+#fix             wallfond all wall/gran/hertz/history 1 0 zplane 0 NULL 1
+fix             wallfond all wall/gran/hertz/history primitive type 1 zplane 0.0 store_force yes rolling_friction off cohesion off tangential_damping on viscous off
+lattice         sc $d origin 0. 0. ${radius}
+region          insertregbas block -${Lsimu} ${Lsimu} -${Dsimu} ${Dsimu} 0 $d units box
+create_atoms    1 region insertregbas
+set             region insertregbas diameter $d density ${rho}
+group           atmfond region insertregbas
+neigh_modify    exclude group atmfond atmfond
+
+# ------- Création de la pluie (première) -----
+region          insertreg block -${Linsert} ${Linsert} -${Dinsert} ${Dinsert} ${HinsertBottom} ${HinsertTop} units box
+fix             gravi all gravity 9.81 chute 0.0
+#fix            pluie all pour ${NA} 1 ${seed1} vol 0.3 3 diam uniform $d $d dens uniform ${rho} ${rho} vel uniform 0. 0. 0. 0. 0. region insertreg
+fix             pts1 all particletemplate/sphere 1 atom_type 1 density constant 2500 radius constant ${radius}
+fix             pdd1 all particledistribution/discrete 276 1 pts1 1
+fix             pluie all insert/rate/region seed 1927 distributiontemplate pdd1 maxattempt 3 nparticles ${N} insert_every 5000 particlerate ${NDebit} overlapcheck yes verbose yes region insertreg
+
+#-------- Création du cylindre -----------
+#fix            cyl all mesh/gran/stressanalysis ./CylOK.stl 1 ${cylsc} 0 0 ${cyloffZ} 0. 0. 0.
+#fix             dowalls all wall/gran/hertz/history 1 0 mesh/gran/stressanalysis 1 cyl
+fix             cyl all wall/gran/hertz/history primitive type 1 ycylinder 0.0025 $h 0.0 store_force yes tangential_damping on cohesion off rolling_friction off viscous off
+
+#restart         500000 restartsimu1ZPOF2-*
+
+fix             fondfreeze atmfond freeze
+fix             integr all nve/sphere
+
+dump            dmp all custom 5000 dump.test id type x y z vx vy vz radius f_force_cyl[1] f_force_cyl[2] f_force_cyl[3]
+#dump           dmp all custom 5000 dump.test1ZPOF id type x y z vx vy vz radius
+#dump           dmp2 all mesh/gran/VTK 100 Post1ZPOF/dump.stress1ZPOF-* stresscomponents cyl
+#compute         cout all pair/gran/local id force
+#dump           forcedump all local 5000 dump.force1ZPOF c_cout[1] c_cout[2] c_cout[3] c_cout[4] c_cout[5] c_cout[6]
+#dump            dumpstl all stl 5000 dump.stl1ZPOFi
+compute        cout all pair/gran/local id force
+dump            forcedump all local 5000 dump.force c_cout[1] c_cout[2] c_cout[3] c_cout[4] c_cout[5] c_cout[6]
+region          dumpreg cylinder y 0 $h 0.004 -${Dsimu} ${Dsimu} units box
+dump            dmp3 all custom 100 dump.forcewall id x y z f_force_cyl[1] f_force_cyl[2] f_force_cyl[3]
+dump_modify     dmp3 region dumpreg
+
+# ----- Check que le timestep est pas trop faible -----
+fix             t all check/timestep/gran 500 0.2 0.2
+thermo_style    custom step f_t[1] f_t[2]
+thermo          500
+
+#=======================================
+#run             100000
+#=======================================
+#unfix           integr
+#unfix           pluie
+#unfix           pts1
+#unfix           pdd1
+
+#------------- Déplacement du cylindre à sa position ---------------
+#fix             bouger all move/mesh/gran linear 0 0 -0.1 units box cyl
+#fix             integr all nve/sphere
+
+#=======================================
+#run             120000 upto
+#=======================================
+#unfix           bouger
+#unfix           integr
+
+#region          insertregb block -${Lsimu} ${Lsimu} -${Dsimu} ${Dsimu} ${IRBb} ${IRBh} units box
+#fix            pluie all pour ${NB} 1 ${seed2} vol 0.5 3 diam uniform $d $d dens uniform ${rho} ${rho} vel uniform 0. 0. 0. 0. 0. rate 0. region insertregb
+#fix             pts1 all particletemplate/sphere 1 atom_type 1 density constant 2500 radius constant ${radius}
+#fix             pdd1 all particledistribution/discrete 276 1 pts1 1
+#fix             pluie all insert/rate/region seed 1927 distributiontemplate pdd1 maxattempt 3 nparticles ${N} insert_every 5000 particlerate ${NDebit} overlapcheck yes verbose yes region insertreg
+#fix             integr all nve/sphere
+
+#=======================================
+run             75000 upto
+#=======================================
+unfix           pluie
+unfix           integr
+unfix           m3
+fix             m3 all property/global coefficientRestitution peratomtypepair 1 0.6
+fix             integr all nve/sphere
+set             group atmfond vx 0.02
+
+#=======================================
+run             300000 upto
+#=======================================
+
+

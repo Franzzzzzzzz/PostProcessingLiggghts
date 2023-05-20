@@ -1,0 +1,22 @@
+Manière d'écrire le script de writing : 
+
+{print} ldump:vtk, ldump:mat
+{default}
+
+[ldump:vtk]
+vx, vy, vz, rayon, masse
+[ldump:mat] 
+[ldump:mean:mat]
+[ldump:mean:vtk]
+[cfdump:vtk]
+[cfdump:mat]
+[cfdump:mean:mat]
+[cfdump:mean:vtk]
+[coarse:mat]
+[coarse:vtk]
+[coarse:mean:mat]
+[coarse:mean:vtk]
+
+Variables possibles à écrire : 
+Tous ts : 
+1D : vx

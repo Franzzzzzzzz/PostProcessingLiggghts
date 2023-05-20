@@ -1,0 +1,329 @@
+#include "Headers/Dump.h"
+#include <sys/stat.h>
+
+// =====================================================
+// Fonctions de la superclasse Dump ====================
+//======================================================
+Dump::Dump (void)
+{
+ nbsteps=0 ;
+ if (actions["dumpall"].set)
+   inscrit=-2 ; 
+ else
+   inscrit=-1 ; 
+}
+
+//-------------------------------------------------------
+int Dump::open (string chem)
+{
+struct stat ficdmp, fictmp ;
+string chemtmp(chem) ; 
+fstream dumptmp ; 
+int i ; 
+
+chemtmp.append(".tmp") ; 
+dumptmp.open(chemtmp.c_str(), ios::in | ios::binary) ; 
+if (stat(chemtmp.c_str(), &fictmp)>=0)
+ {
+ stat(chem.c_str(), &ficdmp);
+ if (ficdmp.st_mtime>fictmp.st_mtime)
+  {
+  DISP_Info("Tmp plus ancien que le dump. Recalculé") ;
+  dumptmp.close() ;
+  remove(chemtmp.c_str()) ;
+  }
+ }
+
+dumpin.open(chem.c_str()) ;
+if (!dumpin)
+  {cout << "Erreur d'ouverture du dump\n" ; return -1 ;} 
+
+if (dumptmp.is_open() && actions["chainforce"].set)
+ {
+ DISP_Info("L'utilisation des fichiers tmp avec les chainforce est supprimé par précaution (difficile de distinguer le TL du TCF). Le tmp sera supprimé") ;
+ dumptmp.close() ;
+ remove(chemtmp.c_str()) ;
+ }
+ 
+//cout << "Reading TMP a priori" ; fflush(stdout) ;
+if (dumptmp.is_open() && !actions["dumpall"].set && !actions["chainforce"].set)
+  {
+  Step null_step ;
+
+  dumptmp.read((char*)&nbsteps, sizeof(int)) ; 
+  steps.resize(nbsteps, null_step) ;
+  for (i=0 ; i<nbsteps ; i++)
+      {
+	  // DOES NOT WORK !
+	  //std::size_t found = chem.find("force");
+	  //if (found!=std::string::npos) steps[i].Type=TCF ;
+	  //else steps[i].Type=TL ;
+	  if (actions["vtk"].set) steps[i].Type=TF ;
+      else if (actions["chainforce"].set) {DISP_Err("L'utilisation des fichiers tmp avec les chainforce est supprimé par précaution (difficile de distinguer le TL du TCF).") ;
+      	  	  	  	  	  	  	  	  	  steps[i].Type=TCF ; }
+      else steps[i].Type=TL ;
+
+      dumptmp.read((char*)&steps[i].posinfile, sizeof(streampos)) ;
+      } 
+  dumptmp.close() ; 
+  return 0 ; 
+  }
+else
+  {
+  cout << "\nDump::open          " ;
+  actions.disp_progress() ;  dumpin.seekg(0,ios::end) ; 
+  actions.total=dumpin.tellg() ; dumpin.seekg(0, ios::beg) ; 
+  if (actions["dumpall"].set)
+    read(5, -1) ; 
+  else 
+    read(4, -1) ; 
+
+  dumptmp.open(chemtmp.c_str(), ios::out | ios::binary) ; 
+  if (!dumptmp.is_open()) cout << "WARNING : impossible de créer le fichier tmp de dump\n" ;
+     dumptmp.write((char*)&nbsteps, sizeof(int)) ; 
+  for (i=0 ; i<nbsteps ; i++)
+     {
+     dumptmp.write((char*)&steps[i].posinfile, sizeof(streampos)) ;     
+     }
+  dumptmp.close() ; 
+  return 1 ; 
+  }
+}
+//-----------------------------------------------------------------
+int Dump::write_asVTKBase(string chemin, char type)
+{
+long int loop[3] ;
+int idx[3], i, j, k, v, ts; 
+string chemin2 ; char strnum[20] ; 
+double ** datas ; 
+Writing * W ;
+ofstream out ; 
+bool stop ; 
+
+if (type == 1) {DISP_Err ("L'écriture d'un seul dump n'a pas été reprogrammée (pb pour la décompression de dump.stress") ; return -1 ; } //TODO
+
+W=&(actions.ecrire) ; 
+
+W->startall() ; 
+pthread_mutex_lock(&W->mutex);
+stop=false ; 
+loopdat(loop) ; ts=loop[0] ; 
+while (stop==false) 
+{
+  pthread_cond_wait(&W->sigout, &W->mutex);
+  switch (W->Signal)
+  {
+    case WHATAREYOU : W->sendin(LDUMP) ; break ; 
+    case FIRSTTS : W->sendin(OK) ; W->i=&ts ; check_timestep(ts) ; break ;
+    case NEXTTS : 
+      ts+=loop[1] ; 
+      if (ts>=loop[2]) 
+	{ts=-1 ; W->i=&ts ; W->sendin(FINISH) ; } 
+      else 
+	{check_timestep(ts) ; W->i=&ts ; W->sendin(OK) ; }
+      break ; 
+    case ASKING1D : 
+      W->d[0]=&(steps[ts].datas[steps[ts].find_idx(*(W->i))][0]) ; W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;  
+    case ASKING2D : 
+      for (i=0 ; i<3 ; i++) 
+        W->d[i]=&(steps[ts].datas[steps[ts].find_idx(*(W->i+i))][0]) ; 
+      W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;  
+    case ASKING3D : 
+      for (i=0 ; i<9 ; i++) 
+	W->d[i]=&(steps[ts].datas[steps[ts].find_idx(*(W->i+i))][0]) ; 
+      W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;  
+    case FINI : stop=true ; W->sendin(OK) ; break ; 
+    default : DISP_Warn("Signal d'écriture inconnu"); break ; 
+  }
+}
+/*W=&(actions.ecrire) ; 
+if (W->get_typeset("ldump:vtk")) // have to write all vtk
+{ 
+ cout << "Dump::write_asVTKBase          " ;
+ loopdat(loop) ; 
+ actions.total=loop[2]-loop[0] ; actions.disp_progress() ;
+ datas=(double **) malloc(sizeof(double *)*9) ; 
+
+ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
+ {
+  actions.valeur=i-loop[0] ;
+  sprintf(strnum, "%ld", i-loop[0]) ; chemin2=chemin+"-"+strnum+".vtk" ; 
+  out.open(chemin2.c_str(), ios::out) ;
+  check_timestep(i) ;
+  
+  idx[0]=steps[i].find_idx(POSX) ; idx[1]=steps[i].find_idx(POSY) ; idx[2]=steps[i].find_idx(POSZ) ; 
+  if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 ) DISP_Err("Err: les positions des atomes sont indispensables pour écrire le vtk") ; 
+  datas[0]=&(steps[i].datas[idx[0]][0]) ; datas[1]=&(steps[i].datas[idx[1]][0]) ; datas[2]=&(steps[i].datas[idx[2]][0]) ;
+  W->VTKPolyData(out, datas, steps[i].nb_atomes) ; 
+  W->VTKStartPointData(out, steps[i].nb_atomes) ; 
+  while ( (res=W->get_nextfield("ldump:vtk"))  != -1)
+  {
+    // Construction des données 
+    it=W->dim.begin() ; std::advance(it,res);
+
+    for (j=0 ; (res2=W->get_nextvardef(it->first)) != -1 ; j++  )
+      datas[j]=&(steps[i].datas[steps[i].find_idx(res2)][0]) ;
+
+    W->VTKField(out, it->first, datas,it->second,steps[i].nb_atomes) ; 
+  }
+  out.close() ; 
+ }
+}
+    
+if (W->get_typeset("ldump:mat")) // have to write a matlab 
+{
+#ifdef MATLAB  
+ MATFile * mout ; 
+ DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ; 
+ cout << "Dump::write_asVTKBase          " ;
+ loopdat(loop) ;
+ actions.total=loop[2]-loop[0] ; actions.disp_progress() ;
+ 
+ // Allocation mémoire
+ i=0 ; check_timestep(loop[0]) ;
+ while ( (res=W->get_nextfield("ldump:mat")) != -1)
+  {
+    it=W->dim.begin() ; std::advance(it,res);
+    printf("Allocation de %ld double\n", steps[loop[0]].nb_atomes*W->get_numelem(it->first)*((loop[2]-loop[0])/loop[1])) ;
+    if (i==0) datas=(double **) malloc ((i+1)*sizeof(double *)) ; 
+    else datas=(double **) realloc(datas, (i+1)*sizeof(double *)) ; 
+    datas[i] = (double *) mxCalloc(steps[loop[0]].nb_atomes*W->get_numelem(it->first)*((loop[2]-loop[0])/loop[1]), sizeof(double));
+    i++ ; 
+  }
+ 
+ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
+ {
+  actions.valeur=i-loop[0] ;
+  check_timestep(i) ;
+  ts=(i-loop[0])/loop[1] ; // dat[var][atm,dim,ts]
+  for (v=0 ; (res=W->get_nextfield("ldump:mat")) != -1 ; v++)
+  {
+    it=W->dim.begin() ; std::advance(it,res);
+    for (j=0 ; (res2=W->get_nextvardef(it->first)) != -1 ; j++)
+    {
+     idx[0]=steps[i].find_idx(res2) ;
+     for (k=0 ; k<steps[i].nb_atomes ; k++)
+      datas[v][ts*W->get_numelem(it->first)*steps[i].nb_atomes + j*steps[i].nb_atomes + k] = steps[i].datas[idx[0]][k] ; 
+    }
+  }
+ }
+ 
+ chemin2=chemin+".mat" ; 
+ mout=matOpen(chemin2.c_str(), "w");
+ j=0 ;
+ while ( (res=W->get_nextfield("ldump:mat")) != -1)
+ {
+  it=W->dim.begin() ; std::advance(it,res);
+  W->MATMatrix (mout, it->first, datas[j], 3, steps[i-loop[1]].nb_atomes, W->get_numelem(it->first), (loop[2]-loop[0])/loop[1]) ; 
+  j++ ; 
+ }
+ matClose(mout) ; 
+#else
+ DISP_Warn ("Le programme n'a pas été compilé avec le support matlab. Pas de fichier mat écrit.\n") ; 
+#endif   
+}*/
+return 1 ;   
+}
+
+//------------------------------------------------------------------
+void Dump::disp(void)
+{
+ cout << "\nRésumé du dump :\n" ;
+ cout << nbsteps << "pas de dump.\n--------------------\n" ; 
+}
+//------------------------------------------------------------------
+int Dump::check_timestep(long int timestep)
+{  
+int i ;
+if (actions["dumpall"].set) return 0 ; 
+if (inscrit==timestep) return 1 ;
+if (inscrit>=0) // il faut libérer la mémoire
+  {
+  inscrit=free_timestep(inscrit) ;
+  } 
+dumpin.seekg(steps[timestep].posinfile, ios::beg) ;
+read(3, (int)timestep) ;
+Filter filtre_tmp ;
+// ------ Application des pré-filtres ------
+if (prefiltre.size()>0)
+   {
+   //printf("PRE ") ; filtre_tmp.disp(prefiltre) ;
+   filtre_tmp.do_filter(steps[timestep], prefiltre) ;
+   //printf("PRE ") ; filtre_tmp.disp(prefiltre) ;
+   }
+//------ Application des filtres globaux (ie. issus de la ligne de commande) ----
+if (actions.filtre_global.size()>0)
+   {
+   filtre_tmp.do_filter(steps[timestep], actions.filtre_global) ; 
+//printf("GLOB%d %d ", steps[timestep].Type , steps[timestep].nb_atomes) ; filtre_tmp.disp(actions.filtre_global) ;
+   }
+if (actions["anglebystep"].set)
+  {
+  double angle ; char filtrestr[50] ;
+  vector <struct Op> tmp_op ;
+  angle=-actions["anglebystep"]["anglebystep"]/180.*M_PI*timestep;
+  // Création du filtre pour le dump
+  sprintf(filtrestr, "null::zrotate::%.10f", angle) ;
+  tmp_op=filtre_tmp.parse_arg(filtrestr) ;
+  //tmp_op.valeur=angle ; //Fait automatiquement normalement
+  filtre_tmp.do_filter(steps[timestep], tmp_op) ;
+  } 
+//------- Application des post-filtres --------
+if (postfiltre.size()>0)
+	{
+	filtre_tmp.do_filter(steps[timestep], postfiltre) ;
+//printf("POST ") ; filtre_tmp.disp(postfiltre) ;
+	}
+
+if (actions["teststress"].set)
+   {
+	DISP_Err("teststress doit être reprogrammé correctement pour être utilisé\n") ;
+	/*
+	int  i ;
+	for (i=0 ; i<steps[timestep].nb_triangles ; i++)
+	{ Vector centre ;
+	centre=steps[timestep].get_tri_center(i) ;
+
+    steps[timestep].datas[steps[timestep].find_idx(FORCEX)][i]=abs(centre(3)) ;
+    steps[timestep].datas[steps[timestep].find_idx(FORCEY)][i]=0 ;
+    steps[timestep].datas[steps[timestep].find_idx(FORCEZ)][i]=centre(3) ;
+
+	}*/
+   }
+   
+//--------- Fin des filtres --------
+inscrit=timestep ;
+return 2 ; 
+}
+
+//-----------------------------------------------------------------
+int Dump::free_timestep (long int inscrit)
+{
+int i ; 
+
+for (i=0 ; i<steps[inscrit].nb_idx ; i++)
+     {steps[inscrit].datas[i].clear() ; }
+  steps[inscrit].datas.clear() ; 
+  steps[inscrit].idx_col.clear() ;
+  steps[inscrit].nb_idx=0 ; 
+  inscrit=-1 ; 
+return inscrit ; 
+}
+//---------------------------------------------------------------
+void Dump::loopdat (long int *res)
+{
+if (actions["extract"].set)
+   {res[0]=(int)actions["extract"]["extract_deb"] ; res[2]=(int)actions["extract"]["extract_fin"] ;
+     if (res[0]<0) {res[0]=0 ; DISP_Warn("WARNING : le debut de l'extraction est <0. RAZ.\n") ; }
+     if (res[2]>nbsteps) {res[2]=nbsteps ; DISP_Warn("WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n") ; }
+  }
+else
+   {res[0]=0 ; res[2]=nbsteps;}
+
+if (actions["downsampling"].set)
+   { res[1]=(int)actions["downsampling"]["downsampling"] ;
+   if (res[1]<=0 || res[1]>nbsteps) { res[1]=1 ; DISP_Warn("WARNING : downsampling incorrect. Remis à 1.\n") ;}
+   }
+else
+	res[1]=1 ;
+}

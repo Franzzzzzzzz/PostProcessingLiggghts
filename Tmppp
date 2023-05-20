@@ -1,0 +1,45 @@
+Filter.cpp:   step.datas[i].erase(step.datas[i].begin(),step.datas[i].begin()+stop) ; 
+Filter.cpp://	{step.datas[j].erase (step.datas[j].begin()+i, step.datas[j].end()) ; }
+Ids.cpp:  canonic_name.erase(remove_if( canonic_name.begin(), canonic_name.end(), ::ispunct ), canonic_name.end() );
+Ids.cpp:  canonic_name.erase(remove_if( canonic_name.begin(), canonic_name.end(), ::isspace ), canonic_name.end() );
+LStep.cpp:  datas[i].erase(datas[i].begin()+atm) ;}
+LStep.cpp:  datas[i].erase(datas[i].end()-nb, datas[i].end()-1) ;}
+LcfDump.cpp:chem2=chemin ; chem2.erase(chem2.rfind(".gz")) ; chem2.append("-GrainForce.txt") ;
+LcfDump.cpp:    chem=chemin ; chem.erase(chem.rfind(".gz")) ; chem.append("-GrainForceByAngle-mean.txt") ;
+LcfDump.cpp:chem=chemin ; chem.erase(chem.rfind(".gz")) ; chem.append("-GrainForce.txt") ;
+Main.cpp:    if (commande[1]=='-') commande.erase(0,2) ; 
+Main.cpp:    else commande.erase(0,1) ; 
+Main.cpp:        {aliasname.erase(aliasname.begin()+i) ; aliascommand.erase(aliascommand.begin()+i) ; break ;}
+Main.cpp:   aliascommand[i].erase(aliascommand[i].begin(), aliascommand[i].begin()+found+1) ; 
+Multisphere.cpp:    gps.erase (gps.begin()+i) ; ngp-- ; i-- ; 
+Surface.cpp:try{chemin.erase(chemin.rfind(".gz")) ;}
+Surface.cpp:try{chemin.erase(chemin.rfind(".gz")) ; }
+Surface.cpp:chemin.erase(chemin.rfind(".gz")) ; 
+Writing.cpp: if (found!=std::string::npos) {dirs.erase(0, 10) ; }
+Writing.cpp: if (found!=std::string::npos) {dirs.erase(0, 9) ; }
+Writing.cpp: if (found!=std::string::npos) {dirs.erase(0, 14) ; }
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), ','), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), ' '), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '/'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '\\'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '?'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '%'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '*'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), ':'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '|'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '<'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '>'), dirs.end());
+Writing.cpp: dirs.erase(std::remove(dirs.begin(), dirs.end(), '.'), dirs.end());
+Writing.cpp:        try{(*chemin).erase((*chemin).rfind(".gz")) ; } catch(...){}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ;} catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:	try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:	try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ;} catch (...) {}
+Writing.cpp:      try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
+Writing.cpp:commande.erase(remove_if( commande.begin(), commande.end(), ::isspace ), commande.end() );
