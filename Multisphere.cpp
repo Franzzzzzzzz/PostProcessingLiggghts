@@ -36,7 +36,7 @@ for (i=0 ; i<step.nb_atomes ; i++)
     gps[(int)(step.datas[idx[3]][i])].push_back((int)step.datas[idx[4]][i]) ;
  }
 }
-if (ngp==-1) {DISP_Warn("Aucun groupe multisphere trouvé, il y a un problème.") ; printf("Step ID=%d", currentstep) ; fflush(stdout) ;   }   
+if (ngp==-1) {DISP_Warn(_("Aucun groupe multisphere trouvé, il y a un problème.")) ; printf("Step ID=%d", currentstep) ; fflush(stdout) ;   }   
 
 for (i=1, longest=0 ; i<=ngp ; i++) if (longest<gps[i][0]) longest=gps[i][0] ; 
 pts.resize(longest, null) ; 
@@ -89,13 +89,13 @@ for (j=1 ; j<=ngp ; j++)
     if (step.datas[idx[4]][gps[j][k+1]-1]!=gps[j][k+1]) 
     {
       printf("%g %g ", step.datas[idx[4]][gps[j][k+1]-1],gps[j][k+1] ) ; 
-      DISP_Err("Probleme in multisphere ici\n") ; data[0][j]=GP_BAD ; 
+      DISP_Err(_("Probleme in multisphere ici\n")) ; data[0][j]=GP_BAD ; 
     } 
     t.set(step.datas[idx[0]][gps[j][k+1]-1], step.datas[idx[1]][gps[j][k+1]-1], step.datas[idx[2]][gps[j][k+1]-1]);   
     pts[k]=t ;
     if (t.isnan()) 
     {
-      data[0][j]=GP_LOST ; printf("Le groupe %d a été perdu. Atomes:", j) ; for (l=0 ; l<gps[j][0] ; l++) {printf("%d ", gps[j][l+1]-1) ; } printf("\n") ; break ;  
+      data[0][j]=GP_LOST ; printf(_("Le groupe %d a été perdu. Atomes:"), j) ; for (l=0 ; l<gps[j][0] ; l++) {printf("%d ", gps[j][l+1]-1) ; } printf("\n") ; break ;  
     }
     centroid=centroid+pts[k] ;
   } 
@@ -170,7 +170,7 @@ for (j=1 ; j<=ngp ; j++)
   data[5][j]=segments[idmax](2) ; 
   data[6][j]=segments[idmax](3) ; 
   if ((isnan(data[4][j]) || isnan(data[5][j]) || isnan(data[6][j])) && data[0][j]==GP_OK) 
-  {DISP_Warn("NaN dans le data multisphere avec GP_OK, probleme\n") ; data[0][j]=GP_BAD ;
+  {DISP_Warn(_("NaN dans le data multisphere avec GP_OK, probleme\n")) ; data[0][j]=GP_BAD ;
   }
 }
 
@@ -191,7 +191,7 @@ idx[3]=step.find_idx(IDS("IDMULTISPHERE")) ; idx[4]=step.find_idx(IDS("ID")) ;
 
 if (actions["symetriser"].set)
   {
-    DISP_Warn("symetriser not implemented in multisphere for fluxes\n") ; 
+    DISP_Warn(_("symetriser not implemented in multisphere for fluxes\n")) ; 
   }
 
 type=actions["multisphereflux"]["type"] ; 
@@ -280,7 +280,7 @@ for (j=0 ; j<ngp ; j++)
     pts[k]=t ;
     if (t.isnan()) 
     {
-      data[0][j]=GP_LOST ; printf("Le groupe %d a été perdu, ne devrait pas arriver pour multisphere flux. Atomes:", j) ; for (l=0 ; l<gps[j][0] ; l++) {printf("%d ", gps[j][l+1]-1) ; } printf("\n") ; break ;  
+      data[0][j]=GP_LOST ; printf(_("Le groupe %d a été perdu, ne devrait pas arriver pour multisphere flux. Atomes:"), j) ; for (l=0 ; l<gps[j][0] ; l++) {printf("%d ", gps[j][l+1]-1) ; } printf("\n") ; break ;  
     }
     centroid=centroid+pts[k] ;
   } 
@@ -335,7 +335,7 @@ for (j=0 ; j<ngp ; j++)
   data[5][j]=segments[idmax](2) ; 
   data[6][j]=segments[idmax](3) ; 
   if ((isnan(data[4][j]) || isnan(data[5][j]) || isnan(data[6][j])) && data[0][j]==GP_OK) 
-  {DISP_Warn("NaN dans le data multisphere avec GP_OK, probleme\n") ; data[0][j]=GP_BAD ;
+  {DISP_Warn(_("NaN dans le data multisphere avec GP_OK, probleme\n")) ; data[0][j]=GP_BAD ;
   }
 }
 currentstepinit=true ; 
@@ -381,7 +381,7 @@ double Multisphere::compute_dzeta (Step & step)
 //--------------------------------------------------
 void Multisphere::compute_eigen(Step &step)
 {
- DISP_Err("This function hasn't been tested and probably don't work. Please check the source (Multisphere::compute_eigen()) to check what to do") ; 
+ DISP_Err(_("This function hasn't been tested and probably don't work. Please check the source (Multisphere::compute_eigen()) to check what to do")) ; 
  return ; 
  /*    //Calcul::eigen(K, Kval, Kvec) ;
     

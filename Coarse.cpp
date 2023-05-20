@@ -60,7 +60,7 @@ stdt=(double**)malloc(sizeof(double*)*tmp.nb_boites_tot) ;
 for (i=0 ; i<tmp.nb_boites_tot ; i++) stdt[i]=(double*)malloc(sizeof(double)*nbsteps) ;
 stdphi=(double**)malloc(sizeof(double*)*tmp.nb_boites_tot) ;
 for (i=0 ; i<tmp.nb_boites_tot ; i++) stdphi[i]=(double*)malloc(sizeof(double)*nbsteps) ;
-if ( !actions["is2D"].set) DISP_Warn("COARSTDTAU n'est calculé que pour sigmaxy sigmayx") ;
+if ( !actions["is2D"].set) DISP_Warn(_("COARSTDTAU n'est calculé que pour sigmaxy sigmayx")) ;
 idx[0]=tmp.cstep->find_idx(IDS("COARSIGTOTXX")) ; idx[1]=tmp.cstep->find_idx(IDS("COARSIGTOTYY")) ; idx[2]=tmp.cstep->find_idx(IDS("COARSIGTOTZZ")) ;
 idx[3]=tmp.cstep->find_idx(IDS("COARSIGTOTXY")) ; idx[4]=tmp.cstep->find_idx(IDS("COARSIGTOTYX")) ; idx[5]=tmp.cstep->find_idx(IDS("COARPHI")) ;
 
@@ -254,14 +254,14 @@ while (stop==false)
       break ;
     case ASKING1D :
       idx[0]=steps[ts].find_idx(*(W->i)) ;
-      if (idx[0]==-1) {DISP_Warn("Donnée pas trouvée 1D\n") ; W->sendin(OK) ;}
+      if (idx[0]==-1) {DISP_Warn(_("Donnée pas trouvée 1D\n")) ; W->sendin(OK) ;}
       else {W->d[0]=&(steps[ts].datas[idx[0]][0]) ; W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; }
       break ;
     case ASKING2D :
       for (i=0 ; i<3 ; i++)
       {
 	idx[i]=steps[ts].find_idx(*(W->i+i)) ;
-	if(idx[i]==-1) {DISP_Warn("Donnée pas trouvée 2D: ") ; printf("%d \n",*(W->i+i)) ;  W->sendin(OK) ;break ; }
+	if(idx[i]==-1) {DISP_Warn(_("Donnée pas trouvée 2D: ")) ; printf("%d \n",*(W->i+i)) ;  W->sendin(OK) ;break ; }
       }
       if (i<3) break ;
       for (i=0 ; i<3 ; i++)
@@ -271,7 +271,7 @@ while (stop==false)
       for (i=0 ; i<9 ; i++)
       {
 	idx[i]=steps[ts].find_idx(*(W->i+i)) ;
-	if(idx[i]==-1) {DISP_Warn("Donnée pas trouvée 3D\n") ; W->sendin(OK) ;break ; }
+	if(idx[i]==-1) {DISP_Warn(_("Donnée pas trouvée 3D\n")) ; W->sendin(OK) ;break ; }
       }
       if (i<9) break ;
       for (i=0 ; i<9 ; i++)
@@ -282,7 +282,7 @@ while (stop==false)
 	W->d[i]=&(steps[ts].datas[steps[ts].find_idx(*(W->i+i))][0]) ;
       W->i=&steps[ts].nb_atomes ; W->sendin(OK) ; break ;
     case FINI : stop=true ; W->sendin(OK) ; break ;
-    default : DISP_Warn("Signal d'écriture inconnu"); W->sendin(UNABLE) ; W->disp_Signal() ; break ;
+    default : DISP_Warn(_("Signal d'écriture inconnu")); W->sendin(UNABLE) ; W->disp_Signal() ; break ;
   }
 }
 return 1 ;
@@ -311,7 +311,7 @@ if (actions["use-box"].set)
 	if (actions["use-box"]["box_zmin"]<step.box[2][0]) {infobox|=2  ; borders[2][0]=step.box[2][0]; } else {borders[2][0]=actions["use-box"]["box_zmin"] ;}
 	if (actions["use-box"]["box_zmax"]>step.box[2][1]) {infobox|=1  ; borders[2][1]=step.box[2][1]; } else {borders[2][1]=actions["use-box"]["box_zmax"] ;}
 
-	if ((infobox > 0)  && (!(infobox & 128))) {DISP_Info("\nUse-box plus grand que la simu : ") ; printf("0x%x\n", infobox) ;  infobox|=128 ; }
+	if ((infobox > 0)  && (!(infobox & 128))) {DISP_Info(_("\nUse-box plus grand que la simu : ")) ; printf("0x%x\n", infobox) ;  infobox|=128 ; }
 
     }
 else
@@ -335,14 +335,14 @@ Volume.resize(nb_boites_tot, 0) ;
 
 if (actions["wingauss"].set)
    {
-   DISP_Warn("Ne devrait pas être utilisé. Par defaut, winsphere pour les coarse ATM, creneau3D pour les coarse CF\n") ;
+   DISP_Warn(_("Ne devrait pas être utilisé. Par defaut, winsphere pour les coarse ATM, creneau3D pour les coarse CF\n")) ;
    specatm=speccf=true ;
    fenetre=&Fonction::int_gaussienne3D ;
    fenetreO=&Fonction::gaussienne3D ;
    DISP_Warn("Volume0 et Volume ne sont pas calculé pour Wingauss\n") ;
    if (actions["wingauss"]["sigma"]==-1)
       {
-      DISP_Warn("Attention : le calcul automatique du sigma pour une wingauss simple ne se fait qu'à partir du nombre de boîte dans la dimension x\n") ;
+      DISP_Warn(_("Attention : le calcul automatique du sigma pour une wingauss simple ne se fait qu'à partir du nombre de boîte dans la dimension x\n")) ;
       if (actions["sig-boites"].set) {tailles(1)=actions["sig-boites"]["sig-x"] ; tailles(2)=actions["sig-boites"]["sig-y"] ; tailles(3)=actions["sig-boites"]["sig-z"] ;}
       else tailles=taille_boite(step) ;
       sigmafenetre(1)=sigmafenetre(2)=sigmafenetre(3)=1/sqrt(2)*tailles(1) ;
@@ -352,7 +352,7 @@ if (actions["wingauss"].set)
    sigmafenetreO=sigmafenetre ;
    }
 else if (actions["wingauss3D"].set)
-   { DISP_Err("WINGAUSS3D not implemented") ; }
+   { DISP_Err(_("WINGAUSS3D not implemented")) ; }
 else if (actions["wincreneau"].set)
    {
     specatm=true ;
@@ -366,23 +366,23 @@ else if (actions["wincreneau"].set)
     else
     {
       if (infofenetre)
-         DISP_Warn("Win creneau pas clair en 3D...\n") ;
+         DISP_Warn(_("Win creneau pas clair en 3D...\n")) ;
       if (nb_boites[0]==1 && nb_boites[1]==1)
       {
 	if (infofenetre)
-	    DISP_Warn ("... mais comme il n'y a qu'une boite en x et y, on dit que c'est une tranche ! EN TEST\n") ;
+	    DISP_Warn (_("... mais comme il n'y a qu'une boite en x et y, on dit que c'est une tranche ! EN TEST\n")) ;
 	fenetreO=&Fonction::intersect_tranche_z ;
       }
       else if (nb_boites[0]==1 && nb_boites[2]==1)
       {
 	if (infofenetre)
-	   DISP_Warn ("... mais comme il n'y a qu'une boite en x et z, on dit que c'est une tranche ! EN TEST\n") ;
+	   DISP_Warn (_("... mais comme il n'y a qu'une boite en x et z, on dit que c'est une tranche ! EN TEST\n")) ;
 	fenetreO=&Fonction::intersect_tranche_y ;
       }
       else if (nb_boites[1]==1 && nb_boites[2]==1)
       {
 	if (infofenetre)
-	   DISP_Warn ("... mais comme il n'y a qu'une boite en y et z, on dit que c'est une tranche ! EN TEST\n") ;
+	   DISP_Warn (_("... mais comme il n'y a qu'une boite en y et z, on dit que c'est une tranche ! EN TEST\n")) ;
 	fenetreO=&Fonction::intersect_tranche_x ;
       }
       else
@@ -395,7 +395,7 @@ else if (actions["wincreneau"].set)
 if (specatm==false)
    {
    if (infofenetre) {
-	DISP_Info("Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la sphère est la plus petite dimension du pas spatial.\n") ;
+	DISP_Info(_("Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la sphère est la plus petite dimension du pas spatial.\n")) ;
 	}
    if (actions["sig-boites"].set) {tailles(1)=actions["sig-boites"]["sig-x"] ; tailles(2)=actions["sig-boites"]["sig-y"] ; tailles(3)=actions["sig-boites"]["sig-z"] ;}
    else tailles=taille_boite(step) ;
@@ -404,9 +404,9 @@ if (specatm==false)
    sigmafenetreO(1)=sigmafenetreO(2)=sigmafenetreO(3)=tailles(1)/2.0 ;
 
    if (infofenetre) {
-        DISP_Info("Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la sphère est la plus petite dimension du pas spatial : ") ;
+        DISP_Info(_("Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la sphère est la plus petite dimension du pas spatial : ")) ;
 	cout << sigmafenetreO(1)*1000*2 ; DISP_Info("mm.\n") ; }
-   if (showwarn2 && sigmafenetreO(1)<actions.Cst["Radius"]) {DISP_Warn("Attention : la taille de la sphère de moyennage est plus petite que le rayon des atomes\n") ; showwarn2=false ;}
+   if (showwarn2 && sigmafenetreO(1)<actions.Cst["Radius"]) {DISP_Warn(_("Attention : la taille de la sphère de moyennage est plus petite que le rayon des atomes\n")) ; showwarn2=false ;}
 
    //fenetre=&Fonction::int_intersect_sphere ;
    if (actions["is2D"].set) {fenetreO=&Fonction::intersect_cercle ;
@@ -419,7 +419,7 @@ if (specatm==false)
 if (speccf==false)
    {
    // Fonction créneau 3D
-   if (actions["is2D"].set) { if (infofenetre){DISP_Info("Chainforce fenetre creneau 2D\n") ;} fenetre = &Fonction::int_creneau2D ; }
+   if (actions["is2D"].set) { if (infofenetre){DISP_Info(_("Chainforce fenetre creneau 2D\n")) ;} fenetre = &Fonction::int_creneau2D ; }
    else {fenetre=&Fonction::int_creneau3D ; }
 
    if (actions["sig-boites"].set) {sigmafenetre(1)=actions["sig-boites"]["sig-x"] ; sigmafenetre(2)=actions["sig-boites"]["sig-y"] ; sigmafenetre(3)=actions["sig-boites"]["sig-z"] ;}
@@ -427,11 +427,11 @@ if (speccf==false)
 
    if (actions["winboxyper"].set)
    	   { if (nb_boites[1]>1 || (actions["use-box"].set && ((borders[1][1]-borders[1][0])<(step.box[1][1]-step.box[1][0]))))
-   	     { DISP_Warn("A VERIFIER !!!!! Attention, pour une boite y periodique, la taille en y devrait être égale à l'épaisseur de la boite de simu, et il ne devrait y avoir qu'une seulle boite en y\n") ;
+   	     { DISP_Warn(_("A VERIFIER !!!!! Attention, pour une boite y periodique, la taille en y devrait être égale à l'épaisseur de la boite de simu, et il ne devrait y avoir qu'une seulle boite en y\n")) ;
    	     }
    	   }
    if (showwarn && (sigmafenetre(1)<actions.Cst["Radius"] || sigmafenetre(2)<actions.Cst["Radius"] || (sigmafenetre(3)<actions.Cst["Radius"] && (!actions["is2D"].set))))
-	   {DISP_Warn("Attention, l'une des dimension de la boîte de moyennage est inéfrieur au rayon des atomes"); showwarn=false ; }
+	   {DISP_Warn(_("Attention, l'une des dimension de la boîte de moyennage est inéfrieur au rayon des atomes")); showwarn=false ; }
 
    if (!actions["is2D"].set)
      for (int v=0 ; v<Volume.size() ; v++) Volume[v]=sigmafenetre(1)*sigmafenetre(2)*sigmafenetre(3) ;
@@ -500,7 +500,7 @@ if (actions["delcyl"].set)
   Vector xcyl (actions["delcyl"]["xcyl"], actions["delcyl"]["ycyl"], actions["delcyl"]["zcyl"]) ;
   Vector dircyl (actions["delcyl"]["dirxcyl"], actions["delcyl"]["dirycyl"], actions["delcyl"]["dirzcyl"]) ;
   Vector xsphere ;
-  if (infofenetre) DISP_Warn ("delcyl est en phase de test. Fonctionne seulement en winsphere !!") ;
+  if (infofenetre) DISP_Warn (_("delcyl est en phase de test. Fonctionne seulement en winsphere !!")) ;
   for (v=0 ; v<nb_boites_tot ; v++)
   {
    xsphere(1)=cstep->datas[1][v] ; xsphere(2)=cstep->datas[2][v] ; xsphere(3)=cstep->datas[3][v] ;
@@ -509,7 +509,7 @@ if (actions["delcyl"].set)
 }
 if (actions["deltank"].set) // VERY VERY CRUDE
 {
-  DISP_Warn("Attention, l'utilisation de deltank est très simplifiée (pas de longueur du tank)\n") ;
+  DISP_Warn(_("Attention, l'utilisation de deltank est très simplifiée (pas de longueur du tank)\n")) ;
   Vector pos ;
   for (v=0 ; v<nb_boites_tot ; v++)
   {
@@ -558,7 +558,7 @@ Coarse operator+(Coarse c1, Coarse c2)
    temp=c1 ;
  else
    {
-   cout << "ERR : tentative d'addition de deux coarse n'ayant pas des propriétés identiques" ;
+   cout << _("ERR : tentative d'addition de deux coarse n'ayant pas des propriétés identiques") ;
    return temp ;
    }
 
@@ -610,12 +610,12 @@ Vector r, f, xa, xb ;
 
 // 1 : checks du type de coarse 0 cfcoarse seulement (cannot do w/kinetic), 1 atmcoarse seul, 2 both
 if (type==1 && actions["w/kinetic"].set )
-   {DISP_Err("ERR: impossible de calculer les contraintes cinétiques sans dump atomique");
+   {DISP_Err(_("ERR: impossible de calculer les contraintes cinétiques sans dump atomique"));
     return 1 ; }
 switch(type) {
-  case 0 : if (step.Type!=TCF) {DISP_Err("ERR: impossible de calculer les contraintes. Types de step incorrects"); return 2 ;} break;
-  case 1 : if (stepatm.Type!=TL) {DISP_Err("ERR: impossible de calculer les vitesses. Types de step incorrects"); return 2 ;} break ;
-  case 2 : if (step.Type!=TCF && stepatm.Type!=TL) {DISP_Err("ERR: impossible de calculer les contraintes. Types de step incorrects"); return 2 ;} break ;
+  case 0 : if (step.Type!=TCF) {DISP_Err(_("ERR: impossible de calculer les contraintes. Types de step incorrects")); return 2 ;} break;
+  case 1 : if (stepatm.Type!=TL) {DISP_Err(_("ERR: impossible de calculer les vitesses. Types de step incorrects")); return 2 ;} break ;
+  case 2 : if (step.Type!=TCF && stepatm.Type!=TL) {DISP_Err(_("ERR: impossible de calculer les contraintes. Types de step incorrects")); return 2 ;} break ;
   }
 
 // 2 : récupération des indexes
@@ -634,20 +634,20 @@ if (type==0 || type==2)
   if (bool_coarse&4) idx[11]=step.find_idx(IDS("CFKSPR")) ;
   if (bool_coarse&8) idx[12]=step.find_idx(IDS("CFLSPR")) ;
 
-  for (j=0 ; j<9 ; j++) { if (idx[j]==-1) { printf("%d ", j) ; DISP_Err ("ERR: donnees manquantes pour le coarse graining\n") ; return 3 ;}}
+  for (j=0 ; j<9 ; j++) { if (idx[j]==-1) { printf("%d ", j) ; DISP_Err (_("ERR: donnees manquantes pour le coarse graining\n")) ; return 3 ;}}
   }
 if (type==1 || type==2)
   {
   idxatm[0]=stepatm.find_idx(IDS("POSX")) ; idxatm[1]=stepatm.find_idx(IDS("POSY"))  ; idxatm[2]=stepatm.find_idx(IDS("POSZ")) ;
   idxatm[3]=stepatm.find_idx(IDS("VX"))   ; idxatm[4]=stepatm.find_idx(IDS("VY"))    ; idxatm[5]=stepatm.find_idx(IDS("VZ")) ;
-  for (j=0 ; j<6 ; j++) { if (idxatm[j]==-1) { printf("/%d/ ", j) ;  DISP_Err ("ERR: donnees manquantes pour le coarse graining\n") ; printf("[%d %d]\n",step.timestep, stepatm.timestep) ;  return 3 ;}}
+  for (j=0 ; j<6 ; j++) { if (idxatm[j]==-1) { printf("/%d/ ", j) ;  DISP_Err (_("ERR: donnees manquantes pour le coarse graining\n")) ; printf("[%d %d]\n",step.timestep, stepatm.timestep) ;  return 3 ;}}
 
   idxatm[6]=stepatm.find_idx(IDS("RAYON")) ;
   if (idxatm[6]==-1)
     {
     if (infoonce)
     {
-      DISP_Info("Pas de données de RAYON. Le rayon atm utilisé pour le coarse graining est celui de Actions ") ;
+      DISP_Info(_("Pas de données de RAYON. Le rayon atm utilisé pour le coarse graining est celui de Actions ")) ;
       infoonce=false ;
     }
     rayon=actions.Cst["Radius"] ;
@@ -657,7 +657,7 @@ if (type==1 || type==2)
   {
       idxatm[7]=stepatm.find_idx(IDS("orientxx")) ;
       if (idxatm[7]==-1) 
-          printf("Cannot find orientation information in the dump atm");
+          printf(_("Cannot find orientation information in the dump atm"));
   }
   densite=actions.Cst["Rhograin"] ;
   est2D=actions["is2D"].set ;
@@ -710,7 +710,7 @@ if (type==1 || type==2)
      coeff=VolumeO[idxclosest] ;
      fenetreO(coeff, xa, sigmafenetreO, rayon) ;
      if (isnan(coeff))
-     {DISP_Warn("Coeff a pris une valeur NAN") ; }
+     {DISP_Warn(_("Coeff a pris une valeur NAN")) ; }
 
      if (est2D) masse=M_PI*densite*rayon*rayon ;
      else masse=4/3.*M_PI*densite*rayon*rayon*rayon ;
@@ -733,7 +733,7 @@ if (type==1 || type==2)
   phi[j]=phi[j]/densite ;
   if (nb_atm[j]>0)
      mean_radius[j]=mean_radius[j]/nb_atm[j] ;
-  if (VolumeO[j]!=0) nb_atm[j]*=VolumeO[j] ; else DISP_Warn("Etrange d'avoir un volume nul ...") ;
+  if (VolumeO[j]!=0) nb_atm[j]*=VolumeO[j] ; else DISP_Warn(_("Etrange d'avoir un volume nul ...")) ;
   if (phi[j]!=0)
     {
      vx[j]=vx[j]/(phi[j]*densite) ;
@@ -769,7 +769,7 @@ if ((type==1 || type==2) && actions["w/kinetic"].set)
 
      coeff=VolumeO[idxclosest] ;
      fenetreO(coeff, xa, sigmafenetreO, rayon) ;
-     if (isnan(coeff)) DISP_Warn("Coeff a pris une valeur NAN") ;
+     if (isnan(coeff)) DISP_Warn(_("Coeff a pris une valeur NAN")) ;
 
      if (est2D) masse=M_PI*densite*rayon*rayon ;
      else masse=4/3.*M_PI*densite*rayon*rayon*rayon ;
@@ -815,7 +815,7 @@ if (type==0 || type==2)
      xa=r/(-2.0)+position-position_vec(idxclosest) ; xb=r/2.+position-position_vec(idxclosest) ;
      coeff=Volume[idxclosest] ;
      fenetre(coeff,xa, xb, sigmafenetre) ;
-     if (isnan(coeff)) DISP_Warn("Coeff a pris une valeur NAN\n") ;
+     if (isnan(coeff)) DISP_Warn(_("Coeff a pris une valeur NAN\n")) ;
      //printf("%g ", r.dot(f)) ;
      sigma=(r.multiply(f))*coeff*(-1) ;
      addto_sigma (idxclosest, sigma) ;
@@ -917,7 +917,7 @@ void Coarse::compute_sigmatot (void)
    //printf("{B%g}", cstep->datas[idx1+i][j]) ;
    check+=fabs(cstep->datas[idx1+i][j]) ; }
   }
-  if (check<1e-100) DISP_Warn("La partie contrainte cinétique est très faible, il n'y a pas un oublie de w/kinetic ?\n") ;
+  if (check<1e-100) DISP_Warn(_("La partie contrainte cinétique est très faible, il n'y a pas un oublie de w/kinetic ?\n")) ;
 }
 Vector Coarse::position_vec (int id)
 {
@@ -1087,7 +1087,7 @@ bool operator== (Boites b1, Boites b2)
 int CoarseDump::do_coarse_basic (Dump &dump, string chemin)   // Coarse basic : seulement du LDump, avec boîte créneau de base, toujours moyennée en temps
 {
 // TODO
-  DISP_Err("Il faudrait réimplémenter le do_coarse_basic") ;
+  DISP_Err(_("Il faudrait réimplémenter le do_coarse_basic")) ;
   return 1 ;
 /*long int debut, fin, step ;
 int  i,j, idx[6] ; Coarse coarse_null ;
@@ -1171,7 +1171,7 @@ return 1 ;*/
 
 int CoarseDump::open (string chemin) {
 int i ; Step null_step ;
-if (chemin.length() >0) DISP_Warn("Chemin devrait être vide ...") ;
+if (chemin.length() >0) DISP_Warn(_("Chemin devrait être vide ...")) ;
 // Ne rien faire, normalement tout a été fait lors du calcul du coarse
 return 1;
 }

@@ -76,7 +76,7 @@ int LucDump::read (unsigned char read_type, int index)
   ligneC=(char*)malloc(5000) ;
   Type=TL ;
 
-  if (read_type & 4) {nbsteps=0; printf("Lecture initiale du dump, peut prendre du temps ...\n") ; }
+  if (read_type & 4) {nbsteps=0; printf(_("Lecture initiale du dump, peut prendre du temps ...\n")) ; }
   if (read_type & 2) idx=index ;
 
   while (!dumpin.eof() && stop<2 )
@@ -131,15 +131,15 @@ int LucDump::read (unsigned char read_type, int index)
 		  steps[idx].datas[j][i]=strtod(actu, &suiv) ;
 		  if (actu==suiv)
 		  {
-		    DISP_Err("Conversion to double failed dans LDump! Something really bad happened. Going to next field...\n") ;
+		    DISP_Err(_("Conversion to double failed dans LDump! Something really bad happened. Going to next field...\n")) ;
 		    while (*actu!=' ' && *actu!=0) actu++ ;
 		  }
 		  else
 		    actu=suiv ;
 		  if ( !isfinite(steps[idx].datas[j][i]) && first_naninf)
 		  {
-		    DISP_Warn("\n\n!!! Une valeur lue dans LDump est inf ou nan. ") ;
-		    DISP_Warn("Elle n'a PAS été supprimée.\n") ;
+		    DISP_Warn(_("\n\n!!! Une valeur lue dans LDump est inf ou nan. ")) ;
+		    DISP_Warn(_("Elle n'a PAS été supprimée.\n")) ;
                     first_naninf=false ;
 		      //steps[idx].datas[j][i]=0 ;
 		  }
@@ -207,7 +207,7 @@ if (position!=string::npos)
   if (position!=string::npos)
    return 4 ;
 
-  cerr << "WARN1 : item inconnu " << ligne << ".\n" ;
+  cerr << _("WARN1 : item inconnu ") << ligne << ".\n" ;
   return -1 ;
   }
 else
@@ -232,13 +232,13 @@ int LucDump::sparselabels(Step &step , string ligne)
     res=IDS(item) ;
 
     if (res==-1)
-    {DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter\n") ;
+    {DISP_Warn (_("Un type de donné n'est pas référencé, IDS va l'ajouter\n")) ;
 
      res=IDS.new_id(item, TL) ;
      if (res!=-1) step.idx_col[compteur]=res ;
      else
      {
-       DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n");
+       DISP_Err(_("Le type inconnu n'a pas pu être ajouté !!\n"));
        step.idx_col[compteur]=IDS("UNKNOWN") ;
      }
     }
@@ -350,7 +350,7 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
     }
 out.close() ;
 double denom=(loop[2]-loop[0])/(double)loop[1] ;
-sprintf(infos, "La largeur en angle des boites est de %f degrés (%f radians).\n", 360.0/actions["wallforce-by-angle"]["nbbox_theta"], 2*M_PI/actions["wallforce-by-angle"]["nbbox_theta"]) ;    ;
+sprintf(infos, _("La largeur en angle des boites est de %f degrés (%f radians).\n"), 360.0/actions["wallforce-by-angle"]["nbbox_theta"], 2*M_PI/actions["wallforce-by-angle"]["nbbox_theta"]) ;    ;
 DISP_Info(infos) ;
 sprintf(infos, "La commande matlab à utiliser est reshape(X, %d, %d, %d).", 9, (int)actions["wallforce-by-angle"]["nbbox_theta"], (int)denom) ;
 DISP_Info(infos) ;
@@ -414,7 +414,7 @@ switch(dir) {
     box[3]=fmin(actions["use-box"]["box_ymax"], steps[i].box[1][1]) ;
     box[4]=steps[i].box[2][0] ; box[5]=steps[i].box[2][1] ;
     break ;
-  default: DISP_Warn("Direction de moyennage xray inconnue\n") ;
+  default: DISP_Warn(_("Direction de moyennage xray inconnue\n")) ;
 }
 width=actions["xray"]["width"] ; height=actions["xray"]["height"] ;
 img=(double**)malloc(sizeof(double*)*width) ;
@@ -574,16 +574,16 @@ Type=TL ;
 
 if (!checkfile()) {return -1 ;}
 
-if (read_type & 4) {nbsteps=0 ; printf("Lecture initiale du dump compressé, peut prendre du temps ...\n") ; }
+if (read_type & 4) {nbsteps=0 ; printf(_("Lecture initiale du dump compressé, peut prendre du temps ...\n")) ; }
 if (read_type & 2) {idx=index ;}
 
 if (isfirst == true) // Lecture de l'header du fichier
    {
    res=fread(datas, 1, 26, in) ; datas[26]=0 ;  // Extraction de l'header AVFF
-   if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRESSED")) cout << "Compression avec la version 1.0 du compresseur. Cela ne devrait pas poser de problème. Utiliser sinon une version plus ancienne de PostProcessing.\n" ;
-   else if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.0")) cout << "Compression avec la version 2.0, ne devrait pas poser de probl�me \n" ;
-   else if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.1")) cout << "Compression avec la version 2.1, pourrait causer des erreurs\n" ;
-   else if (strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.3")) cout << "WARN : le fichier compressé ne semble pas avoir l'header correct\n" ;
+   if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRESSED")) cout << _("Compression avec la version 1.0 du compresseur. Cela ne devrait pas poser de problème. Utiliser sinon une version plus ancienne de PostProcessing.\n") ;
+   else if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.0")) cout << _("Compression avec la version 2.0, ne devrait pas poser de probl�me \n") ;
+   else if (!strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.1")) cout << _("Compression avec la version 2.1, pourrait causer des erreurs\n") ;
+   else if (strcmp(datas,"AVFFLIGGGHTSDUMPCOMPRES2.3")) cout << _("WARN : le fichier compressé ne semble pas avoir l'header correct\n") ;
 
    res=fread(&USI, 2, 1, in) ;
    res=fread(datas,1, USI, in) ; datas[USI]=0 ;
@@ -639,7 +639,7 @@ if (isfirst == true) // Lecture de l'header du fichier
 	 else if (format==10)
 	    {res=fread(&D,8,1,in) ; cp_dat.champs.denombrables[i][j]=D ; }
          else
-            {cout << "AFormat inconnu dans la sous fonction convertDBL"  ; std::exit(EXIT_FAILURE) ;}
+            {cout << _("AFormat inconnu dans la sous fonction convertDBL")  ; std::exit(EXIT_FAILURE) ;}
 	 }
        }
      }
@@ -707,7 +707,7 @@ for (i=beggining ; i<endding ; i++)
             else if (format==10)
               {res=fread(&D,8,1,in) ; steps[i].datas[j][k]=D ; }
             else
-              {cout << "BFormat inconnu dans la sous fonction convertDBL" ; std::exit(EXIT_FAILURE) ;}
+              {cout << _("BFormat inconnu dans la sous fonction convertDBL") ; std::exit(EXIT_FAILURE) ;}
 	    }
 	   }
 	  else if (cp_dat.formats[j]>=cp_dat.CHAR_CST && cp_dat.formats[j]<cp_dat.CHAR_DENOM_2)
@@ -731,7 +731,7 @@ for (i=beggining ; i<endding ; i++)
               }
 	   }
           else
-           {cout << "ERR : format inconnu lors de la décompression des steps." ; }
+           {cout << _("ERR : format inconnu lors de la décompression des steps.") ; }
           }
 
 	else 	// On ne recherche que les positions dans le fichier qui pointent vers les données de chaque ts.
@@ -746,7 +746,7 @@ for (i=beggining ; i<endding ; i++)
             else if ((format==3) || (format==4)) longueur=2 ;
             else if ((format==5) || (format==6) || (format==9)) longueur=4 ;
             else if ((format==7) || (format==8) || (format==10)) longueur=8 ;
-            else {cout << "Format inconnu dans la sous fonction convertDBL" ; std::exit(EXIT_FAILURE) ;}
+            else {cout << _("Format inconnu dans la sous fonction convertDBL") ; std::exit(EXIT_FAILURE) ;}
 
 	   fseek(in, length_dat*longueur, SEEK_CUR) ;
 	   }
@@ -762,7 +762,7 @@ for (i=beggining ; i<endding ; i++)
 	   fseek(in, longueur, SEEK_CUR) ;
 	   }
           else
-           {cout << "ERR : format inconnu lors de la décompression des steps." ; }
+           {cout << _("ERR : format inconnu lors de la décompression des steps.") ; }
 	  }
 	}
     }
@@ -774,7 +774,7 @@ bool LcpDump::checkfile (void)
 {
 if (dumpinc==NULL)
   {
-  cout << "ERR ! Le fichier de dump doit être ouvert au format C (FILE*) pour être utilisé dans un dump compressé. Des erreurs surviendront." ;
+  cout << _("ERR ! Le fichier de dump doit être ouvert au format C (FILE*) pour être utilisé dans un dump compressé. Des erreurs surviendront.") ;
   return false ;
   }
 return true ;
@@ -822,5 +822,5 @@ if (steps[0].Type==TL || steps[0].Type==TCF)
 else if (steps[0].Type==TF)
    {FDump::disp() ; fflush(stdout) ; }
 else
-  cout<<"WARN : le type de steps n'est pas connu pour les dump compressé, disp impossible" ;
+  cout<<_("WARN : le type de steps n'est pas connu pour les dump compressé, disp impossible") ;
 }

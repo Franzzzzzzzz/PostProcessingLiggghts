@@ -18,7 +18,7 @@ int LcfDump::read (unsigned char read_type, int index)
   Type=TCF ; 
   ligneC=(char*)malloc(5000) ; 
   
-  if (read_type & 4) {nbsteps=0; printf("Lecture initiale du dump, peut prendre du temps ...\n") ; }
+  if (read_type & 4) {nbsteps=0; printf(_("Lecture initiale du dump, peut prendre du temps ...\n")) ; }
   if (read_type & 2) idx=index ;
 
   while (!dumpin.eof() && stop<2 )
@@ -73,7 +73,7 @@ int LcfDump::read (unsigned char read_type, int index)
 			steps[idx].datas[j][i]=strtod(actu, &suiv) ;
 			if (actu==suiv) 
 			{ 
-			  DISP_Err("Conversion to double failed ! Something really bad happened. Going to next field...\n") ; 
+			  DISP_Err(_("Conversion to double failed ! Something really bad happened. Going to next field...\n")) ; 
 			  while (*actu!=' ' && *actu!=0) actu++ ; 
 			}
 			else 
@@ -81,13 +81,13 @@ int LcfDump::read (unsigned char read_type, int index)
 			if ( !isfinite(steps[idx].datas[j][i]))
 			{
 			 if (actions["nofileerror"].set && first)
-			 { DISP_Warn("Une valeur lue est inf ou nan \n") ; 
+			 { DISP_Warn(_("Une valeur lue est inf ou nan \n")) ; 
 			   first=false ; }
 			 else if (!actions["nofileerror"].set && first_naninf)
 			 {
                            
-			  DISP_Warn("\n\n!!! Une valeur lue est inf ou nan.  ") ; 
-			  DISP_Warn("Elle n'a PAS été supprimée.\n") ;
+			  DISP_Warn(_("\n\n!!! Une valeur lue est inf ou nan.  ")) ; 
+			  DISP_Warn(_("Elle n'a PAS été supprimée.\n")) ;
                           first_naninf=false ; 
 			  //steps[idx].datas[j][i]=0 ;
 			 }
@@ -146,7 +146,7 @@ if (position!=string::npos)
   if (position!=string::npos)
    return 4 ;
 
-  cerr << "WARN1 : item inconnu " << ligne << ".\n" ;
+  cerr << _("WARN1 : item inconnu ") << ligne << ".\n" ;
   return -1 ;
   }
 else
@@ -171,12 +171,12 @@ int LcfDump::sparselabels(Step &step , string ligne)
     res=IDS(item) ;
     
     if (res==-1) 
-    {DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter\n") ; 
+    {DISP_Warn (_("Un type de donné n'est pas référencé, IDS va l'ajouter\n")) ; 
      res=IDS.new_id(item, TCF) ; 
      if (res!=-1) step.idx_col[compteur]=res ;
      else 
      {
-       DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n"); 
+       DISP_Err(_("Le type inconnu n'a pas pu être ajouté !!\n")); 
        step.idx_col[compteur]=IDS("UNKNOWN") ; 
      }
     }
@@ -296,7 +296,7 @@ while (stop==false)
          W->d[i]=&(dmp->steps[ts].datas[idx[i]][0]) ; 
       if (*(W->i+i)==-1) {W->i=&(dmp->steps[ts].nb_atomes) ; W->sendin(OK) ;} break ;    
     case FINI : stop=true ; W->sendin(OK) ; break ; 
-    default : DISP_Warn("Signal d'écriture inconnu"); W->disp_Signal() ;  break ; 
+    default : DISP_Warn(_("Signal d'écriture inconnu")); W->disp_Signal() ;  break ; 
   }
 }
 return 1;    
@@ -321,9 +321,9 @@ map<int, int> contact_histogram ; int totalcf=0 ;
 
 loopdat(loop) ;
 
-cout << "\nLcfDump::write_grainforce         " ;
+cout << _("\nLcfDump::write_grainforce         ") ;
 actions.total=loop[2] ; actions.disp_progress() ;
-DISP_Info("On travail sur du 2D en xy\n") ;
+DISP_Info(_("On travail sur du 2D en xy\n")) ;
 
 chem2=chemin ; try{chem2.erase(chem2.rfind(".gz"));} catch(...){} chem2.append("-GrainForce.txt") ;
 out2.open(chem2.c_str(), ios::out) ;
@@ -366,7 +366,7 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
       //if (datas[idx[5]][i]==1) return 0 ;
       if (steps[i].datas[idx[4]][j]==idgrain) sgn=-1;
       else if (steps[i].datas[idx[3]][j]==idgrain) sgn=1 ;  //Tout va bien
-      else {DISP_Warn("Il n'y a pas le bon ID dans la chaines !") ; continue ; }
+      else {DISP_Warn(_("Il n'y a pas le bon ID dans la chaines !")) ; continue ; }
     
       forces[0]+=(steps[i].datas[idx[0]][j]*sgn) ;
       forces[1]+=(steps[i].datas[idx[1]][j]*sgn) ;
@@ -421,7 +421,7 @@ if (bytot) out2.close() ;
 //printf("%d %d\n", (int) ((loop[2]-loop[0])/(double)loop[1] - denom), denom) ;
 if (byangle)
 {
-  sprintf(infos, "La largeur en angle des boites est de %f degrés (%f radians).\n", 360.0/actions["grainforce-by-angle"]["nbbox_theta"], 2*M_PI/actions["grainforce-by-angle"]["nbbox_theta"]) ;    ;
+  sprintf(infos, _("La largeur en angle des boites est de %f degrés (%f radians).\n"), 360.0/actions["grainforce-by-angle"]["nbbox_theta"], 2*M_PI/actions["grainforce-by-angle"]["nbbox_theta"]) ;    ;
   DISP_Info(infos) ;
 
   //sprintf(infos, "La commande matlab à utiliser est reshape(X, %d, %d, %d).\n", 5, (int)actions["grainforce-by-angle"]["nbbox_theta"], (int)denom) ;
@@ -450,7 +450,7 @@ if (actions["grainforce-by-angle"].set && actions["mean"].set)
 if (byduration)
 {
 FILE * outhist ; 
-DISP_Info("Nombre total de chainforce: ") ; printf("%d\n", totalcf) ; 
+DISP_Info(_("Nombre total de chainforce: ")) ; printf("%d\n", totalcf) ; 
 chem=chemin ; try{chem.erase(chem.rfind(".gz")) ;} catch(...){} chem.append("-DurationHistogram.txt") ;
 out.open(chem.c_str(), ios::out) ;
 out << "DureeTS Occurence\n" ;  
@@ -539,12 +539,12 @@ FILE *in ;
 
 loopdat(loop) ;
 
-cout << "\nLcfDump::write_radiuscontact          " ;
+cout << _("\nLcfDump::write_radiuscontact          ") ;
 actions.total=loop[2] ; actions.disp_progress() ;
 DISP_Info("On travail sur du 2D en xy\n") ;
 
 // Chargement du tableau des rayons (compliqué sinon...)
-DISP_Warn("On utilise un fichier externe de rayons Radius.txt. Ce n'est certes pas joli, mais beaucoup plus simple !!\n") ;
+DISP_Warn(_("On utilise un fichier externe de rayons Radius.txt. Ce n'est certes pas joli, mais beaucoup plus simple !!\n")) ;
 in=fopen("Radius.txt", "r") ;
 double tmpray ; int id, nbids=0, tmpid, idold=-1 ; int res ; 
 ids=(int *)malloc(sizeof(int)) ; rayons=(double *)malloc(sizeof(double)) ;
@@ -603,7 +603,7 @@ for (i=loop[0] ; i<loop[2] ; i+=loop[1])
 	}
 
 char chaine[500] ;
-sprintf(chaine, "Nombre de ts utilises : %d sur %ld. Rayon : %.15lf.\n", nbstepok, (loop[2]-loop[0])/loop[1], radius/(double)nbgrains) ;
+sprintf(chaine, _("Nombre de ts utilises : %d sur %ld. Rayon : %.15lf.\n"), nbstepok, (loop[2]-loop[0])/loop[1], radius/(double)nbgrains) ;
 DISP_Info(chaine) ;
 
 return 0 ;
@@ -626,28 +626,28 @@ int LcfDump::coupletot (string chemin, LucDump & ldump)
   result[1]=(double*)malloc(sizeof(double)*(loop[2]-loop[0])/loop[1]) ; 
   result[2]=(double*)malloc(sizeof(double)*(loop[2]-loop[0])/loop[1]) ; 
   
-  cout << " Entrer la position du centre du cylindre (x y z) (constante) : \n" ;
+  cout << _(" Entrer la position du centre du cylindre (x y z) (constante) : \n") ;
   cin >> C.centre(1) >> C.centre(2) >> C.centre(3) ;
   //C.centre(1)=C.centre(2)=0 ; C.centre(3)=0.08 ;
-  cout << "Coordonnées entrées : " << C.centre(1) << " " << C.centre(2) << " " << C.centre(3) << "\n";
+  cout << _("Coordonnées entrées : ") << C.centre(1) << " " << C.centre(2) << " " << C.centre(3) << "\n";
   
-  cout << " Entrer l'axe initial du cylindre (x y z) (premier tsdump) : \n" ;
+  cout << _(" Entrer l'axe initial du cylindre (x y z) (premier tsdump) : \n") ;
   cin >> caxe(1) >> caxe(2) >> caxe(3) ;
   //caxe(1)=1 ; caxe(2)=caxe(3)=0 ;
   caxe.normalise() ; 
-  cout << "Coordonnées entrées : " << caxe(1) << " " << caxe(2) << " " << caxe(3) << "\n";
+  cout << _("Coordonnées entrées : ") << caxe(1) << " " << caxe(2) << " " << caxe(3) << "\n";
   
-  cout << " Entrer la vitesse de rotation (en degré par tsdump) : \n" ;
+  cout << _(" Entrer la vitesse de rotation (en degré par tsdump) : \n") ;
   cin >> omega ; 
   //omega=0.9 ; 
   omega=omega/180*M_PI ;
-  cout << "Vitesse entrée : " << omega << "\n";
+  cout << _("Vitesse entrée : ") << omega << "\n";
   
-  cout << " Entrer l'axe de rotation du cylindre (x, y, z) : \n" ;
+  cout << _(" Entrer l'axe de rotation du cylindre (x, y, z) : \n") ;
   cin >> axis(1) >> axis(2) >> axis(3) ;
   //axis(1)=axis(2)=0 ; axis(3)=-1 ;
   axis.normalise() ; 
-  cout << "Coordonnées entrées : " << axis(1) << " " << axis(2) << " " << axis(3) << "\n";
+  cout << _("Coordonnées entrées : ") << axis(1) << " " << axis(2) << " " << axis(3) << "\n";
   
   cout << "\nLcfDump::coupletot          " ;
   actions.total=(loop[2]-loop[0])/loop[1] ; actions.disp_progress() ;
@@ -746,7 +746,7 @@ int LcfDump::energy(string chemin, LucDump & ldump)
 {
  long int loop[3] ; map <string, double> res ;
  FILE * out ; out=fopen(chemin.c_str(), "w") ; 
- if (out==NULL) {DISP_Err("Cannot open output file\n") ; return 0 ; }
+ if (out==NULL) {DISP_Err(_("Cannot open output file\n")) ; return 0 ; }
  loopdat(loop) ;
  actions.total=(loop[2]-loop[0])/loop[1] ; actions.disp_progress() ;  
 

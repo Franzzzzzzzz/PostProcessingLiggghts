@@ -20,11 +20,11 @@ int i=0, j, k, stop=0, idx ;
 
 Type=TF ; 
 
-if (read_type & 4) {nbsteps=0 ; printf("Lecture initiale du vtk, peut prendre du temps ...\n") ; }
+if (read_type & 4) {nbsteps=0 ; printf(_("Lecture initiale du vtk, peut prendre du temps ...\n")) ; }
 if (read_type & 2) {idx=index ;}
 
 if (info==false)
-DISP_Info("Les tests de réussite de lecture ne sont pas effectués ici. Si des problèmes surviennent, consulter les fonctions LDump::read() pour voir les tests qu'il faudrait effectuer.\n") ; 
+DISP_Info(_("Les tests de réussite de lecture ne sont pas effectués ici. Si des problèmes surviennent, consulter les fonctions LDump::read() pour voir les tests qu'il faudrait effectuer.\n")) ; 
 info=true ; 
 
 while (!dumpin.eof() && stop<2)
@@ -185,21 +185,21 @@ if (position!=string::npos)
    position=ligne.find("shearstress") ;
    if (position!=string::npos)
       return 32 ;
-   DISP_Warn("WARN8 : type de scalaire inconnu dans le vtk\n") ; return 30 ;
+   DISP_Warn(_("WARN : type de scalaire inconnu dans le vtk\n")) ; return 30 ;
    }
 position=ligne.find("VECTORS") ;
 if (position!=string::npos)
    {
    position=ligne.find("forcesTri") ;
    if (position!=string::npos)
-      {if (!actions["v1"].set && warn ){DISP_Warn("Les donnees forcesTri ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n") ; warn=false ;} return 41 ;}
+      {if (!actions["v1"].set && warn ){DISP_Warn(_("Les donnees forcesTri ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n")) ; warn=false ;} return 41 ;}
    position=ligne.find("normales") ;
    if (position!=string::npos)
-	  {if (!actions["v1"].set && warn){DISP_Warn("Les donnees normales ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n") ; warn=false ; } return 42 ; }
+	  {if (!actions["v1"].set && warn){DISP_Warn(_("Les donnees normales ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n")) ; warn=false ; } return 42 ; }
    position=ligne.find("stress") ;
       if (position!=string::npos)
-   	  {if (actions["v1"].set && warn){DISP_Warn("Les donnees stress ne devraients pas exister en Lv1.\n") ; warn=false ; } return 43 ; }
-   DISP_Warn("WARN9 : type de vecteur inconnu dans le vtk\n") ; return 40 ;
+   	  {if (actions["v1"].set && warn){DISP_Warn(_("Les donnees stress ne devraients pas exister en Lv1.\n")) ; warn=false ; } return 43 ; }
+   DISP_Warn(_("WARN : type de vecteur inconnu dans le vtk\n")) ; return 40 ;
    }
 position=ligne.find("POINTS") ;
 if (position!=string::npos)
@@ -207,10 +207,10 @@ if (position!=string::npos)
 // POLYGONS en Lv1 est la même chose (y compris la syntaxe) en Lv2. La lecture (et donc la valeur de renvoie) est donc la même
 position=ligne.find("POLYGONS") ;
 if (position!=string::npos)
-	{if (!actions["v1"].set && warn){DISP_Warn("Les donnees forcesTri ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n") ; warn=false ; } return 6 ;}
+	{if (!actions["v1"].set && warn){DISP_Warn(_("Les donnees forcesTri ne devraients pas exister en Lv2. Utiliser --v1 peut aider\n")) ; warn=false ; } return 6 ;}
 position=ligne.find("CELLS") ;
 if (position!=string::npos)
-	{if (actions["v1"].set && warn){DISP_Warn("Les donnees CELLS devraient être POLYGONS pour la Lv1.\n") ; warn=false ;} return 6 ;}
+	{if (actions["v1"].set && warn){DISP_Warn(_("Les donnees CELLS devraient être POLYGONS pour la Lv1.\n")) ; warn=false ;} return 6 ;}
 
 return 0 ;
 }
@@ -326,7 +326,7 @@ if (actions["group-triangles"].set)
 {
 char chaine[500] ;
 groupout.close() ;
-sprintf(chaine, "Le fichier %s a ete cree. La commande matlab de redimensionnement est reshape(X,9,%d,%ld).", chem2.c_str(), nb_tri,((loop[2]-loop[0])/loop[1])) ;
+sprintf(chaine, _("Le fichier %s a ete cree. La commande matlab de redimensionnement est reshape(X,9,%d,%ld)."), chem2.c_str(), nb_tri,((loop[2]-loop[0])/loop[1])) ;
 DISP_Info(chaine) ;
 }
 
@@ -349,9 +349,9 @@ out.open(chem.c_str(), ios::out) ;
 
 loopdat(loop) ; 
 
-cout << " Entrer les coordonnées du centre du cylindre (x y z) : \n" ;
+cout << _(" Entrer les coordonnées du centre du cylindre (x y z) : \n") ;
 cin >> c(1) >> c(2) >> c(3) ;
-cout << "Coordonnées entrées : " << c(1) << " " << c(2) << " " << c(3) << "\n";
+cout << _("Coordonnées entrées : ") << c(1) << " " << c(2) << " " << c(3) << "\n";
 cout << "\nFDump::write_coupletot          " ;
 actions.total=loop[2]-loop[0] ; actions.disp_progress() ;
 
@@ -387,7 +387,7 @@ if (actions["anglebystep"].set)
    {
    anglebase=actions["anglebystep"]["anglebystep"]/180.*M_PI ;
    // Calcul des centres des triangles :
-   DISP_Err("NON IMPLEMENTé : il faut reprogrammer anglebystep dans FDump::mean_stress") ;
+   DISP_Err(_("NON IMPLEMENTé : il faut reprogrammer anglebystep dans FDump::mean_stress")) ;
    /*Matrix mat_null(3,1) ; mat_null=0.0 ;
    centres.resize(tmp_forces.nb_triangles,mat_null) ;
    for (j=0 ; j<tmp_forces.nb_triangles ; j++)
@@ -406,7 +406,7 @@ for (i=loop[0]+1 ; i<loop[2] ; i+=loop[1])
        Filter filtre_tmp ;
        // Création du filtre pour le Ldump
        sprintf(filterdo, "null::zrotate::%.10f", angle) ;
-       DISP_Err("Please check the type value here (anglebystep in FDump.cpp, meanstress)\n") ; 
+       DISP_Err(_("Please check the type value here (anglebystep in FDump.cpp, meanstress)\n")) ; 
        postfiltre=filtre_tmp.parse_arg(filterdo, TF ) ;
        postfiltre[0].valeur=angle ;
        }
@@ -415,7 +415,7 @@ for (i=loop[0]+1 ; i<loop[2] ; i+=loop[1])
 
     if (actions["anglebystep"].set)
        {
-    	   DISP_Err("NON IMPLEMENTé : il faut reprogrammer anglebystep dans FDump::mean_stress") ;
+    	   DISP_Err(_("NON IMPLEMENTé : il faut reprogrammer anglebystep dans FDump::mean_stress")) ;
        /*for (j=0 ; j<steps[i].nb_triangles ; j++)
            {
            centrebis=steps[i].get_tri_center(j) ;

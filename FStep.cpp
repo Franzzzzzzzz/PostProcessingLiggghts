@@ -148,7 +148,7 @@ case 3 : 	nb_idx+=3 ; datas.resize(nb_idx, vector<double>(1,0)) ;	idx_col.resize
 		 		}
 		 	break ;
 
-default : DISP_Err("Erreur : la reconstruction demandée pour le triangle n'est pas possible\n") ; break ;
+default : DISP_Err(_("Erreur : la reconstruction demandée pour le triangle n'est pas possible\n")) ; break ;
 }
 return 1 ;
 }
@@ -178,12 +178,12 @@ for (i=0 ; i<nb_triangles ; i++)
   }
 if (actions["iscylperiodic"].set)
    {
-   if (compt!=cptold) {cptold=compt ; printf("\n[%d faces oubliées sur %d faces]", compt, nb_triangles) ;}
+   if (compt!=cptold) {cptold=compt ; printf(_("\n[%d faces oubliées sur %d faces]"), compt, nb_triangles) ;}
    else printf(".") ;
    }
 if (actions["w/otige"].set)
    {
-   if (comptb!=cptbold) {cptbold=comptb ; printf("\n[%d faces oubliées sur %d faces en w/o tige]", comptb, nb_triangles) ;}
+   if (comptb!=cptbold) {cptbold=comptb ; printf(_("\n[%d faces oubliées sur %d faces en w/o tige]"), comptb, nb_triangles) ;}
    }
 //torque=torque/nb_triangles ;    STUPID !!!!!!!!!!!!!!!!!
 return 1 ;
@@ -253,7 +253,7 @@ int Step::Fatm_rotate (Matrix3x3 & rot, int id)
 {
 int idx[3] ;
 Vector pt1 ;
-printf("Should check that Step::Fatm_rotate") ; fflush(stdout) ;
+printf(_("Should check that Step::Fatm_rotate")) ; fflush(stdout) ;
 if (id>=nb_pts)
   {
   id-=nb_pts ;

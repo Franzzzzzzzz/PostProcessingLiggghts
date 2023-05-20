@@ -160,7 +160,7 @@ for (i=0 ; i<dump.steps[ts].nb_atomes ; i++)
       }
   }
 
-printf("Distance min entre atomes : %f\nDistance max entre atomes : %f\n", rmin, rmax) ;  
+printf(_("Distance min entre atomes : %f\nDistance max entre atomes : %f\n"), rmin, rmax) ;  
 return 0 ; 
 }
 
@@ -171,7 +171,7 @@ return 0 ;
 int Stats::disp ()
 {
  unsigned int i ;
- cout << "\n---------------------------\n Statistiques des données : \n---------------------------\n IDX  " ;
+ cout << _("\n---------------------------\n Statistiques des données : \n---------------------------\n IDX  ") ;
  
  for (i=0 ; i<idx_col.size(); i++)
    {printf("%d ", idx_col[i]) ; }

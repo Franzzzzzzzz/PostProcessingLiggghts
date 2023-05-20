@@ -172,8 +172,8 @@ void Step::Lwrite_asRESTART (ofstream &out)
 {
 int i ; int idx[6] ; int maxtype=0 ;
 // Nb : ne fonctionne que pur les grains de type liggghts granular !!
-DISP_Info("Ceci ne fonctionne que pour les grains de type granular\n") ;
-cout << "Ecriture du timestep " << timestep << ".\n";
+DISP_Info(_("Ceci ne fonctionne que pour les grains de type granular\n")) ;
+cout << _("Ecriture du timestep ") << timestep << ".\n";
 
 out << "Donnees atomiques generees par POSTPROCESSING. Permet une insertion d'atomes via la commande liggghts read_data.\n\n" ;
 out << "#========================================================\n" ;
@@ -193,7 +193,7 @@ idx[0]=find_idx(IDS("ID")) ;
 idx[1]=find_idx(IDS("TYPE")) ;
 idx[2]=find_idx(IDS("POSX")) ; idx[3]=find_idx(IDS("POSY")) ; idx[4]=find_idx(IDS("POSZ")) ;
 idx[5]=find_idx(IDS("RAYON")) ;
-DISP_Info("La densité des atomes est fixée à 2500 !\n") ;
+DISP_Info(_("La densité des atomes est fixée à 2500 !\n")) ;
 
 for (i=0 ; i<nb_atomes ; i++)
   {
@@ -204,7 +204,7 @@ for (i=0 ; i<nb_atomes ; i++)
   if (datas[idx[1]][i]>maxtype) maxtype=datas[idx[1]][i] ;
   }
 if (maxtype>1)
-  DISP_Warn("Attention : il y a plus d'1 type d'atome, une erreur surviendra sans doute dans liggghts !") ;
+  DISP_Warn(_("Attention : il y a plus d'1 type d'atome, une erreur surviendra sans doute dans liggghts !")) ;
 
 out.close() ;
 }
@@ -216,7 +216,7 @@ fr[0]=fr[1]=fr[2]=0.0 ;
 
 idx[0]=find_idx(IDS("FORCEWALLX")) ; idx[1]=find_idx(IDS("FORCEWALLY")) ; idx[2]=find_idx(IDS("FORCEWALLZ")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1)
-   {DISP_Err("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump") ; return 1 ; }
+   {DISP_Err(_("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump")) ; return 1 ; }
 
 for (i=0 ; i<nb_atomes ; i++)
    {
@@ -251,10 +251,10 @@ idx[0]=find_idx(IDS("FORCEWALLX")) ; idx[1]=find_idx(IDS("FORCEWALLY")) ; idx[2]
 idx[3]=find_idx(IDS("POSX")) ; idx[4]=find_idx(IDS("POSY")) ; idx[5]=find_idx(IDS("POSZ")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1||idx[3]==-1||idx[4]==-1||idx[5]==-1)
    {printf("%d %d %d %d %d %d||", idx[0], idx[1], idx[2], idx[3], idx[4], idx[5] ) ;  
-     DISP_Err("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump") ; return 1 ; }
+     DISP_Err(_("Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/forcetot et un Ldump")) ; return 1 ; }
 
-if (actions["wallforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau") ; info=false ; } } // Fenêtre créneau
-else {sigma=actions["wallforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info ("Utilisation d'une fenêtre gaussienne") ; info=false ; } } // Fenêtre gaussienne
+if (actions["wallforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info(_("Utilisation d'une fenêtre créneau")) ; info=false ; } } // Fenêtre créneau
+else {sigma=actions["wallforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info (_("Utilisation d'une fenêtre gaussienne")) ; info=false ; } } // Fenêtre gaussienne
 
 
 // Parcours des atomes, ajout des forces aux angles adaptés
@@ -318,7 +318,7 @@ double center[2], rayon, dst, jj, kk ; int bound[4] ;
 
 double dw, dh ; 
 dw=(box[1]-box[0])/(double)(w) ; dh=(box[3]-box[2])/(double)(h) ;
-if (abs(dw/dh-1)>0.05) {DISP_Info("Pixels de l'image assez éloignés d'être carrés ...") ; printf("dw=%g, dh=%g\n", dw, dh) ; } 
+if (abs(dw/dh-1)>0.05) {DISP_Info(_("Pixels de l'image assez éloignés d'être carrés ...")) ; printf("dw=%g, dh=%g\n", dw, dh) ; } 
 
 switch(dir) {
   case 0: idx[0]=find_idx(IDS("POSY")) ; idx[1]=find_idx(IDS("POSZ")) ; break ;
@@ -365,7 +365,7 @@ return 0 ;
 double Step::GetVoronoi()
 {
 #ifndef VORONOI
-DISP_Err("Program not compiled with voronoi support, no result computed.\n") ; 
+DISP_Err(_("Program not compiled with voronoi support, no result computed.\n")) ; 
 return 0 ; 
 #else
 
@@ -379,7 +379,7 @@ idx.push_back(find_idx(IDS("POSY"))) ;
 idx.push_back(find_idx(IDS("POSZ"))) ;
 idx.push_back(find_idx(IDS("RAYON"))) ;
 
-for (auto v:idx) if (v==-1) DISP_Warn("WARN: one of the expected index was not found in Step::GetVoronoi()\n") ; 
+for (auto v:idx) if (v==-1) DISP_Warn(_("WARN: one of the expected index was not found in Step::GetVoronoi()\n")) ; 
 
 for (i=0 ; i<nb_atomes ; i++)
     if (datas[idx[0]][i]==id) 

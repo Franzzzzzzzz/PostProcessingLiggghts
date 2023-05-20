@@ -145,7 +145,7 @@ else if ((format==7) || (format==8) || (format==10))
      {tmp.LI=valeur ; fwrite(&tmp.LI, 8, 1, out);} 
   }
 else
-{cout << "Format inconnu dans la sous fonction convertDBL"; std::exit(EXIT_FAILURE) ;}
+{cout << _("Format inconnu dans la sous fonction convertDBL"); std::exit(EXIT_FAILURE) ;}
 
 return tmp ; 
 }
@@ -210,11 +210,11 @@ else
       else if (champs.denom[i]==2)
 	return(UINT_DENOM_2|mask) ;
       else
-        cout << "This is strange : in compression, CFPERIOD should be 0 or 1 ! " ; 
+        cout << _("This is strange : in compression, CFPERIOD should be 0 or 1 ! ") ; 
   }
   else if (champs.idx_col[i]==IDS("UNKNOWN"))
   {
-    cout << "ERREUR de compression : le type UNKNOWN ne peut être utilisé dans la compression.\n" ;
+    cout << _("ERREUR de compression : le type UNKNOWN ne peut être utilisé dans la compression.\n") ;
     std::exit(EXIT_FAILURE) ;
   }
 
@@ -235,7 +235,7 @@ else
          }
       else
          {
-         cout << "INFO : la compression du champ de type "<< champs.idx_col[i]<< "sera malheureusement en double et non en float.\n" ; 
+         cout << _("INFO : la compression du champ de type ")<< champs.idx_col[i]<< _("sera malheureusement en double et non en float.\n") ; 
          if (champs.denom[i]==1)
 	    return(DOUBLE_CST|mask) ;
          else if (champs.denom[i]==2)
@@ -280,7 +280,7 @@ int Compresser::create_datas_denom (vector <unsigned char> & datasout, unsigned 
        octtmp=j ; break ; 
        }
      }
-   if (j==champs.denom[idx]) {cout <<"Une erreur est survenue dans la compression d'un type dénombrable" ; }
+   if (j==champs.denom[idx]) {cout <<_("Une erreur est survenue dans la compression d'un type dénombrable") ; }
    
    octet=octet | (octtmp&mask) ; 
    decalage+=bits ; 
@@ -338,7 +338,7 @@ int Compresser::uncompress (FILE * in)
   int I ; long int LI ; 
   int i, j, k, l ;
   */
-  cout << "!!!!!!!!!!!!!!!!!!!!\nCette fonction n'existe qu'à titre de souvenir de la décompression dans la version précédente. Elle ne devrait dans l'idéal plus être utilisée. Il faut construire un objet de classe LcpDump et utiliser la fonction write_dump\n!!!!!!!!!!!!!!\n" ;
+  cout << _("!!!!!!!!!!!!!!!!!!!!\nCette fonction n'existe qu'à titre de souvenir de la décompression dans la version précédente. Elle ne devrait dans l'idéal plus être utilisée. Il faut construire un objet de classe LcpDump et utiliser la fonction write_dump\n!!!!!!!!!!!!!!\n") ;
   return 1 ;
   
 /*  fread(datas, 1, 26, in) ; datas[26]=0 ;  // Extraction de l'header AVFF

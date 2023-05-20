@@ -12,15 +12,15 @@ int i, j, k ;
 
 if (actions["extract"].set)
    {debut=(int)actions["extract"]["extract_deb"] ; fin=(int)actions["extract"]["extract_fin"] ;
-     if (debut<0) {debut=0 ; cout << "WARNING : le debut de l'extraction est <0. RAZ.\n" ; }
-     if (fin>dump.nbsteps) {fin=dump.nbsteps ; cout << "WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n" ; }
+     if (debut<0) {debut=0 ; cout << _("WARNING : le debut de l'extraction est <0. RAZ.\n") ; }
+     if (fin>dump.nbsteps) {fin=dump.nbsteps ; cout << _("WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n") ; }
   }
 else
    {debut=0 ; fin=dump.nbsteps;}
 
 if (actions["downsampling"].set)
    { step=(int)actions["downsampling"]["downsampling"] ; 
-   if (step<=0 || step>nbsteps) { step=1 ; cout << "WARNING : downsampling incorrect. Remis à 1.\n" ;}
+   if (step<=0 || step>nbsteps) { step=1 ; cout << _("WARNING : downsampling incorrect. Remis à 1.\n") ;}
    }
 else
    step=1 ; 
@@ -95,15 +95,15 @@ int i, j, k ;
 
 if (actions["extract"].set)
    {debut=(int)actions["extract"]["extract_deb"] ; fin=(int)actions["extract"]["extract_fin"] ;
-     if (debut<0) {debut=0 ; cout << "WARNING : le debut de l'extraction est <0. RAZ.\n" ; }
-     if (fin>dump.nbsteps) {fin=dump.nbsteps ; cout << "WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n" ; }
+     if (debut<0) {debut=0 ; cout << _("WARNING : le debut de l'extraction est <0. RAZ.\n") ; }
+     if (fin>dump.nbsteps) {fin=dump.nbsteps ; cout << _("WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n") ; }
   }
 else
    {debut=0 ; fin=dump.nbsteps;}
 
 if (actions["downsampling"].set)
    { step=(int)actions["downsampling"]["downsampling"] ;
-   if (step<=0 || step>nbsteps) { step=1 ; cout << "WARNING : downsampling incorrect. Remis à 1.\n" ;}
+   if (step<=0 || step>nbsteps) { step=1 ; cout << _("WARNING : downsampling incorrect. Remis à 1.\n") ;}
    }
 else
    step=1 ;
@@ -163,8 +163,8 @@ chemin2 << chemin << "-Surface" << ".txt" ;
 out.open(chemin2.str().c_str(), ios::out) ; 
 
 // On écrit la commande matlab de redimensionnement, histoire de l'avoir en dur. On l'écrit aussi à l'écran.
-out << "% Commande matlab de redimensionnement : reshape(X,"<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
-cout<< "Commande matlab de redimensionnement : reshape(X,"<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
+out << _("% Commande matlab de redimensionnement : reshape(X,")<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
+cout<< _("Commande matlab de redimensionnement : reshape(X,")<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
 
 for (i=0 ; i<nbsteps ; i++)
   {
@@ -215,8 +215,8 @@ chemin2 << chemin << "-SurfaceBas" << ".txt" ;
 out.open(chemin2.str().c_str(), ios::out) ;
 
 // On écrit la commande matlab de redimensionnement, histoire de l'avoir en dur. On l'écrit aussi à l'écran.
-out << "% Commande matlab de redimensionnement : reshape(X,"<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
-cout<< "Commande matlab de redimensionnement : reshape(X,"<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
+out << _("% Commande matlab de redimensionnement : reshape(X,")<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
+cout<< _("Commande matlab de redimensionnement : reshape(X,")<<((int)(nbbox[1]))<<","<<((int)(nbbox[0]))<<","<<((int)(nbsteps))<<");\n" ;
 
 for (i=0 ; i<nbsteps ; i++)
   {

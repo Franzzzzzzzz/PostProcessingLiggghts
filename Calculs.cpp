@@ -463,7 +463,7 @@ double Fonction::volume_intersect_pave_cylindre(Vector pos, Vector sigmafenetre,
 
   // Sinon, MonteCarlo methode
 #ifndef BOOST
-  DISP_Err("Impossible d'effectuer le calcul si le programme n'a pas été compilé avec BOOST") ;
+  DISP_Err(_("Impossible d'effectuer le calcul si le programme n'a pas été compilé avec BOOST")) ;
   return Volume ;
 #else
   static boost::random::mt19937 gen(std::time(0));
@@ -493,7 +493,7 @@ if (xnorm<fabs(w(1)-radius))
   if (radius<=w(1)) {res=1/V ; return ; }
   else
   {
-    if (warn_once) DISP_Warn("Attention : rayon trop grand pour le coarse (on devrait s'en sortir, mais la mesure de phi risque d'être bof ...)!\n") ;
+    if (warn_once) DISP_Warn(_("Attention : rayon trop grand pour le coarse (on devrait s'en sortir, mais la mesure de phi risque d'être bof ...)!\n")) ;
     warn_once=false ;
     res=1/(M_PI*radius*radius) ; return ;
   }
@@ -518,7 +518,7 @@ double V=w(1)*w(2) ;
 double Vp=M_PI*radius*radius ;
 double A, X, Y ;
 
-if (2*radius > w(1) || 2*radius > w(2)) DISP_Warn ("Attention : rayon trop grand pour le coarse rect2D !") ;
+if (2*radius > w(1) || 2*radius > w(2)) DISP_Warn (_("Attention : rayon trop grand pour le coarse rect2D !")) ;
 
 // On se place dans le cadran x+y+
 X=fabs(x(1)) ; Y=fabs(x(2)) ;
@@ -573,9 +573,9 @@ void Fonction::intersect_tranche(double &res, Vector &x, Vector &w, double radiu
     case 'x': orient=1 ; break ;
     case 'y': orient=2 ; break ;
     case 'z': orient=3 ; break ;
-    default : orient=1 ; DISP_Err("Orientation tranche incorrecte") ; break ;
+    default : orient=1 ; DISP_Err(_("Orientation tranche incorrecte")) ; break ;
   }
-  if (2*radius > w(orient)) DISP_Warn("Attention : rayon trop grand pour le coarse tranche !") ;
+  if (2*radius > w(orient)) DISP_Warn(_("Attention : rayon trop grand pour le coarse tranche !")) ;
   if (x(orient)>w(orient)/2.+radius || x(orient)<-w(orient)/2.-radius) {res=0 ; return ; }
   else if (x(orient)<w(orient)/2.-radius && x(orient)>-w(orient)/2.+radius) {res=1/V ; return ; }
   else
@@ -589,7 +589,7 @@ void Fonction::intersect_tranche(double &res, Vector &x, Vector &w, double radiu
 //..........
 void Fonction::int_intersect_sphere (double & res , Vector &xa, Vector &xb, Vector &w)
 {
-cout << "ERR : int_intersect_sphere : NOT IMPLEMENTED YET" ;
+cout << _("ERR : int_intersect_sphere : NOT IMPLEMENTED YET") ;
 }
 
 void Fonction::int_gaussienne3D(double & res, Vector &xa, Vector &xb, Vector &w)
@@ -597,7 +597,7 @@ void Fonction::int_gaussienne3D(double & res, Vector &xa, Vector &xb, Vector &w)
 double normea=Calcul::norm(xa), normeb=Calcul::norm(xb), ra, rb ;
 //Fonction::gaussienne3D(ra,normea, w(1), double radius) ; Fonction::gaussienne3D(rb, normeb, w(1), double radius) ;
 //res=0.5*(ra+rb) ;
-DISP_Err("NOT IMPLEMENTED");
+DISP_Err(_("NOT IMPLEMENTED"));
 }
 //..........
 void Fonction::int_creneau3D (double & res, Vector &xa, Vector &xb, Vector &w)
@@ -901,7 +901,7 @@ void Vector::disp(void)
 //--------------
 Vector operator* (Vector & v, Matrix3x3 & m)
 {
- if (v.iscol()) {cerr << "MATRIXERR : multiplication impossible matrix*ligne" ;}
+ if (v.iscol()) {cerr << _("MATRIXERR : multiplication impossible matrix*ligne") ;}
  else
  {
   Vector res(v);
@@ -915,7 +915,7 @@ Vector operator* (Vector & v, Matrix3x3 & m)
 //--------------
 Vector operator* (Matrix3x3 & m, Vector & v)
 {
- if (!v.iscol()) {cerr << "MATRIXERR : multiplication impossible matrix*ligne" ;}
+ if (!v.iscol()) {cerr << _("MATRIXERR : multiplication impossible matrix*ligne") ;}
  else
  {
   Vector res(v);
@@ -929,7 +929,7 @@ Vector operator* (Matrix3x3 & m, Vector & v)
 //-------------
 Matrix3x3 Vector::multiply (Vector & v)
 {
- if (iscol()==false && v.iscol()==true) {cerr << "MATRIXERR : utiliser la fonction .dot() pour faire line*column\n" ;}
+ if (iscol()==false && v.iscol()==true) {cerr << _("MATRIXERR : utiliser la fonction .dot() pour faire line*column\n") ;}
  else
  {
   Matrix3x3 res ;
@@ -1247,7 +1247,7 @@ for (i=0 ; i<npts ; i++)
       {factor+=data[j] ; n++ ; }
     }
   }
-  if (n!=5 && n!=6) {DISP_Warn("WARN: nombre de triangle auxquels appartient le point incorrect (5 attendu) dans Icosahedre:deform.") ; printf("%d\n", n) ; }
+  if (n!=5 && n!=6) {DISP_Warn(_("WARN: nombre de triangle auxquels appartient le point incorrect (5 attendu) dans Icosahedre:deform.")) ; printf("%d\n", n) ; }
   else
   {
     factor=factor/n ;

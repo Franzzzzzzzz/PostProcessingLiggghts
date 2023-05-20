@@ -120,12 +120,12 @@ valeur[j]=0 ;
 int res ;
 res=IDS(id) ;
 if (res==-1)
-{DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter (avec un type TL) \n") ;
+{DISP_Warn (_("Un type de donné n'est pas référencé, IDS va l'ajouter (avec un type TL) \n")) ;
  res=IDS.new_id(id, TL) ;
  if (res!=-1) op_tmp.idx1=res ;
  else
  {
-   DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n");
+   DISP_Err(_("Le type inconnu n'a pas pu être ajouté !!\n"));
    op_tmp.idx1=IDS("UNKNOWN") ;
  }
 }
@@ -138,12 +138,12 @@ if (((valeur[0]>65 && valeur[0]<90) || (valeur[0]>97 && valeur[0]<122)) && (strn
   type=1 ;
   res=IDS(valeur) ;
   if (res==-1)
-    { DISP_Warn ("Un type de donné n'est pas référencé, IDS va l'ajouter\n") ;
+    { DISP_Warn (_("Un type de donné n'est pas référencé, IDS va l'ajouter\n")) ;
       res=IDS.new_id(id, TL) ;
       if (res!=-1) op_tmp.idx2=res ;
       else
       {
-	DISP_Err("Le type inconnu n'a pas pu être ajouté !!\n");
+	DISP_Err(_("Le type inconnu n'a pas pu être ajouté !!\n"));
 	op_tmp.idx2=IDS("UNKNOWN") ;
       }
     }
@@ -153,18 +153,18 @@ if (((valeur[0]>65 && valeur[0]<90) || (valeur[0]>97 && valeur[0]<122)) && (strn
 else
   {
   type=0 ;
-  sscanf(valeur,"%lf",&op_tmp.valeur) ; if(isnan(op_tmp.valeur)) printf("Nan in filter value, proceeding\n") ;
+  sscanf(valeur,"%lf",&op_tmp.valeur) ; if(isnan(op_tmp.valeur)) printf(_("Nan in filter value, proceeding\n")) ;
   }
 
 if (type==0)
   {
   if (Operations.count(op)>0) op_tmp.operation=op ;
-  else {cerr << "WARN2 : le type d'operation" << op <<"est inconnu pour le filtre\n" ; }
+  else {cerr << _("WARN2 : le type d'operation") << op <<_("est inconnu pour le filtre\n") ; }
   }
 else if (type==1)
   {
   if (Operations.count(op)>0) op_tmp.operation=op ;
-  else {cerr << "WARN2 : le type d'operation" << op <<"est inconnu pour le filtre\n" ; }
+  else {cerr << _("WARN2 : le type d'operation") << op <<_("est inconnu pour le filtre\n") ; }
   }
 op_tmp.type=type ;
 op_tmp.TypeDump=TypeDump ;
@@ -225,7 +225,7 @@ int Filter::lieedwardswap (Step &step, struct Op op)
  box[3]=step.box[1][1]-fmax(0, step.triclinic[2]) ;
  box[4]=step.box[2][0] ; box[5]=step.box[2][1] ;
  //printf("%g %g %g %g %g %g %g\n", box[0], box[1], box[2], box[3], box[4], box[5]) ; fflush(stdout) ;
- if (step.Type!=TL) {DISP_Err("LieEdward PBC non implémenté en type non atomique") ; return -1 ; }
+ if (step.Type!=TL) {DISP_Err(_("LieEdward PBC non implémenté en type non atomique")) ; return -1 ; }
 
  idx[0]=step.find_idx(IDS("POSX")) ;
  idx[1]=step.find_idx(IDS("POSY")) ;
@@ -304,7 +304,7 @@ int Filter::moveref (Step &step, struct Op op)
  //referential moving at constant ACCELERATION (yes ...)
  if (op.idx1==IDS("FX") || op.idx1==IDS("FY") || op.idx1==IDS("FZ")) // referentiel moving at constante velocity
  {
-  if (warn==-1) {DISP_Warn ("C'est un filtre SPECIAL PURPOSE. Il faut le vérifier avant de l'utiliser.\n") ; warn=1 ; }
+  if (warn==-1) {DISP_Warn (_("C'est un filtre SPECIAL PURPOSE. Il faut le vérifier avant de l'utiliser.\n")) ; warn=1 ; }
   if ( op.idx1==IDS("FX") )
   {for (i=0 ; i<step.nb_atomes ; i++)
       {
@@ -327,7 +327,7 @@ int Filter::moveref (Step &step, struct Op op)
  return 0 ;
  }
 
- DISP_Warn ("Impossible d'appliquer le filtre de referentiel mobile\n") ;
+ DISP_Warn (_("Impossible d'appliquer le filtre de referentiel mobile\n")) ;
  return -1 ;
 
 }
@@ -352,7 +352,7 @@ else if (step.Type==TCF)
  idx[1]=step.find_idx(IDS("CFPOSY")) ;
  idx[2]=step.find_idx(IDS("CFPOSZ")) ;
 }
-else DISP_Warn("Filter::translate_refgen : type de dump inconnu pour ce filtre\n") ;
+else DISP_Warn(_("Filter::translate_refgen : type de dump inconnu pour ce filtre\n")) ;
 
 idx[3]=step.find_idx(op.idx1) ;
 for (i=0 ; i<step.nb_atomes ; i++)
@@ -369,7 +369,7 @@ for (i=0 ; i<step.nb_atomes ; i++)
 
 if (ok==false)
  {
- DISP_Warn("Erreur : impossible d'effectuer la translation de referentiel")  ;
+ DISP_Warn(_("Erreur : impossible d'effectuer la translation de referentiel"))  ;
  return 0 ;
  }
 //printf("%f %f %f|", pos[0], pos[1], pos[2]) ;
@@ -408,7 +408,7 @@ int idx[3] ; int group ; int nogroup=0 ;
 
 if (step.Type==TL) idx[0]=step.find_idx(IDS("ID")) ;
 else if (step.Type==TCF) { idx[0]=step.find_idx(IDS("CFID1")) ; idx[1]=step.find_idx(IDS("CFID2")) ; }
-else {DISP_Err ("Dump inconnu pour l'opération collapseby\n") ; return 3 ; }
+else {DISP_Err (_("Dump inconnu pour l'opération collapseby\n")) ; return 3 ; }
 
 // Création initiale des groupes d'atomes
 if (op.operation=="::sumby::" || op.operation=="::meanby::")
@@ -417,7 +417,7 @@ if (op.operation=="::sumby::" || op.operation=="::meanby::")
 }
 else if (t0 && (op.operation=="::sumbyt0::" || op.operation=="::meanbyt0::"))
 {
- DISP_Info ("Filter sumbyt0 ou meanbyt0 : Les valeurs individuelles sont calculées au premier pas de temps. Les ID des particules / chaînes sont supposés constants au cours du temps.\n") ;
+ DISP_Info (_("Filter sumbyt0 ou meanbyt0 : Les valeurs individuelles sont calculées au premier pas de temps. Les ID des particules / chaînes sont supposés constants au cours du temps.\n")) ;
 
  IDS.new_id("group",step.Type) ;
  IDS.new_id("groupnumber",step.Type) ;
@@ -494,7 +494,7 @@ for (i=keys.size() ; i<step.nb_atomes+keys.size() ; i++)
 }
 if (nogroup>0)
 {
- printf("%d ", nogroup) ; DISP_Info ("atomes n'ont pas eu de groupe attribués\n") ;
+ printf("%d ", nogroup) ; DISP_Info (_("atomes n'ont pas eu de groupe attribués\n")) ;
 }
 
 if (op.operation=="::meanbyt0::")
@@ -584,10 +584,10 @@ if (op.type==0)
   {
    for (i=0 ; i<step.nb_atomes-j ; i++)
     {
-    if (op.operation=="<") {DISP_Warn("Filter incompatible avec nan") ;}
-    if (op.operation==">") {DISP_Warn("Filter incompatible avec nan") ;}
-    if (op.operation=="<="){DISP_Warn("Filter incompatible avec nan") ;}
-    if (op.operation==">="){DISP_Warn("Filter incompatible avec nan") ;}
+    if (op.operation=="<") {DISP_Warn(_("Filter incompatible avec nan")) ;}
+    if (op.operation==">") {DISP_Warn(_("Filter incompatible avec nan")) ;}
+    if (op.operation=="<="){DISP_Warn(_("Filter incompatible avec nan")) ;}
+    if (op.operation==">="){DISP_Warn(_("Filter incompatible avec nan")) ;}
     if (op.operation=="=") {if (!isnan(step.datas[idx][i])) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
     if (op.operation =="!="){if (isnan(step.datas[idx][i])) {step.swap_atm(i, step.nb_atomes-1-j) ; j++ ; i-- ; }}
     }
@@ -621,7 +621,7 @@ else if (op.type==1)
   }
 else
   {
-  cout << "ERR : le nom de l'opération à effectuer n'est pas correct\n" ;
+  cout << _("ERR : le nom de l'opération à effectuer n'est pas correct\n") ;
   }
 
 if (j>0)
@@ -904,7 +904,7 @@ else
  while (op.alter_dump->steps[i].timestep != step.timestep)
    {
    if (op.alter_dump->steps[i].timestep > step.timestep)
-     {cout << "ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump" ; return -1 ; }
+     {cout << _("ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump") ; return -1 ; }
     //else
     //   {i++ ; op.alter_dump->check_timestep(i) ;}
    i++ ;
@@ -927,7 +927,7 @@ else
  atmstep=&(op.alter_dump->steps[i]) ;
  idx[0]=atmstep->find_idx(IDS("ID")) ;
  int warnings=0 ; static bool warn=true ;
- if (idx[0] == -1 && warn) DISP_Warn("The ID column was not found in the atmstep") ;
+ if (idx[0] == -1 && warn) DISP_Warn(_("The ID column was not found in the atmstep")) ;
  std::vector<double>::iterator it;
 
  for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
@@ -936,7 +936,7 @@ else
     	warnings++ ;
     	if (warn==true)
     	  { warn=false ;
-    	  DISP_Warn("WARN : les ID n'augmentent pas par pas de 1 dans le LucDump. Tentative de correction par ajout d'un atome nul, qui ne devrait normalement pas être appelé") ;
+    	  DISP_Warn(_("WARN : les ID n'augmentent pas par pas de 1 dans le LucDump. Tentative de correction par ajout d'un atome nul, qui ne devrait normalement pas être appelé")) ;
 	  //printf("{%d}", i+1) ;
     	  }
     	for (j=0; j<atmstep->nb_idx ; j++)
@@ -955,7 +955,7 @@ else
   {
   for (i=0 ; i<atmstep->datas[idx[0]].size() ; i++)
     { if (atmstep->datas[idx[0]][i]!=i+1)
-    	{DISP_Err("ERR : les ID n'augmentent pas par pas de 1 dans le LucDump. Cela aurait dû être corrigé à la boucle précédente !") ;}
+    	{DISP_Err(_("ERR : les ID n'augmentent pas par pas de 1 dans le LucDump. Cela aurait dû être corrigé à la boucle précédente !")) ;}
     }
   }
 
@@ -1019,17 +1019,17 @@ else
 		 else if (step.idx_col[j]==IDS("CFPOSX")) { step.datas[j].push_back(position[0]) ; break ;}
 		 else if (step.idx_col[j]==IDS("CFPOSY")) { step.datas[j].push_back(position[1]) ; break ;}
 		 else if (step.idx_col[j]==IDS("CFPOSZ")) { step.datas[j].push_back(position[2]) ; break ;}
-		 else {DISP_Err("Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli") ; break ;}
+		 else {DISP_Err(_("Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli")) ; break ;}
 	 	 }
 	 added++ ;
  	 }
   // Check
   for (j=1 ; j<step.nb_idx ; j++)
  	 {
-	 if (step.datas[j].size()!=step.datas[0].size()) DISP_Err("Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur tous les indexes.") ;
+	 if (step.datas[j].size()!=step.datas[0].size()) DISP_Err(_("Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur tous les indexes.")) ;
  	 }
-  printf("Ajoutés : %d %d %d \n", step.nb_atomes, added, (int) step.datas[0].size()) ; fflush(stdout) ;
-  if (step.nb_atomes+added != step.datas[0].size()) DISP_Err ("Erreur : l'ajout de wallforce a généré un problème ! ") ;
+  printf(_("Ajoutés : %d %d %d \n"), step.nb_atomes, added, (int) step.datas[0].size()) ; fflush(stdout) ;
+  if (step.nb_atomes+added != step.datas[0].size()) DISP_Err (_("Erreur : l'ajout de wallforce a généré un problème ! ")) ;
   step.nb_atomes+=added ;
   }
  }
@@ -1042,8 +1042,8 @@ else
 if (atmstep)
 {
  idx[0]=atmstep->find_idx(IDS("IDMULTISPHERE")) ; idx[1]=step.find_idx(IDS("CFID1")) ; idx[2]=step.find_idx(IDS("CFID2")) ;
- if (idx[0]!=-1 && !actions["multisphere"].set) DISP_Warn("Attention, le champ id_mutisphere est défini dans le dump, mais aucune action n'est effectuée. utiliser --mutisphere peut aider\n") ;
- else if (idx[0]==-1 && actions["multisphere"].set) DISP_Warn("Etrange de definir --multisphere sans champ multisphere\n") ;
+ if (idx[0]!=-1 && !actions["multisphere"].set) DISP_Warn(_("Attention, le champ id_mutisphere est défini dans le dump, mais aucune action n'est effectuée. utiliser --mutisphere peut aider\n")) ;
+ else if (idx[0]==-1 && actions["multisphere"].set) DISP_Warn(_("Etrange de definir --multisphere sans champ multisphere\n")) ;
  else if (idx[0]!=-1 && actions["multisphere"].set)
  {//Suppression des chainforce internes aux multisphere
    int todelete=0 ;
@@ -1070,7 +1070,7 @@ bool first ; int intersampling ; int samplingatm ;
 int idx[8] ; Step * wstep ; int i ;
 
 if (step.find_idx(IDS("FORCEWALLX")) != -1 || step.find_idx(IDS("FORCEWALLY")) != -1 || step.find_idx(IDS("FORCEWALLZ")) != -1)
-{DISP_Info ("Le dump atomique contient déjà les forces avec le mur, le dump de wallforce n'a pas été utilisé") ; return 0 ; }
+{DISP_Info (_("Le dump atomique contient déjà les forces avec le mur, le dump de wallforce n'a pas été utilisé")) ; return 0 ; }
 
 if (first==true)
  {
@@ -1085,7 +1085,7 @@ else
 while (op.wall_dump->steps[i].timestep != step.timestep)
    {
    if (op.wall_dump->steps[i].timestep > step.timestep)
-     {cout << "ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump" ; return -1 ; }
+     {cout << _("ERR : impossible de trouver des timestep correspondant entre le LucDump et le LcfDump") ; return -1 ; }
    i++ ;
    }
 op.wall_dump->check_timestep(i) ;
@@ -1107,7 +1107,7 @@ idx[6]=wstep->find_idx(IDS("FORCEWALLZ")) ;
 idx[7]=wstep->find_idx(IDS("ID")) ;
 
 if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 || idx[3]==-1 || idx[4]==-1 || idx[5]==-1 || idx[6]==-1)
-{DISP_Warn("Attention: wallchainforce non trouvées dans le walldump...") ; return 0 ; }
+{DISP_Warn(_("Attention: wallchainforce non trouvées dans le walldump...")) ; return 0 ; }
 
 for (int i=0 ; i<step.nb_atomes ; i++)
 {
@@ -1160,7 +1160,7 @@ for (i=step.nb_atomes ; i<step.nb_atomes + step.nb_atomes_supp ; i++)
 {
  if (warn_once==true)
  {warn_once=false ;
- DISP_Warn("Attention, le filtrage des chainforce periodiques n'a pas vraiment été testé. Ces chaines devraient idéalement ne pas être utilisées.\n") ;}
+ DISP_Warn(_("Attention, le filtrage des chainforce periodiques n'a pas vraiment été testé. Ces chaines devraient idéalement ne pas être utilisées.\n")) ;}
 
  if (step.datas[idxs[3]][i]>(step.box[0][1]-step.box[0][0])/2)
  {
@@ -1308,7 +1308,7 @@ int Filter::quat2orient (Step &step, struct Op op)
  static Matrix<double,3,3> frame ; static bool first=true ;
  if (first)
  {
-  if (!actions["superquadric"].set) DISP_Warn("Expecting --superquadric as arguments") ;
+  if (!actions["superquadric"].set) DISP_Warn(_("Expecting --superquadric as arguments")) ;
   frame(0,0)=actions["superquadric"]["semiaxisx"]*2 ; frame(1,1)=actions["superquadric"]["semiaxisy"]*2 ; frame(2,2)=actions["superquadric"]["semiaxisz"]*2 ; // *2 because we are giving the semi-axis
   frame(0,1)=frame(0,2)=frame(1,0)=frame(1,2)=frame(2,0)=frame(2,1)=0 ;
  }
@@ -1326,9 +1326,9 @@ int Filter::quat2orient (Step &step, struct Op op)
  idx[4]=step.find_idx(IDS("orientxx")) ;
  idx[0]=step.find_idx(IDS("QUATERNION1")) ; idx[1]=step.find_idx(IDS("QUATERNION2")) ; idx[2]=step.find_idx(IDS("QUATERNION3")) ; idx[3]=step.find_idx(IDS("QUATERNION4")) ;
  idx[5]=step.find_idx(IDS("TYPE")) ; idx[6]=step.find_idx(IDS("RAYON")) ;
- if (idx[5]!=-1 && idx[6]!=-1 && first) DISP_Info("If any atom has a type > 1, they are considered as spherical with the radius given by the dump\n") ;
- if (idx[5]!=-1 && idx[6]==-1 && first) DISP_Warn ("If some superquadric have type>1, things will break as the radius are not available\n") ;
- if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 || idx[3]==-1 || idx[4]==-1) DISP_Err("IDX not found Filter::quat2orient\n") ;
+ if (idx[5]!=-1 && idx[6]!=-1 && first) DISP_Info(_("If any atom has a type > 1, they are considered as spherical with the radius given by the dump\n")) ;
+ if (idx[5]!=-1 && idx[6]==-1 && first) DISP_Warn (_("If some superquadric have type>1, things will break as the radius are not available\n")) ;
+ if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1 || idx[3]==-1 || idx[4]==-1) DISP_Err(_("IDX not found Filter::quat2orient\n")) ;
  for (int i=0 ;i<step.nb_atomes ; i++)
  {
    if (idx[5]!=-1 && step.datas[idx[5]][i]>1)

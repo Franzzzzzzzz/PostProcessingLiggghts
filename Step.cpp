@@ -14,7 +14,7 @@ vector <int> Step::find_idx(vector<int>id, bool errcatch)
     res.push_back(find_idx(i)) ;
     if (res[res.size()-1]==-1) bad ;
   }
-  if (bad && errcatch) DISP_Err ("An expected id could not be found, problems will happen.\n") ;
+  if (bad && errcatch) DISP_Err (_("An expected id could not be found, problems will happen.\n")) ;
   return (res) ;
 }
 //-----------------------------------------------
@@ -32,7 +32,7 @@ if (!actions["norebuild"].set)
   if (id==IDS("FORCEX") || id==IDS("FORCEY") || id==IDS("FORCEZ"))
   { if (find_idx(IDS("STRESSX"))!=-1 && find_idx(IDS("STRESSY"))!=-1 && find_idx(IDS("STRESSZ"))!=-1 )
       { if (messages[1]==false)
-	{DISP_Info("Les id FORCE ont été cherchés mais non trouvés. Les id STRESS ont été trouvés. Les id de forces vont être reconstruits ... (indiqué une seule fois)\n") ;
+	{DISP_Info(_("Les id FORCE ont été cherchés mais non trouvés. Les id STRESS ont été trouvés. Les id de forces vont être reconstruits ... (indiqué une seule fois)\n")) ;
 	 messages[1]=true ; }
 	 buildtridata(1) ;
 	 return (find_idx(id)) ;
@@ -41,7 +41,7 @@ if (!actions["norebuild"].set)
   else if (id==IDS("NORMALEX") || id==IDS("NORMALEY") || id==IDS("NORMALEZ"))
   {
     if (messages[2]==false)
-      {DISP_Info("Les id NORMALE ont été cherchés mais non trouvés. Ils vont être reconstruits ... (indiqué une seule fois)\n") ;
+      {DISP_Info(_("Les id NORMALE ont été cherchés mais non trouvés. Ils vont être reconstruits ... (indiqué une seule fois)\n")) ;
        messages[2]=true ; }
       buildtridata(2) ;
       return (find_idx(id)) ;
@@ -49,7 +49,7 @@ if (!actions["norebuild"].set)
   else if (id==IDS("CENTREX") || id==IDS("CENTREY") || id==IDS("CENTREZ"))
   {
     if (messages[3]==false)
-      {DISP_Info("Les id CENTRE ont été cherchés mais non trouvés. Ils vont être reconstruits ... (indiqué une seule fois)\n") ;
+      {DISP_Info(_("Les id CENTRE ont été cherchés mais non trouvés. Ils vont être reconstruits ... (indiqué une seule fois)\n")) ;
        messages[3]=true ; }
       buildtridata(3) ;
       return (find_idx(id)) ;
@@ -57,7 +57,7 @@ if (!actions["norebuild"].set)
   else if ((id==IDS("FX") || id==IDS("FY") || id==IDS("FZ")) && (actions["chainforce"].set))
   {
     if (messages[2]==false)
-    {DISP_Info("Les id F[XYZ] ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n") ;
+    {DISP_Info(_("Les id F[XYZ] ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n")) ;
       messages[2]=true ; }
     otherstep->LCFforce_by_particle_v2(*this, 1) ;
     return (find_idx(id)) ;
@@ -65,7 +65,7 @@ if (!actions["norebuild"].set)
   else if ((id==IDS("FORCEWALLX") || id==IDS("FORCEWALLY") || id==IDS("FORCEWALLZ")) && (actions["chainforce"].set))
   {
     if (messages[2]==false)
-    {DISP_Info("Les id FORCEWALL[XYZ] ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n") ;
+    {DISP_Info(_("Les id FORCEWALL[XYZ] ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n")) ;
       messages[2]=true ; }
     otherstep->LCFforce_by_particle_v2(*this, 1) ;
     return (find_idx(id)) ;
@@ -73,7 +73,7 @@ if (!actions["norebuild"].set)
   else if (id==IDS("ATMPRESSURE") && (actions["chainforce"].set))
   {
     if (messages[2]==false)
-    {DISP_Info("Les id ATMPRESSURE ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n") ;
+    {DISP_Info(_("Les id ATMPRESSURE ont été cherchés mais non trouvés. Ils vont être reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n")) ;
       messages[2]=true ; }
     otherstep->LCFpressure_by_particle(*this) ;
     return (find_idx(id)) ;
@@ -82,7 +82,7 @@ if (!actions["norebuild"].set)
 else // Pas de rebuild => on quitte
   {
   if (messages[0]==false)
-	   {char erreur[100] ; sprintf(erreur,"\nWARNING : l'id n° %d a été cherché mais pas trouvé. Enlever --norebuild peut aider. \n", id) ; messages[0]=true ;
+	   {char erreur[100] ; sprintf(erreur,_("\nWARNING : l'id n° %d a été cherché mais pas trouvé. Enlever --norebuild peut aider. \n"), id) ; messages[0]=true ;
 	   DISP_Warn(erreur) ; }
 	return -1 ;
   }
@@ -170,7 +170,7 @@ vector <string> aliases ;
 for (i=0 ; i<nb_idx ; i++)
  {
  aliases=IDS.alias(idx_col[i]) ;
- if (aliases.size()==0) {DISP_Warn("WARN5 : index inconnu pour l'écriture des titres de colonnes\n") ; continue ;}
+ if (aliases.size()==0) {DISP_Warn(_("WARN5 : index inconnu pour l'écriture des titres de colonnes\n")) ; continue ;}
  out << aliases[0] << " " ;
  }
  /*switch ()

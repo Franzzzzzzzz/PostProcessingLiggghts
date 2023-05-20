@@ -8,7 +8,7 @@ void gzifstream::open (const char* filename)
   if (filename[l-3]=='.' && filename[l-2]=='g' && filename[l-1]=='z') 
   {
     isgz=true ; 
-    if (!actions["dumpall"].set) DISP_Warn("Il vaut mieux utiliser l'option dumpall vec les dump compressés gz, si la mémoire le permet.\n") ; 
+    if (!actions["dumpall"].set) DISP_Warn(_("Il vaut mieux utiliser l'option dumpall vec les dump compressés gz, si la mémoire le permet.\n")) ; 
     gzopen(filename) ;
   }
   else 
@@ -26,7 +26,7 @@ int gzifstream::gzopen(const char * filename)
   cur=0 ; qttavail=0 ; curtot=0 ;
   
   gzin=fopen(filename, "rb") ; 
-  if (gzin==NULL) DISP_Err("Impossible d'ouvrir le dump\n") ; 
+  if (gzin==NULL) DISP_Err(_("Impossible d'ouvrir le dump\n")) ; 
   
   strm.zalloc = Z_NULL;
   strm.zfree = Z_NULL;
@@ -91,9 +91,9 @@ void gzifstream::gzgetline (unsigned char** s, streamsize n )
     }
   }
   else if (i-cur==n-1)
-    DISP_Warn("Ligne trop longue ... Bizarre \n") ; 
+    DISP_Warn(_("Ligne trop longue ... Bizarre \n")) ; 
   else
-    DISP_Err("Ne peut pas arriver ...\n") ; 
+    DISP_Err(_("Ne peut pas arriver ...\n")) ; 
 }
 //---------------------------------------------
 void gzifstream::getline (string & ligne) 
@@ -197,7 +197,7 @@ gzifstream& gzifstream::seekg (long int off, ios_base::seekdir way)
 {
   if (isgz) 
   {
-    if (way==ios::end) DISP_Err("Non implémenté: impossible de se déplacer de la fin en gz\n") ;
+    if (way==ios::end) DISP_Err(_("Non implémenté: impossible de se déplacer de la fin en gz\n")) ;
     else if (way==ios::cur) gzmove(curtot+off) ; 
     else if (way==ios::beg) gzmove(off) ;
     else DISP_Err("Should not happen (bad way)") ; 
@@ -225,7 +225,7 @@ void gzifstream::gzmove (unsigned long int pos)
     else
     {
      // printf("%ld %ld %ld\n", cur, curtot, pos) ; 
-    DISP_Warn("Déplacement en arrière, pas assez de données dans le buffer: relecture du fichier (il faudrait éviter ça ...)\n") ; 
+    DISP_Warn(_("Déplacement en arrière, pas assez de données dans le buffer: relecture du fichier (il faudrait éviter ça ...)\n")) ; 
     fclose(gzin) ; 
     gzopen(name) ; 
     }
@@ -236,7 +236,7 @@ void gzifstream::gzmove (unsigned long int pos)
   if (cur==qttavail) 
   {
     if (!nomoredata) getmoredata() ;
-    else {printf("%ld %ld %ld\n", cur, curtot, pos) ; DISP_Err("Mouvement au delà de la fin du fichier") ; exit(1) ; }
+    else {printf("%ld %ld %ld\n", cur, curtot, pos) ; DISP_Err(_("Mouvement au delà de la fin du fichier")) ; exit(1) ; }
   }
     
   while (pos>0)
@@ -245,7 +245,7 @@ void gzifstream::gzmove (unsigned long int pos)
     if (cur==qttavail) 
     {
       if (!nomoredata) getmoredata() ;
-      else {DISP_Err("Mouvement au delà de la fin du fichier") ; exit(1) ; }
+      else {DISP_Err(_("Mouvement au delà de la fin du fichier")) ; exit(1) ; }
     }
   }
 }
@@ -260,7 +260,7 @@ int gzifstream::getmoredata()
 {
   unsigned long int i ; 
 
-  if (nomoredata) {DISP_Err("Impossible de décompresser plus de données\n") ; return 1; }
+  if (nomoredata) {DISP_Err(_("Impossible de décompresser plus de données\n")) ; return 1; }
   
   // On recopie ce qui n'a pas encore été lu dans le début du buffer.
   for (i=cur ; i<qttavail ; i++) mybuffer[i-cur]=mybuffer[i] ; 

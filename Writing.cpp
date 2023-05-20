@@ -84,8 +84,8 @@ switch(Signal)
   case CFDUMP : lcfdump() ; break ;
   case COARSEDUMP : coarsedump() ; break ;
   case VTKDUMP : break ;
-  case OTHERDUMP : DISP_Warn("Writing : Je ne sais pas traiter ce dump.\n") ; break ;
-  default : DISP_Err("Writing : signal inattendu.\n") ;
+  case OTHERDUMP : DISP_Warn(_("Writing : Je ne sais pas traiter ce dump.\n")) ; break ;
+  default : DISP_Err(_("Writing : signal inattendu.\n")) ;
 }
 sendout(FINI) ; pthread_mutex_unlock(&mutex);
 return NULL ;
@@ -105,7 +105,7 @@ int Writing::makedir()
  found = dirs.find("dump.forcewall");
  if (found!=std::string::npos) {dirs.erase(0, 14) ; }
 
- if (dirs.length()<=0) {DISP_Warn ("Writing: impossible d'utiliser un dossier au nom vide. L'écriture se fera dans le dossier actuel.\n") ; return 2 ; }
+ if (dirs.length()<=0) {DISP_Warn (_("Writing: impossible d'utiliser un dossier au nom vide. L'écriture se fera dans le dossier actuel.\n")) ; return 2 ; }
 
  // Bad chars are suppressed
  dirs.erase(std::remove(dirs.begin(), dirs.end(), ','), dirs.end());
@@ -122,9 +122,9 @@ int Writing::makedir()
  dirs.erase(std::remove(dirs.begin(), dirs.end(), '.'), dirs.end());
 
  res=std::system(("mkdir "+dirs+ " >/dev/null 2>&1 ").c_str()) ;
- if (res==0) {DISP_Info("Writing: nouveau répertoire : ") ; printf("%s\n", dirs.c_str()) ; }
- else if (res==1 || res==256) {DISP_Info("Writing: utilisation d'un répertoire existant : ") ; printf("%s\n", dirs.c_str()) ;  }
- else {DISP_Warn("Writing: Une erreur s'est produite en essayant de créer un répertoire\n") ; printf("%s\n", dirs.c_str()) ; return 3 ; }
+ if (res==0) {DISP_Info(_("Writing: nouveau répertoire : ")) ; printf("%s\n", dirs.c_str()) ; }
+ else if (res==1 || res==256) {DISP_Info(_("Writing: utilisation d'un répertoire existant : ")) ; printf("%s\n", dirs.c_str()) ;  }
+ else {DISP_Warn(_("Writing: Une erreur s'est produite en essayant de créer un répertoire\n")) ; printf("%s\n", dirs.c_str()) ; return 3 ; }
 
  *chemin=(dirs+"/")+*chemin ;
  return 1 ;
@@ -151,7 +151,7 @@ char strnum[10] ;
        }
       break ;
     case MAT :
-      DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) + ".mat" ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -159,7 +159,7 @@ char strnum[10] ;
       MATFichier(chemin2) ;
       break ;
     case ASCII :
-      DISP_Info("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ;} catch (...) {}
       chemin2=(*chemin) ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -167,14 +167,14 @@ char strnum[10] ;
       ASCIIFichier(chemin2, 1) ;
       break ;
     case BINARY :
-      DISP_Info("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
       check_unregistered() ;
       ASCIIFichier(chemin2, 2) ;
       break ;
-    default : DISP_Warn("Writing : Unsupported format\n") ;
+    default : DISP_Warn(_("Writing : Unsupported format\n")) ;
   }
  }
  return 1 ;
@@ -201,7 +201,7 @@ char strnum[10] ;
        }
       break ;
     case MAT :
-      DISP_Info("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écrire matlab de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) + ".mat" ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -209,7 +209,7 @@ char strnum[10] ;
       MATFichier(chemin2) ;
       break ;
     case ASCII :
-      DISP_Info("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -217,14 +217,14 @@ char strnum[10] ;
       ASCIIFichier(chemin2,1) ;
       break ;
     case BINARY :
-      DISP_Info("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de LDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
       check_unregistered() ;
       ASCIIFichier(chemin2,2) ;
       break ;
-    default : DISP_Warn("Writing : Unsupported format\n") ;
+    default : DISP_Warn(_("Writing : Unsupported format\n")) ;
   }
  }
  return 1 ;
@@ -251,7 +251,7 @@ char strnum[10] ;
        }
       break ;
     case MAT :
-      DISP_Info("Attention : pour l'écrire matlab de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écrire matlab de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin) + "-coarse.mat" ;
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -259,7 +259,7 @@ char strnum[10] ;
       MATFichier(chemin2) ;
       break ;
     case ASCII :
-      DISP_Info("Attention : pour l'écriture ASCII de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ;} catch (...) {}
       chemin2=(*chemin)+"-coarse";
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
@@ -267,14 +267,14 @@ char strnum[10] ;
       ASCIIFichier(chemin2,1) ;
       break ;
     case BINARY :
-      DISP_Info("Attention : pour l'écriture ASCII de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n") ;
+      DISP_Info(_("Attention : pour l'écriture ASCII de CoarseDump, les données sont d'abord chargées en mémoire, ce qui peut prendre beaucoup de temps et risque de dépasser la capacité mémoire.\n")) ;
       try {(*chemin).erase((*chemin).rfind(".gz")) ; } catch (...) {}
       chemin2=(*chemin)+"-coarse";
       sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
       check_unregistered() ;
       ASCIIFichier(chemin2,2) ;
       break ;
-    default : DISP_Warn("Writing : Unsupported format\n") ;
+    default : DISP_Warn(_("Writing : Unsupported format\n")) ;
   }
  }
  return 1 ;
@@ -300,7 +300,7 @@ idx[0]=IDS("POSX") ; idx[1]=IDS("POSY") ; idx[2]=IDS("POSZ") ;
 i=idx ;
 sendout(ASKING2D) ; pthread_cond_wait(&sigin, &mutex);
 
-if (Signal==UNABLE) {DISP_Err("Writing: Les données de position sont indispensables") ; }
+if (Signal==UNABLE) {DISP_Err(_("Writing: Les données de position sont indispensables")) ; }
 if (f==POLYDATA) {VTKPolyData(out, d, *i) ; nbpt=*i ; }
 else if (f==UNSTRUCTUREDGRID) {VTKUnstructuredGrid(out, d, *i) ; nbpt=*i ; }
 else if (f==STRUCTUREDGRID)
@@ -308,7 +308,7 @@ else if (f==STRUCTUREDGRID)
   sendout(ASKINGGRID) ; pthread_cond_wait(&sigin, &mutex);
   VTKStructuredGrid(out, d, nbpt, i) ;
 }
-else DISP_Err("Writing : not implemented") ;
+else DISP_Err(_("Writing : not implemented")) ;
 
 sendout(CHOOSECFDUMP) ; pthread_cond_wait(&sigin, &mutex);
 if (Signal==OK)
@@ -316,7 +316,7 @@ if (Signal==OK)
 idx[0]=IDS("CFID1") ; idx[1]=IDS("CFID2") ; idx[2]=-1 ;
 i=idx ;
 sendout(ASKINGND) ; pthread_cond_wait(&sigin, &mutex);
-if (Signal==UNABLE) {DISP_Err("Writing: Les données de CFID sont indispensables en CFDUMP") ; }
+if (Signal==UNABLE) {DISP_Err(_("Writing: Les données de CFID sont indispensables en CFDUMP")) ; }
 VTKCellLines(out, d, *i) ; nbcell=*i ;
 }
 
@@ -360,7 +360,7 @@ for (int dos=0 ; dos<2 ; dos++)
       case 1 : sendout(ASKING1D) ; break ;
       case 2 : sendout(ASKING2D) ; break ;
       case 3 : sendout(ASKING3D) ; break ;
-      default : DISP_Warn("Writing: Dimension inconnue") ;
+      default : DISP_Warn(_("Writing: Dimension inconnue")) ;
     }
     pthread_cond_wait(&sigin, &mutex);
     if (Signal==UNABLE) continue ;
@@ -407,7 +407,7 @@ for (i=1 ; i<commande.length() ; i++)
      else if (type==2)
        set_varset(space,var) ;
      else
-       DISP_Warn("Writing : pas d'espace ou de fonction definie") ;
+       DISP_Warn(_("Writing : pas d'espace ou de fonction definie")) ;
    }
    ptoc=i ;
  }
@@ -421,7 +421,7 @@ int Writing::set_print(string nom, bool val)
  map<string,WFormat>::iterator it2 ;
  it2=formats.find(nom) ;
 
- if (it2==formats.end()) {DISP_Warn("Writing : chaine de print non trouvée") ; printf("%s/", nom.c_str()) ; }
+ if (it2==formats.end()) {DISP_Warn(_("Writing : chaine de print non trouvée")) ; printf("%s/", nom.c_str()) ; }
 
  if (val==true) format_writing=(format_writing | (1<<(std::distance(formats.begin(), it2)))) ;
  else format_writing=(format_writing & (~(1<<(std::distance(formats.begin(), it2))))) ;
@@ -482,8 +482,8 @@ int Writing::set_def()
    case CFDUMP: /*set_print("vtk", true) ;*/ break ;
    case COARSEDUMP : /*parse("[+vtk]phi,v,sigma[mat]pos,phi,v,sigma") ; */ break ;
    case VTKDUMP : break ;
-   case OTHERDUMP : DISP_Info("Writing : pas de mise à défaut pour OTHERDUMP\n") ; break ;
-   default : DISP_Warn("Writing : signal incohérent pour setdef\n") ;
+   case OTHERDUMP : DISP_Info(_("Writing : pas de mise à défaut pour OTHERDUMP\n")) ; break ;
+   default : DISP_Warn(_("Writing : signal incohérent pour setdef\n")) ;
  }
  return 1 ;
 }
@@ -507,7 +507,7 @@ else if (function=="matlib")
 #ifdef MATLAB
    use_matlib=true ;
 #else
-   {use_matlib=false ; DISP_Warn("Impossible d'utiliser la librairie Matlab, PostProc n'a pas été compilé avec le support Matlab.\n") ;}
+   {use_matlib=false ; DISP_Warn(_("Impossible d'utiliser la librairie Matlab, PostProc n'a pas été compilé avec le support Matlab.\n")) ;}
 #endif
 }
 else if (function=="nomatlib")
@@ -515,7 +515,7 @@ else if (function=="nomatlib")
  if (space=="mat") use_matlib=false ;
 }
 else
-  DISP_Warn("Unknown writing function") ;
+  DISP_Warn(_("Unknown writing function")) ;
 
 return 1 ;
 }
@@ -563,7 +563,7 @@ if (!function.compare("print"))
 void Writing::disp()
 {
   map <string, WFormat>::iterator itfrmt=formats.begin() ;
-  printf("-----> Selected formats 0x%X\n", format_writing) ;
+  printf(_("-----> Selected formats 0x%X\n"), format_writing) ;
   for (vector<unsigned char *>::iterator it=varset.begin() ; it<varset.end() ; it++)
   { printf("%-8s>", itfrmt->first.c_str()) ; itfrmt++ ;
     for (int i=0 ; i<char1D+chardim ; i++)
@@ -632,14 +632,14 @@ int Writing::get_numelem (string var)
  if (it==dim.end()) return 1 ;
  else if (it->second==2) return 3 ;
  else if (it->second==3) return 9 ;
- else {DISP_Warn ("Writing : dimension inconnue") ; return 0 ;}
+ else {DISP_Warn (_("Writing : dimension inconnue")) ; return 0 ;}
 }
 int Writing::get_numelem (int var)
 {
  if (var==1) return 1 ;
  else if (var==2) return 3 ;
  else if (var==3) return 9 ;
- else {DISP_Warn ("Writing : dimension inconnue") ; return 0 ;}
+ else {DISP_Warn (_("Writing : dimension inconnue")) ; return 0 ;}
 }
 
 string Writing::get_nextname (string var)
@@ -661,7 +661,7 @@ string Writing::get_nextname (string var)
      case 1 : num++ ; return  (var+"y") ;
      case 2 : num++ ; return  (var+"z") ;
      case 3 : num=-1 ;return  ("false") ;
-     default : DISP_Warn("Writing : should not happen\n") ; break ;
+     default : DISP_Warn(_("Writing : should not happen\n")) ; break ;
   }
  }
  else if (it->second==3)
@@ -678,11 +678,11 @@ string Writing::get_nextname (string var)
      case 7 : num++ ; return  (var+"zy") ;
      case 8 : num++ ; return  (var+"zz") ;
      case 9 : num=-1 ;return  ("false") ;
-     default : DISP_Warn("Writing : should not happen\n") ; break ;
+     default : DISP_Warn(_("Writing : should not happen\n")) ; break ;
   }
  }
  else
-   DISP_Warn("Writing : dimension inconnue \n") ;
+   DISP_Warn(_("Writing : dimension inconnue \n")) ;
 num=-1 ;
 return "false" ;
 }
@@ -821,7 +821,7 @@ int Writing::VTKField (ofstream & out, string name, double **datas, int dim, int
  if (dim==1)  out << "SCALARS " ;
  else if (dim==2) out << "VECTORS " ;
  else if (dim==3) out << "TENSORS " ;
- else DISP_Warn("Writing: dimension annormale pour les données à écrire VTK") ;
+ else DISP_Warn(_("Writing: dimension annormale pour les données à écrire VTK")) ;
 
  out << name <<" double " ;
  if (dim==1)  out << "1 \nLOOKUP_TABLE default\n" ;
@@ -864,7 +864,7 @@ int Writing::MATFichier (string nom)
   boite=NULL ;
   idx=(int *)malloc(1*sizeof(int)) ; dims=(int *)malloc(1*sizeof(int)) ;
   nbelem=(int **)malloc(1*sizeof(int*)) ; noms =(char **) malloc(1*sizeof(char *)) ;
-  if (nbelem==NULL || idx==NULL || dims==NULL || noms==NULL) DISP_Err("Writing : l'allocation a échouée") ;
+  if (nbelem==NULL || idx==NULL || dims==NULL || noms==NULL) DISP_Err(_("Writing : l'allocation a échouée")) ;
   cpt=0 ; cptvar=0 ;
   while ( (res=get_nextfield("mat")) != -1 )
   {
@@ -933,7 +933,7 @@ int Writing::MATFichier (string nom)
 
   datas=(double **)malloc(cptvar*sizeof(double *)) ;
   d=(double **) malloc(cpt*sizeof(double*)) ;
-  if (datas==NULL || d==NULL) DISP_Err("Writing:allocation impossible\n") ;
+  if (datas==NULL || d==NULL) DISP_Err(_("Writing:allocation impossible\n")) ;
 
   sendout(FIRSTTS) ; pthread_cond_wait(&sigin, &mutex);
   sendout(ASKINGGRID) ; pthread_cond_wait(&sigin, &mutex);
@@ -975,12 +975,12 @@ int Writing::MATFichier (string nom)
     if (ts==0)
     {
       ncell_orig=ncell ; natm_orig=natm ;
-      if (ncell_orig==0 || natm_orig==0) DISP_Err("Writing : des données ont été demandées mais sont vides pour ce ts.") ;
+      if (ncell_orig==0 || natm_orig==0) DISP_Err(_("Writing : des données ont été demandées mais sont vides pour ce ts.")) ;
     }
     else
     {
       if (ncell!=ncell_orig || natm!=natm_orig)
-	DISP_Err("Writing : pas le même nombre d'atomes ou de cellules entre ts. Impossible d'écrire Matlab") ;
+	DISP_Err(_("Writing : pas le même nombre d'atomes ou de cellules entre ts. Impossible d'écrire Matlab")) ;
     }
 
     cpt=0 ;
@@ -1001,7 +1001,7 @@ int Writing::MATFichier (string nom)
       if (ts==0) {datas[j]=(double *)calloc((*nbelem[j])*(ts+1)*dims[j], sizeof(double)) ; }
       else 	  datas[j]=(double *)realloc(datas[j], (*nbelem[j])*(ts+1)*dims[j]*sizeof(double)) ;
 #endif
-      if (datas[j]==NULL) {DISP_Err("Writing: pas assez de mémoire à allouer") ; fflush(stdout) ; }
+      if (datas[j]==NULL) {DISP_Err(_("Writing: pas assez de mémoire à allouer")) ; fflush(stdout) ; }
 
       for (k=0 ; k<dims[j] ; k++)
       {
@@ -1155,7 +1155,7 @@ int Writing::ASCIIFichier (string nom, int type)
   boite=NULL ;
   idx=(int *)malloc(1*sizeof(int)) ; dims=(int *)malloc(1*sizeof(int)) ;
   nbelem=(int **)malloc(1*sizeof(int)) ; noms =(char **) malloc(1*sizeof(char *)) ;
-  if (nbelem==NULL || idx==NULL || dims==NULL || noms==NULL) DISP_Err("Writing : l'allocation a échouée") ;
+  if (nbelem==NULL || idx==NULL || dims==NULL || noms==NULL) DISP_Err(_("Writing : l'allocation a échouée")) ;
   cpt=0 ; cptvar=0 ;
   if (type==1) strcpy(fmtstr, "ascii") ;
   else strcpy (fmtstr, "binary") ;
@@ -1167,7 +1167,7 @@ int Writing::ASCIIFichier (string nom, int type)
     dims=(int*)realloc(dims, cptvar*sizeof(int)) ;
     if (res>=IDSMAX)
     {
-     DISP_Info("Pour l'écriture ASCII, les variables de dimensions 2 et 3 ne peuvent être écrites que moyennées en temps / avec 1 seul ts / avec 1 seul atome.\n") ;
+     DISP_Info(_("Pour l'écriture ASCII, les variables de dimensions 2 et 3 ne peuvent être écrites que moyennées en temps / avec 1 seul ts / avec 1 seul atome.\n")) ;
      map<string,int>::iterator it ;
      it=dim.begin() ; std::advance(it,res-IDSMAX) ;
      noms[cptvar-1]=(char*) malloc (sizeof(char)*(it->first.length()+1)) ;
@@ -1258,12 +1258,12 @@ int Writing::ASCIIFichier (string nom, int type)
     if (ts==0)
     {
       ncell_orig=ncell ; natm_orig=natm ;
-      if (ncell_orig==0 || natm_orig==0) DISP_Err("Writing : des données ont été demandées mais sont vides pour ce ts.") ;
+      if (ncell_orig==0 || natm_orig==0) DISP_Err(_("Writing : des données ont été demandées mais sont vides pour ce ts.")) ;
     }
     else
     {
       if (ncell!=ncell_orig || natm!=natm_orig)
-	DISP_Err("Writing : pas le même nombre d'atomes ou de cellules entre ts. Impossible d'écrire ASCII") ;
+	DISP_Err(_("Writing : pas le même nombre d'atomes ou de cellules entre ts. Impossible d'écrire ASCII")) ;
     }
 
     cpt=0 ;
@@ -1271,7 +1271,7 @@ int Writing::ASCIIFichier (string nom, int type)
     {
       if (ts==0) {datas[j]=(double *)calloc((*nbelem[j])*(ts+1)*dims[j], sizeof(double)) ; }
       else 	  datas[j]=(double *)realloc(datas[j], (*nbelem[j])*(ts+1)*dims[j]*sizeof(double)) ;
-      if (datas[j]==NULL) {DISP_Err("Writing: pas assez de mémoire à allouer") ; }
+      if (datas[j]==NULL) {DISP_Err(_("Writing: pas assez de mémoire à allouer")) ; }
       for (k=0 ; k<dims[j] ; k++)
       {
 	for (l=0 ; l<(*nbelem[j]) ; l++)
@@ -1299,7 +1299,7 @@ if (multifile)
 {
  for (j=0 ; j<cptvar ; j++)
  {
-   if (dims[j]>1 && ts>1 && *nbelem[j]>1) {DISP_Warn("Writing : impossible d'écrire une variable de cette dimension en ascii (trop de ts / dim >1).\n") ; continue ; }
+   if (dims[j]>1 && ts>1 && *nbelem[j]>1) {DISP_Warn(_("Writing : impossible d'écrire une variable de cette dimension en ascii (trop de ts / dim >1).\n")) ; continue ; }
    if (ts==1)
    {
     if (type==1)
@@ -1313,7 +1313,7 @@ if (multifile)
       chemin=nom+"-"+noms[j]+".dat" ;
       out=fopen (chemin.c_str(), "wb") ;
       BINARYwrite(out, datas[j], (*nbelem[j]), dims[j]) ;
-      printf("\n\nDimensions du fichier binaire %s : %dx%d\n", chemin.c_str(), dims[j],(*nbelem[j])) ;
+      printf(_("\n\nDimensions du fichier binaire %s : %dx%d\n"), chemin.c_str(), dims[j],(*nbelem[j])) ;
     }
     fclose(out) ;
    }
@@ -1330,7 +1330,7 @@ if (multifile)
       chemin=nom+"-"+noms[j]+".dat" ;
       out=fopen (chemin.c_str(), "wb") ;
       BINARYwrite(out, datas[j], (*nbelem[j]), ts) ;
-      printf("\n\nDimensions du fichier binaire %s : %dx%d\n", chemin.c_str(), ts,(*nbelem[j])) ;
+      printf(_("\n\nDimensions du fichier binaire %s : %dx%d\n"), chemin.c_str(), ts,(*nbelem[j])) ;
     }
     fclose(out) ;
    }
@@ -1347,7 +1347,7 @@ if (multifile)
       chemin=nom+"-"+noms[j]+".dat" ;
       out=fopen (chemin.c_str(), "wb") ;
       BINARYwrite(out, datas[j], dims[j], ts) ;
-      printf("\n\nDimensions du fichier binaire %s : %dx%d\n", chemin.c_str(), ts,dims[j]) ;
+      printf(_("\n\nDimensions du fichier binaire %s : %dx%d\n"), chemin.c_str(), ts,dims[j]) ;
     }
     fclose(out) ;
    }
@@ -1368,7 +1368,7 @@ else
  {
    chemin=nom+"-"+"binary"+".dat" ;
    out=fopen (chemin.c_str(), "wb") ;
-   printf("\n\n%%#Liste des variables du fichier binaire : \n%%#") ;
+   printf(_("\n\n%%#Liste des variables du fichier binaire : \n%%#")) ;
    for (j=0 ; j<cptvar ; j++) printf("%s ", noms[j]) ;
    printf("\n") ;
    BINARYwrite(out, datas, cptvar, (*nbelem[0])) ;

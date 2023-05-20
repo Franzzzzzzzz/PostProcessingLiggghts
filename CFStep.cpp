@@ -34,12 +34,12 @@ idx[0]=find_idx(IDS("CFFORCEX")) ; idx[1]=find_idx(IDS("CFFORCEY")) ; idx[2]=fin
 idx[3]=find_idx(IDS("CFX")) ; idx[4]=find_idx(IDS("CFY")) ; idx[5]=find_idx(IDS("CFZ")) ;
 idx[6]=find_idx(IDS("CFID1")) ; idx[7]=find_idx(IDS("CFID2")) ; idx[8]=find_idx(IDS("CFPERIOD")) ;
 if (idx[0]==-1||idx[1]==-1||idx[2]==-1||idx[3]==-1||idx[4]==-1||idx[5]==-1)
-   {DISP_Err("Les valeurs CFFORCEX/Y/Z et CFX/Y/Z sont necessaires avec --grainforce_by_angle et un CFdump\n") ; return 0 ; }
+   {DISP_Err(_("Les valeurs CFFORCEX/Y/Z et CFX/Y/Z sont necessaires avec --grainforce_by_angle et un CFdump\n")) ; return 0 ; }
 
 //if (has_periodic_chains==true) return 0 ;
 
-if (actions["grainforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info("Utilisation d'une fenêtre créneau\n") ; info=false ; } } // Fenêtre créneau
-else {sigma=actions["grainforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info ("Utilisation d'une fenêtre gaussienne\n") ; info=false ; } } // Fenêtre gaussienne
+if (actions["grainforce-by-angle"]["sigma"]==0) {fen=1; if (info) {DISP_Info(_("Utilisation d'une fenêtre créneau\n")) ; info=false ; } } // Fenêtre créneau
+else {sigma=actions["grainforce-by-angle"]["sigma"]/180*M_PI ; fen=2; if(info) {DISP_Info (_("Utilisation d'une fenêtre gaussienne\n")) ; info=false ; } } // Fenêtre gaussienne
 
 // Parcours des atomes, ajout des forces aux angles adaptés
 int sgn, idatom ;
@@ -49,7 +49,7 @@ for (i=0 ; i<nb_atomes+nb_atomes_supp ; i++)
 	//if (datas[idx[8]][i]==1) return 0 ;
         if (datas[idx[7]][i]==idatom) sgn=-1;
 	else if (datas[idx[6]][i]==idatom) sgn=1 ;  //Tout va bien
-	else {DISP_Warn("Il n'y a pas le bon ID dans la chaines !\n") ; continue ; }
+	else {DISP_Warn(_("Il n'y a pas le bon ID dans la chaines !\n")) ; continue ; }
 
 	angle=Calcul::arctan(datas[idx[3]][i]*sgn, datas[idx[4]][i]*sgn) ;
 	angle=Calcul::angle_0_2pi(angle) ;
@@ -341,7 +341,7 @@ int Step::LCFcouple (Step & lstep, Vector &torque, Cylindre C)
  torque(1)=torque(2)=torque(3)=0;
  
  LCFforce_by_particle_v2 (lstep, 2) ; 
- DISP_Err("Il faut verifier cette fonction avant de l'utiliser") ; 
+ DISP_Err(_("Il faut verifier cette fonction avant de l'utiliser")) ; 
  // Ecarts de force (nul pour la plupart (ou epsilon), seuls les grains en contact avec une paroi doivent montrer quelque chose.
  idx[0]=lstep.find_idx(IDS("FORCEWALLX")) ; idx[1]=lstep.find_idx(IDS("FORCEWALLY")) ; idx[2]=lstep.find_idx(IDS("FORCEWALLZ")) ;
  idx[8]=lstep.find_idx(IDS("FX")) ; idx[9]=lstep.find_idx(IDS("FY")) ; idx[10]=lstep.find_idx(IDS("FZ")) ;
@@ -435,7 +435,7 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
  for (i=0 ; i<nb_atomes ; i++)
  {
    if (lstep.datas[idxatm[0]][datas[idxcf[0]][i]-1]!=datas[idxcf[0]][i] || lstep.datas[idxatm[0]][datas[idxcf[1]][i]-1]!=datas[idxcf[1]][i]) 
-   {DISP_Err("Incohérence dans les ID et les indices de tableau (Step::LCFforce_by_particle_v2)") ; 
+   {DISP_Err(_("Incohérence dans les ID et les indices de tableau (Step::LCFforce_by_particle_v2)")) ; 
      printf("%d %d\n",idxatm[0], lstep.idx_col[idxatm[0]]) ; }
    
    ftotx[datas[idxcf[0]][i]-1]+=  datas[idxcf[2]][i]  ; ftoty[datas[idxcf[0]][i]-1]+=  datas[idxcf[3]][i]  ; ftotz[datas[idxcf[0]][i]-1]+=  datas[idxcf[4]][i]  ;
@@ -444,7 +444,7 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
 
  switch (type) {
    case 1 : //DISP_Warn("Unchecked function") ; 
-	    if (lstep.check_idx(IDS("FX"))!=-1 || lstep.check_idx(IDS("FY"))!=-1 || lstep.check_idx(IDS("FZ"))!=-1) DISP_Warn ("Les FX/FY/FZ existent déjà, pas de reconstruction\n") ; 
+	    if (lstep.check_idx(IDS("FX"))!=-1 || lstep.check_idx(IDS("FY"))!=-1 || lstep.check_idx(IDS("FZ"))!=-1) DISP_Warn (_("Les FX/FY/FZ existent déjà, pas de reconstruction\n")) ; 
 	    else
 	    { lstep.idx_col.push_back(IDS("FX")) ; lstep.idx_col.push_back(IDS("FY")) ; lstep.idx_col.push_back(IDS("FZ")) ; 
 	      lstep.nb_idx+=3 ; 
@@ -462,7 +462,7 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
      break ; 
      
    case 2 : //DISP_Warn("Unchecked function") ; 
-	    if (lstep.check_idx(IDS("FORCEWALLX"))!=-1 || lstep.check_idx(IDS("FORCEWALLY"))!=-1 || lstep.check_idx(IDS("FORCEWALLZ"))!=-1) DISP_Warn ("Les FORCEWALLX/Y/Z existent déjà, pas de reconstruction\n") ; 
+	    if (lstep.check_idx(IDS("FORCEWALLX"))!=-1 || lstep.check_idx(IDS("FORCEWALLY"))!=-1 || lstep.check_idx(IDS("FORCEWALLZ"))!=-1) DISP_Warn (_("Les FORCEWALLX/Y/Z existent déjà, pas de reconstruction\n")) ; 
    	    else
 	    { lstep.idx_col.push_back(IDS("FORCEWALLX")) ; lstep.idx_col.push_back(IDS("FORCEWALLY")) ; lstep.idx_col.push_back(IDS("FORCEWALLZ")) ; 
 	      lstep.nb_idx+=3 ;
@@ -486,7 +486,7 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
      
    case 3 : // Avant de recréer les chainforces vraiment, il faut calculer les forcewall, même si on les met dans la variable temporaire
 	    if (lstep.check_idx(IDS("FORCEWALLX"))!=-1 || lstep.check_idx(IDS("FORCEWALLY"))!=-1 || lstep.check_idx(IDS("FORCEWALLZ"))!=-1) 
-	      DISP_Warn ("Les FORCEWALLX/Y/Z existent, mais ne seront pas utilisées (bizarre)\n") ; 
+	      DISP_Warn (_("Les FORCEWALLX/Y/Z existent, mais ne seront pas utilisées (bizarre)\n")) ; 
 	    
 	    idxatm[1]=lstep.check_idx(IDS("FX")) ; idxatm[2]=lstep.check_idx(IDS("FY")) ; idxatm[3]=lstep.check_idx(IDS("FZ")) ; 
 	    idxatm[7]=lstep.find_idx(IDS("POSX")) ; idxatm[8]=lstep.find_idx(IDS("POSY")) ; idxatm[9]=lstep.find_idx(IDS("POSZ")) ; 
@@ -533,7 +533,7 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
 		 else if (idx_col[j]==IDS("CFPOSX")) { datas[j].push_back(pos(1)) ; }
 		 else if (idx_col[j]==IDS("CFPOSY")) { datas[j].push_back(pos(2)) ; }
 		 else if (idx_col[j]==IDS("CFPOSZ")) { datas[j].push_back(pos(3)) ; }
-		 else {DISP_Err("Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli") ; }
+		 else {DISP_Err(_("Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli")) ; }
 	 	 }
 		added++ ;
 	      }
@@ -542,14 +542,14 @@ int Step::LCFforce_by_particle_v2 (Step &lstep, int type)
 	    // Check
 	    for (j=1 ; j<nb_idx ; j++)
 	      if (datas[j].size()!=datas[0].size()) 
-		DISP_Err("Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur tous les indexes.") ;
+		DISP_Err(_("Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur tous les indexes.")) ;
 	      
 	    printf("Ajoutés : %d %d %d \n", nb_atomes, added, (int) datas[0].size()) ; fflush(stdout) ;
 	    if (nb_atomes+added != datas[0].size()) DISP_Err ("Erreur : l'ajout de wallforce a généré un problème ! ") ;
 	    nb_atomes+=added ;
 	    break ; // car oui, on était toujours dans un case ;-)
      
-    default : DISP_Warn("Type inconnu dans Step::LCFforce_by_particle_v2\n") ; printf("%d ", type) ; 
+    default : DISP_Warn(_("Type inconnu dans Step::LCFforce_by_particle_v2\n")) ; printf("%d ", type) ; 
 	    break ; 
  }
 return 0 ; 
@@ -564,7 +564,7 @@ int idx[11], i ;
 static bool message=true, infogive=true ; 
 Vector f, r ; 
 
-if (message) {DISP_Warn("En phase de testing ...") ; message=false ; }
+if (message) {DISP_Warn(_("En phase de testing ...")) ; message=false ; }
 
 lstep.nb_idx+=1 ; 
 lstep.idx_col.push_back(IDS("ATMPRESSURE")) ;     
@@ -601,9 +601,9 @@ map <string, double> Step::LCFenergy (Step &lstep)
  double nrj_springkn=0, nrj_ktgrain=0 ;  
 
  idx[0]=lstep.find_idx(IDS("VX")) ; idx[1]=lstep.find_idx(IDS("VY")) ; idx[2]=lstep.find_idx(IDS("VZ")) ; 
- if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err("Missing velocity value in the ldump\n") ; 
+ if (idx[0]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err(_("Missing velocity value in the ldump\n")) ; 
  idx[3]=lstep.find_idx(IDS("OMEGAX")) ; idx[4]=lstep.find_idx(IDS("OMEGAY")) ; idx[5]=lstep.find_idx(IDS("OMEGAZ")) ; 
- if (idx[3]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err("Missing angular velocity value in the ldump\n") ;  
+ if (idx[3]==-1 || idx[1]==-1 || idx[2]==-1) DISP_Err(_("Missing angular velocity value in the ldump\n")) ;  
  idx[6]=lstep.find_idx(IDS("MASSE")) ; idx[7]=lstep.find_idx(IDS("RAYON")) ; 
  
  //idx[8]=find_idx(IDS("c_cout[7]")) ;   idx[9]=find_idx(IDS("c_cout[10]"))   ;  // deltas
@@ -621,7 +621,7 @@ map <string, double> Step::LCFenergy (Step &lstep)
  
  //for (int i=0 ; i<14 ; i++) if (idx[i]==-1) {DISP_Err("Missing data:") ; printf("%d \n", i) ; fflush(stdout) ; return (res ); } 
  
- if (first) {DISP_Info("Using moment of inertia of a sphere") ; first=false ; }
+ if (first) {DISP_Info(_("Using moment of inertia of a sphere")) ; first=false ; }
  for (int i=0 ; i<lstep.nb_atomes ; i++)
  {
   if (std::isnan(lstep.datas[idx[6]][i])) continue ; 

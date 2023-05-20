@@ -144,7 +144,7 @@ int IDSCLASS::new_id(string name, int type)
 int min, max ; int i ;
 string canonic_name ; char info[500] ;
 // Est-ce que la chaîne existe déjà (en ID ou alias)
-  if (find(name) != -1 ) {DISP_Warn("IDS : la chaîne ou l'alias existe déjà. Impossible de l'ajouter\n") ; return -1 ; }
+  if (find(name) != -1 ) {DISP_Warn(_("IDS : la chaîne ou l'alias existe déjà. Impossible de l'ajouter\n")) ; return -1 ; }
 
   canonic_name=name ;
   canonic_name.erase(remove_if( canonic_name.begin(), canonic_name.end(), ::ispunct ), canonic_name.end() );
@@ -157,8 +157,8 @@ string canonic_name ; char info[500] ;
     case TCF : min=64 ; max=127 ; canonic_name = "CF" + canonic_name ;  break ;
     case TF : min=128 ; max=191 ; break ;
     case TCOARSE : min=192 ; max=254 ; canonic_name = "COAR" + canonic_name ;  break ;
-    case TNONE : min=1 ; max=254 ; DISP_Warn("IDS : le type TNONE doit être utilisé avec précaution") ;
-    default : DISP_Err("IDS : type inconnu") ; break ;
+    case TNONE : min=1 ; max=254 ; DISP_Warn(_("IDS : le type TNONE doit être utilisé avec précaution")) ;
+    default : DISP_Err(_("IDS : type inconnu")) ; break ;
   }
 
   for (i=min ; i<max ; i++)
@@ -171,7 +171,7 @@ string canonic_name ; char info[500] ;
     }
   }
 
-sprintf(info, "L'alias %s a été ajouté avec succès sous le nom %s avec l'id %d.\n", idalias[i][0].c_str(), idname[i].c_str(), i) ;
+sprintf(info, _("L'alias %s a été ajouté avec succès sous le nom %s avec l'id %d.\n"), idalias[i][0].c_str(), idname[i].c_str(), i) ;
 DISP_Info (info) ;
 return i ;
 }
@@ -179,7 +179,7 @@ return i ;
 //------------------------------
 int IDSCLASS::display_all ()
 {
-  printf("List of ID names and aliases as defined in IDS\n----------------------------------------------\n") ;
+  printf(_("List of ID names and aliases as defined in IDS\n----------------------------------------------\n")) ;
   for (int i=0 ; i<idname.size() ; i++)
   {
    printf("[%3d] %s\n", i, idname[i].c_str() ) ;

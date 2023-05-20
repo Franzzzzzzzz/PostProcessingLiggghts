@@ -73,4 +73,8 @@ class Dump ;
 #include "Writing.h"
 #include "Main.h"
 
-//#include "Ssh.h"
+// Internationalisation
+#include <libintl.h>
+#define _(String) gettext (String)
+#define gettext_noop(String) String
+#define N_(String) gettext_noop (String)

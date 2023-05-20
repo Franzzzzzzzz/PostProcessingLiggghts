@@ -1,0 +1,1718 @@
+# Post processing translation
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-20 14:20+1000\n"
+"PO-Revision-Date: 2023-04-08 17:59+1000\n"
+"Last-Translator: franz <francois.guillard@sydney.edu.au>\n"
+"Language-Team: French <traduc@traduc.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: CFStep.cpp:37
+msgid ""
+"Les valeurs CFFORCEX/Y/Z et CFX/Y/Z sont necessaires avec --"
+"grainforce_by_angle et un CFdump\n"
+msgstr ""
+"Values for CFFORCEX/Y/Z and CFX/Y/Z are necessary with --grainforce_by_angle "
+"and CFdump\n"
+
+#: CFStep.cpp:41
+msgid "Utilisation d'une fenêtre créneau\n"
+msgstr "Using a rectangular window\n"
+
+#: CFStep.cpp:42
+msgid "Utilisation d'une fenêtre gaussienne\n"
+msgstr "Using a gaussian window\n"
+
+#: CFStep.cpp:52
+msgid "Il n'y a pas le bon ID dans la chaines !\n"
+msgstr "Proper ID not present in the link!\n"
+
+#: CFStep.cpp:344
+msgid "Il faut verifier cette fonction avant de l'utiliser"
+msgstr "You should check this function before using it"
+
+#: CFStep.cpp:438
+msgid ""
+"Incohérence dans les ID et les indices de tableau (Step::"
+"LCFforce_by_particle_v2)"
+msgstr ""
+"Inconsisancy between ID and array indices (Step::LCFforce_by_particle_v2)"
+
+#: CFStep.cpp:447
+msgid "Les FX/FY/FZ existent déjà, pas de reconstruction\n"
+msgstr "FX/FY/FZ already exist, not reconstructed\n"
+
+#: CFStep.cpp:465
+msgid "Les FORCEWALLX/Y/Z existent déjà, pas de reconstruction\n"
+msgstr "FORCEWALLX/Y/Z already exist, not reconstructed\n"
+
+#: CFStep.cpp:489
+msgid "Les FORCEWALLX/Y/Z existent, mais ne seront pas utilisées (bizarre)\n"
+msgstr "FORCEWALLX/Y/Z already exist, but will not be used (weird ...)\n"
+
+#: CFStep.cpp:536 Filter.cpp:1022
+msgid ""
+"Erreur : lors de l'ajout de wallchainforce, un idxcol n'a pas pu être rempli"
+msgstr "Error when adding wallchainforce, an idxcol was not filled"
+
+#: CFStep.cpp:545 Filter.cpp:1029
+msgid ""
+"Erreur : l'ajout de wallchainforce ne s'est pas fait de la même manière sur "
+"tous les indexes."
+msgstr "Error when adding wallchainforce, inconsistant accross indices."
+
+#: CFStep.cpp:552
+msgid "Type inconnu dans Step::LCFforce_by_particle_v2\n"
+msgstr "Unknown type in Step::LCFforce_by_particle_v2\n"
+
+#: CFStep.cpp:567
+msgid "En phase de testing ..."
+msgstr "In testing phase ..."
+
+#: CFStep.cpp:604
+msgid "Missing velocity value in the ldump\n"
+msgstr ""
+
+#: CFStep.cpp:606
+msgid "Missing angular velocity value in the ldump\n"
+msgstr ""
+
+#: CFStep.cpp:624
+msgid "Using moment of inertia of a sphere"
+msgstr ""
+
+#: Calculs.cpp:466
+msgid ""
+"Impossible d'effectuer le calcul si le programme n'a pas été compilé avec "
+"BOOST"
+msgstr ""
+"Cannot do the computation when the program wasn't compiled with BOOST support"
+
+#: Calculs.cpp:496
+msgid ""
+"Attention : rayon trop grand pour le coarse (on devrait s'en sortir, mais la "
+"mesure de phi risque d'être bof ...)!\n"
+msgstr ""
+"Warning: radius too large for the coarse graining (should be alright, the "
+"measuring of the density may be off).\n"
+
+#: Calculs.cpp:521
+msgid "Attention : rayon trop grand pour le coarse rect2D !"
+msgstr "Warning: radius too large for the coarse rect2D!"
+
+#: Calculs.cpp:576
+msgid "Orientation tranche incorrecte"
+msgstr "Slice direction incorrect"
+
+#: Calculs.cpp:578
+msgid "Attention : rayon trop grand pour le coarse tranche !"
+msgstr "Warning: radius too large for the coarse in slice"
+
+#: Calculs.cpp:592
+msgid "ERR : int_intersect_sphere : NOT IMPLEMENTED YET"
+msgstr "ERR: int_intersect_sphere: NOT IMPLEMENTED YET"
+
+#: Calculs.cpp:600
+msgid "NOT IMPLEMENTED"
+msgstr ""
+
+#: Calculs.cpp:904 Calculs.cpp:918
+msgid "MATRIXERR : multiplication impossible matrix*ligne"
+msgstr "MATRIXERR: cannot multiply matrix*row"
+
+#: Calculs.cpp:932
+msgid "MATRIXERR : utiliser la fonction .dot() pour faire line*column\n"
+msgstr "MATRIXERR: use the .dot() function to do row*column\n"
+
+#: Calculs.cpp:1250
+msgid ""
+"WARN: nombre de triangle auxquels appartient le point incorrect (5 attendu) "
+"dans Icosahedre:deform."
+msgstr ""
+"WARN: number of triangles belonging to the point incorrect (expects 5) in "
+"Icosahedre:deform."
+
+#: Coarse.cpp:63
+msgid "COARSTDTAU n'est calculé que pour sigmaxy sigmayx"
+msgstr "COARSTDTAU only computed for sigmaxy and sigmayx"
+
+#: Coarse.cpp:257
+msgid "Donnée pas trouvée 1D\n"
+msgstr "Data no found 1D\n"
+
+#: Coarse.cpp:264
+msgid "Donnée pas trouvée 2D: "
+msgstr "Data no found 2D"
+
+#: Coarse.cpp:274
+msgid "Donnée pas trouvée 3D\n"
+msgstr "Data no found 3D\n"
+
+#: Coarse.cpp:285 Dump.cpp:176 LcfDump.cpp:299
+msgid "Signal d'écriture inconnu"
+msgstr "Unknown writing signal"
+
+#: Coarse.cpp:314
+msgid ""
+"\n"
+"Use-box plus grand que la simu : "
+msgstr ""
+"\n"
+" Use-box larger than the simulation box: "
+
+#: Coarse.cpp:338
+msgid ""
+"Ne devrait pas être utilisé. Par defaut, winsphere pour les coarse ATM, "
+"creneau3D pour les coarse CF\n"
+msgstr ""
+"Should not be used. Default is winsphere for atomic coarse graining, "
+"creneau3D for chainforce coarse\n"
+
+#: Coarse.cpp:345
+msgid ""
+"Attention : le calcul automatique du sigma pour une wingauss simple ne se "
+"fait qu'à partir du nombre de boîte dans la dimension x\n"
+msgstr ""
+"Warning: the automatic calculation of sigma for a simple wingauss is only "
+"for the number of gridpoint in x\n"
+
+#: Coarse.cpp:355
+msgid "WINGAUSS3D not implemented"
+msgstr ""
+
+#: Coarse.cpp:369
+msgid "Win creneau pas clair en 3D...\n"
+msgstr "Unclear what win creneau is in 3D...\n"
+
+#: Coarse.cpp:373
+msgid ""
+"... mais comme il n'y a qu'une boite en x et y, on dit que c'est une "
+"tranche ! EN TEST\n"
+msgstr ""
+"... but since there is only one gridpoint in x and y, let's say it's a "
+"slice! (testing)\n"
+
+#: Coarse.cpp:379
+msgid ""
+"... mais comme il n'y a qu'une boite en x et z, on dit que c'est une "
+"tranche ! EN TEST\n"
+msgstr ""
+"... but since there is only one gridpoint in x and z, let's say it's a "
+"slice! (testing)\n"
+
+#: Coarse.cpp:385
+msgid ""
+"... mais comme il n'y a qu'une boite en y et z, on dit que c'est une "
+"tranche ! EN TEST\n"
+msgstr ""
+"... but since there is only one gridpoint in y and z, let's say it's a "
+"slice! (testing)\n"
+
+#: Coarse.cpp:398
+msgid ""
+"Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la "
+"sphère est la plus petite dimension du pas spatial.\n"
+msgstr ""
+"Warning: for coarse-graining on a spherical window, the diameter of the "
+"sphere is the smallest spatial step\n"
+
+#: Coarse.cpp:407
+msgid ""
+"Attention : pour le coarsening sur une fenêtre sphérique, le diamètre de la "
+"sphère est la plus petite dimension du pas spatial : "
+msgstr ""
+"Warning: for coarse-graining on a spherical window, the diameter of the "
+"sphere is the smallest spatial step"
+
+#: Coarse.cpp:409
+msgid ""
+"Attention : la taille de la sphère de moyennage est plus petite que le rayon "
+"des atomes\n"
+msgstr ""
+"Warning: the size of the averaging sphere is lower than the radius of the "
+"particles\n"
+
+#: Coarse.cpp:422
+#, fuzzy
+msgid "Chainforce fenetre creneau 2D\n"
+msgstr "Do an average on a rectangular window"
+
+#: Coarse.cpp:430
+msgid ""
+"A VERIFIER !!!!! Attention, pour une boite y periodique, la taille en y "
+"devrait être égale à l'épaisseur de la boite de simu, et il ne devrait y "
+"avoir qu'une seulle boite en y\n"
+msgstr ""
+"TO CHECK!! Warning, for a periodic box in y, the size in y should be the "
+"thickness of the simulation box, and there should be only one box in y\n"
+
+#: Coarse.cpp:434
+msgid ""
+"Attention, l'une des dimension de la boîte de moyennage est inéfrieur au "
+"rayon des atomes"
+msgstr ""
+"Warning: one the sizes of the averaging window is lower than the particle "
+"radius."
+
+#: Coarse.cpp:503
+msgid "delcyl est en phase de test. Fonctionne seulement en winsphere !!"
+msgstr "delcyl is in testing phase. Only works with winsphere!!"
+
+#: Coarse.cpp:512
+msgid ""
+"Attention, l'utilisation de deltank est très simplifiée (pas de longueur du "
+"tank)\n"
+msgstr "Warning: using deltank is overly simplified\n"
+
+#: Coarse.cpp:561
+msgid ""
+"ERR : tentative d'addition de deux coarse n'ayant pas des propriétés "
+"identiques"
+msgstr "ERR: trying to add two coarse with different properties"
+
+#: Coarse.cpp:613
+msgid ""
+"ERR: impossible de calculer les contraintes cinétiques sans dump atomique"
+msgstr "ERR: cannot compute kinetic stress without an atomic dump"
+
+#: Coarse.cpp:616 Coarse.cpp:618
+msgid "ERR: impossible de calculer les contraintes. Types de step incorrects"
+msgstr "ERR: cannot compute stress. Incorrect step type. "
+
+#: Coarse.cpp:617
+msgid "ERR: impossible de calculer les vitesses. Types de step incorrects"
+msgstr "ERR: cannot compute celocities. Incorrect step type. "
+
+#: Coarse.cpp:637 Coarse.cpp:643
+msgid "ERR: donnees manquantes pour le coarse graining\n"
+msgstr "ERR: missing data for the coarse-graining\n"
+
+#: Coarse.cpp:650
+msgid ""
+"Pas de données de RAYON. Le rayon atm utilisé pour le coarse graining est "
+"celui de Actions "
+msgstr ""
+"No radius data. Using the radius defined in Actions for the coarse-graining."
+
+#: Coarse.cpp:660
+#, c-format
+msgid "Cannot find orientation information in the dump atm"
+msgstr "Cannot find orientation data in the atomic dump"
+
+#: Coarse.cpp:713 Coarse.cpp:772
+msgid "Coeff a pris une valeur NAN"
+msgstr "Coeff is NAN"
+
+#: Coarse.cpp:736
+msgid "Etrange d'avoir un volume nul ..."
+msgstr "Weird to have a zero volum"
+
+#: Coarse.cpp:818
+msgid "Coeff a pris une valeur NAN\n"
+msgstr "Coeff is NAN\n"
+
+#: Coarse.cpp:920
+msgid ""
+"La partie contrainte cinétique est très faible, il n'y a pas un oublie de w/"
+"kinetic ?\n"
+msgstr "Very small kinetic stress componant. Maybe you forgot --w/kinetic?\n"
+
+#: Coarse.cpp:1090
+msgid "Il faudrait réimplémenter le do_coarse_basic"
+msgstr "do_coarse_basic should be reimplemented sometimes..."
+
+#: Coarse.cpp:1174
+msgid "Chemin devrait être vide ..."
+msgstr "Path should be empty..."
+
+#: Compress.cpp:148 LDump.cpp:749
+msgid "Format inconnu dans la sous fonction convertDBL"
+msgstr "Unknown format in the sub-function convertDBL"
+
+#: Compress.cpp:213
+msgid "This is strange : in compression, CFPERIOD should be 0 or 1 ! "
+msgstr ""
+
+#: Compress.cpp:217
+msgid ""
+"ERREUR de compression : le type UNKNOWN ne peut être utilisé dans la "
+"compression.\n"
+msgstr "Compressing error: the UNKNOWN type cannot be used for compression.\n"
+
+#: Compress.cpp:238
+msgid "INFO : la compression du champ de type "
+msgstr "INFO: compression the field of type"
+
+#: Compress.cpp:238
+msgid "sera malheureusement en double et non en float.\n"
+msgstr "will be in double and not in float.\n"
+
+#: Compress.cpp:283
+msgid "Une erreur est survenue dans la compression d'un type dénombrable"
+msgstr "An error occured when compressing a countable type"
+
+#: Compress.cpp:341
+msgid ""
+"!!!!!!!!!!!!!!!!!!!!\n"
+"Cette fonction n'existe qu'à titre de souvenir de la décompression dans la "
+"version précédente. Elle ne devrait dans l'idéal plus être utilisée. Il faut "
+"construire un objet de classe LcpDump et utiliser la fonction write_dump\n"
+"!!!!!!!!!!!!!!\n"
+msgstr ""
+
+#: Dump.cpp:31
+msgid "Tmp plus ancien que le dump. Recalculé"
+msgstr "Tmp older than the dump. Recomputed"
+
+#: Dump.cpp:39
+msgid "Erreur d'ouverture du dump\n"
+msgstr "Error opening the dump\n"
+
+#: Dump.cpp:54
+msgid "Le .tmp est ancien; il ne contient pas de donné de type ...\n"
+msgstr "The .tmp is old, does not contain data type ...\n"
+
+#: Dump.cpp:55
+msgid "La donnée de type est étrange ..."
+msgstr "The data type is weird ..."
+
+#: Dump.cpp:92
+msgid ""
+"Le tmp ne sera pas ecrit car trop gros comparé au dump. Utiliser --forcetmp "
+"pour contrecarrer cela.\n"
+msgstr ""
+"The tmp file will not be written, too large comparet to the dump. Use --"
+"forcetmp to write it anyway.\n"
+
+#: Dump.cpp:100
+msgid "WARNING : impossible de créer le fichier tmp de dump\n"
+msgstr "WARNING: cannot create the tmp file for the dump\n"
+
+#: Dump.cpp:121
+msgid ""
+"L'écriture d'un seul dump n'a pas été reprogrammée (pb pour la décompression "
+"de dump.stress"
+msgstr ""
+"Writing of a single dump was not reprogrammed (problem for decompressing "
+"dump.stress)"
+
+#: Dump.cpp:185
+msgid ""
+"\n"
+"Résumé du dump :\n"
+msgstr ""
+"\n"
+"Summary of the dump:\n"
+
+#: Dump.cpp:186
+msgid ""
+"pas de dump.\n"
+"--------------------\n"
+msgstr ""
+"no dump.\n"
+"--------------------\n"
+
+#: Dump.cpp:230
+msgid ""
+"Please check the type value here (anglebystep in Dump.cpp, check_timestep)\n"
+msgstr ""
+
+#: Dump.cpp:246
+msgid "teststress doit être reprogrammé correctement pour être utilisé\n"
+msgstr "teststress must be reprogrammed properly before being used\n"
+
+#: Dump.cpp:285 Surface.cpp:15 Surface.cpp:98
+msgid "WARNING : le debut de l'extraction est <0. RAZ.\n"
+msgstr "WARNING: beginning of extracting below 0. Set to zero.\n"
+
+#: Dump.cpp:286 Surface.cpp:16 Surface.cpp:99
+msgid "WARNING : la fin de l'extraction est >nbsteps. Remise à nbsteps.\n"
+msgstr ""
+"WARNING: end of extraction above the number of timestep. Set to the max "
+"timestep\n"
+
+#: Dump.cpp:287
+msgid ""
+"ERR: step initial demandée supérieure au nombre de steps\n"
+"\n"
+msgstr "ERR: requested initial step above the number steps\n"
+
+#: Dump.cpp:288
+msgid ""
+"ERR: step final < 0\n"
+"\n"
+msgstr "ERR: final step <0\n"
+
+#: Dump.cpp:295 Surface.cpp:23 Surface.cpp:106
+msgid "WARNING : downsampling incorrect. Remis à 1.\n"
+msgstr "WARNING: incorrect downsampling. Reset to 1.\n"
+
+#: FDump.cpp:23
+#, c-format
+msgid "Lecture initiale du vtk, peut prendre du temps ...\n"
+msgstr "Initial read of the vtk, can take some time ...\n"
+
+#: FDump.cpp:27
+msgid ""
+"Les tests de réussite de lecture ne sont pas effectués ici. Si des problèmes "
+"surviennent, consulter les fonctions LDump::read() pour voir les tests qu'il "
+"faudrait effectuer.\n"
+msgstr ""
+"Actual success tests are not performed here. If problems occur, check the "
+"LDump::read() function to see what test would be useful\n"
+
+#: FDump.cpp:188
+msgid "WARN : type de scalaire inconnu dans le vtk\n"
+msgstr "WARN: unknown scalar type in the vtk\n"
+
+#: FDump.cpp:195 FDump.cpp:210
+msgid ""
+"Les donnees forcesTri ne devraients pas exister en Lv2. Utiliser --v1 peut "
+"aider\n"
+msgstr "The data forcesTri should not exist in Lv2. Maybe use --v1?\n"
+
+#: FDump.cpp:198
+msgid ""
+"Les donnees normales ne devraients pas exister en Lv2. Utiliser --v1 peut "
+"aider\n"
+msgstr "The data normales should not exist in Lv2. Maybe use --v1?\n"
+
+#: FDump.cpp:201
+msgid "Les donnees stress ne devraients pas exister en Lv1.\n"
+msgstr "The data stress should not exist in Lv1.\n"
+
+#: FDump.cpp:202
+msgid "WARN : type de vecteur inconnu dans le vtk\n"
+msgstr "WARN: unknown vector type in the vtk\n"
+
+#: FDump.cpp:213
+msgid "Les donnees CELLS devraient être POLYGONS pour la Lv1.\n"
+msgstr "The data CELLS should be POLYGONS for lv1.\n"
+
+#: FDump.cpp:329
+#, c-format
+msgid ""
+"Le fichier %s a ete cree. La commande matlab de redimensionnement est "
+"reshape(X,9,%d,%ld)."
+msgstr ""
+
+#: FDump.cpp:352
+msgid " Entrer les coordonnées du centre du cylindre (x y z) : \n"
+msgstr "Coordinates of cylinder center (x y z): \n"
+
+#: FDump.cpp:354 LcfDump.cpp:632 LcfDump.cpp:638 LcfDump.cpp:650
+msgid "Coordonnées entrées : "
+msgstr "Coordinates:"
+
+#: FDump.cpp:390 FDump.cpp:418
+msgid ""
+"NON IMPLEMENTé : il faut reprogrammer anglebystep dans FDump::mean_stress"
+msgstr "Not implemented. Need to reprogram anglebystep in FDump::mean_stress"
+
+#: FDump.cpp:409
+msgid ""
+"Please check the type value here (anglebystep in FDump.cpp, meanstress)\n"
+msgstr ""
+
+#: FStep.cpp:151
+msgid ""
+"Erreur : la reconstruction demandée pour le triangle n'est pas possible\n"
+msgstr "Error: cannot rebuilt for this triangle\n"
+
+#: FStep.cpp:181
+#, c-format
+msgid ""
+"\n"
+"[%d faces oubliées sur %d faces]"
+msgstr ""
+"\n"
+"[%d forgotten faces out of %d]"
+
+#: FStep.cpp:186
+#, c-format
+msgid ""
+"\n"
+"[%d faces oubliées sur %d faces en w/o tige]"
+msgstr ""
+"\n"
+"[%d forgotten faces out of %d in w/o tige]"
+
+#: FStep.cpp:256
+#, c-format
+msgid "Should check that Step::Fatm_rotate"
+msgstr ""
+
+#: Filter.cpp:123
+msgid ""
+"Un type de donné n'est pas référencé, IDS va l'ajouter (avec un type TL) \n"
+msgstr "A data type is not referenced, IDS will add it (with type TL)\n"
+
+#: Filter.cpp:128 Filter.cpp:146 LDump.cpp:241 LcfDump.cpp:179
+msgid "Le type inconnu n'a pas pu être ajouté !!\n"
+msgstr "Unknown type could not be added!!\n"
+
+#: Filter.cpp:141 LDump.cpp:235 LcfDump.cpp:174
+msgid "Un type de donné n'est pas référencé, IDS va l'ajouter\n"
+msgstr "A data type is not referenced, IDS will add it\n"
+
+#: Filter.cpp:156
+#, c-format
+msgid "Nan in filter value, proceeding\n"
+msgstr ""
+
+#: Filter.cpp:162 Filter.cpp:167
+msgid "WARN2 : le type d'operation"
+msgstr "WARN2: the operation type"
+
+#: Filter.cpp:162 Filter.cpp:167
+msgid "est inconnu pour le filtre\n"
+msgstr "is unknown for the filter\n"
+
+#: Filter.cpp:228
+msgid "LieEdward PBC non implémenté en type non atomique"
+msgstr "LieEdward PBC not implemented in non-atomic dump"
+
+#: Filter.cpp:307
+msgid ""
+"C'est un filtre SPECIAL PURPOSE. Il faut le vérifier avant de l'utiliser.\n"
+msgstr "This is a SPECIAL PURPOSE filter. Need to check it before using it.\n"
+
+#: Filter.cpp:330
+msgid "Impossible d'appliquer le filtre de referentiel mobile\n"
+msgstr "Cannot apply the filter of moving reference frame\n"
+
+#: Filter.cpp:355
+msgid "Filter::translate_refgen : type de dump inconnu pour ce filtre\n"
+msgstr "Filter::translate_refgen : unknown dump type for this filter\n"
+
+#: Filter.cpp:372
+msgid "Erreur : impossible d'effectuer la translation de referentiel"
+msgstr "Error: cannot translate reference frame"
+
+#: Filter.cpp:411
+msgid "Dump inconnu pour l'opération collapseby\n"
+msgstr "Dump unknown for the operation collapseby\n"
+
+#: Filter.cpp:420
+msgid ""
+"Filter sumbyt0 ou meanbyt0 : Les valeurs individuelles sont calculées au "
+"premier pas de temps. Les ID des particules / chaînes sont supposés "
+"constants au cours du temps.\n"
+msgstr ""
+"Filter sumbyt0 ou meanbyt0: individual values are calculated at first "
+"timestep. The ID of particles/forces are supposed to be constant over time.\n"
+
+#: Filter.cpp:497
+msgid "atomes n'ont pas eu de groupe attribués\n"
+msgstr "atoms do not have an allocated group\n"
+
+#: Filter.cpp:587 Filter.cpp:588 Filter.cpp:589 Filter.cpp:590
+msgid "Filter incompatible avec nan"
+msgstr ""
+
+#: Filter.cpp:624
+msgid "ERR : le nom de l'opération à effectuer n'est pas correct\n"
+msgstr "ERR: the name of the operation is incorrect\n"
+
+#: Filter.cpp:907 Filter.cpp:1088
+msgid ""
+"ERR : impossible de trouver des timestep correspondant entre le LucDump et "
+"le LcfDump"
+msgstr "ERR: cannot find corresponding timesteps between LucDump and LcfDump"
+
+#: Filter.cpp:930
+msgid "The ID column was not found in the atmstep"
+msgstr ""
+
+#: Filter.cpp:939
+msgid ""
+"WARN : les ID n'augmentent pas par pas de 1 dans le LucDump. Tentative de "
+"correction par ajout d'un atome nul, qui ne devrait normalement pas être "
+"appelé"
+msgstr ""
+"WARN: ID do not increase in step of 1 in LucDump. Trying to add a NULL atom, "
+"that hopefully will never be used. "
+
+#: Filter.cpp:958
+msgid ""
+"ERR : les ID n'augmentent pas par pas de 1 dans le LucDump. Cela aurait dû "
+"être corrigé à la boucle précédente !"
+msgstr ""
+"ERR: ID do not increase in step of 1 in LucDump. This should have been "
+"corrected in the previous loop!"
+
+#: Filter.cpp:1031
+#, c-format
+msgid "Ajoutés : %d %d %d \n"
+msgstr "Added: %d %d %d \n"
+
+#: Filter.cpp:1032
+msgid "Erreur : l'ajout de wallforce a généré un problème ! "
+msgstr "Error: the addition of wallforce created a problem!"
+
+#: Filter.cpp:1045
+msgid ""
+"Attention, le champ id_mutisphere est défini dans le dump, mais aucune "
+"action n'est effectuée. utiliser --mutisphere peut aider\n"
+msgstr ""
+"Warning: the id_mutisphere field is defines in the dump, but nothing is done "
+"with it. Using --multisphere may help.\n"
+
+#: Filter.cpp:1046
+msgid "Etrange de definir --multisphere sans champ multisphere\n"
+msgstr "Weird to define --multisphere without this field defined in the dump\n"
+
+#: Filter.cpp:1073
+msgid ""
+"Le dump atomique contient déjà les forces avec le mur, le dump de wallforce "
+"n'a pas été utilisé"
+msgstr ""
+"The atomic dump already has the forces with the wall, the dump of wallforce "
+"was not used."
+
+#: Filter.cpp:1110
+msgid "Attention: wallchainforce non trouvées dans le walldump..."
+msgstr "Warning: wallchainforce not found in the walldump..."
+
+#: Filter.cpp:1163
+msgid ""
+"Attention, le filtrage des chainforce periodiques n'a pas vraiment été "
+"testé. Ces chaines devraient idéalement ne pas être utilisées.\n"
+msgstr ""
+"Warning:; filtering periodic chainforce is not really tested. Ideally, you "
+"do not want those to be used in the calculation. \n"
+
+#: Filter.cpp:1311
+msgid "Expecting --superquadric as arguments"
+msgstr ""
+
+#: Filter.cpp:1329
+msgid ""
+"If any atom has a type > 1, they are considered as spherical with the radius "
+"given by the dump\n"
+msgstr ""
+
+#: Filter.cpp:1330
+msgid ""
+"If some superquadric have type>1, things will break as the radius are not "
+"available\n"
+msgstr ""
+
+#: Filter.cpp:1331
+msgid "IDX not found Filter::quat2orient\n"
+msgstr ""
+
+#: Gunzip.cpp:11
+msgid ""
+"Il vaut mieux utiliser l'option dumpall vec les dump compressés gz, si la "
+"mémoire le permet.\n"
+msgstr ""
+"It is better to use --dumpall with thes compessed dump gz, if you have "
+"enough RAM.\n"
+
+#: Gunzip.cpp:29
+msgid "Impossible d'ouvrir le dump\n"
+msgstr "Cannot open the dump\n"
+
+#: Gunzip.cpp:94
+msgid "Ligne trop longue ... Bizarre \n"
+msgstr "Line too long ... weird\n"
+
+#: Gunzip.cpp:96
+msgid "Ne peut pas arriver ...\n"
+msgstr "Cannot happen...\n"
+
+#: Gunzip.cpp:200
+msgid "Non implémenté: impossible de se déplacer de la fin en gz\n"
+msgstr "Not implemented: cannot move from the end in gz dump\n"
+
+#: Gunzip.cpp:228
+msgid ""
+"Déplacement en arrière, pas assez de données dans le buffer: relecture du "
+"fichier (il faudrait éviter ça ...)\n"
+msgstr ""
+"Moving backward, not enough data in the buffer: re-reading of the file "
+"(should be avoided ...)\n"
+
+#: Gunzip.cpp:239 Gunzip.cpp:248
+msgid "Mouvement au delà de la fin du fichier"
+msgstr "Moving beyond the end of the file"
+
+#: Gunzip.cpp:263
+msgid "Impossible de décompresser plus de données\n"
+msgstr "Cannot uncompress more data\n"
+
+#: Ids.cpp:147
+msgid "IDS : la chaîne ou l'alias existe déjà. Impossible de l'ajouter\n"
+msgstr "IDS: the string or alias already exists, cannot add it\n"
+
+#: Ids.cpp:160
+msgid "IDS : le type TNONE doit être utilisé avec précaution"
+msgstr "IDS: the type TNONE must be used with caution"
+
+#: Ids.cpp:161
+msgid "IDS : type inconnu"
+msgstr "IDS: unknown type"
+
+#: Ids.cpp:174
+#, c-format
+msgid "L'alias %s a été ajouté avec succès sous le nom %s avec l'id %d.\n"
+msgstr "The alisat %s was added with success, with name %s and id %d.\n"
+
+#: Ids.cpp:182
+#, c-format
+msgid ""
+"List of ID names and aliases as defined in IDS\n"
+"----------------------------------------------\n"
+msgstr ""
+
+#: LDump.cpp:79 LcfDump.cpp:21
+#, c-format
+msgid "Lecture initiale du dump, peut prendre du temps ...\n"
+msgstr "Initial reading of the dump, may take some time ...\n"
+
+#: LDump.cpp:134
+msgid ""
+"Conversion to double failed dans LDump! Something really bad happened. Going "
+"to next field...\n"
+msgstr ""
+
+#: LDump.cpp:141
+msgid ""
+"\n"
+"\n"
+"!!! Une valeur lue dans LDump est inf ou nan. "
+msgstr ""
+"\n"
+"\n"
+"!!! A value read from LDump is inf or nan"
+
+#: LDump.cpp:142 LcfDump.cpp:90
+msgid "Elle n'a PAS été supprimée.\n"
+msgstr "It was NOT removed.\n"
+
+#: LDump.cpp:210 LcfDump.cpp:149
+msgid "WARN1 : item inconnu "
+msgstr "WARN1: unknown item"
+
+#: LDump.cpp:353 LcfDump.cpp:424
+#, c-format
+msgid "La largeur en angle des boites est de %f degrés (%f radians).\n"
+msgstr "The angular width of the boxes is %f deg (%f rad).\n"
+
+#: LDump.cpp:417
+msgid "Direction de moyennage xray inconnue\n"
+msgstr "Averaging direction for xray unknown\n"
+
+#: LDump.cpp:577
+#, c-format
+msgid "Lecture initiale du dump compressé, peut prendre du temps ...\n"
+msgstr "Initial reading of compressed dump, may take time...\n"
+
+#: LDump.cpp:583
+msgid ""
+"Compression avec la version 1.0 du compresseur. Cela ne devrait pas poser de "
+"problème. Utiliser sinon une version plus ancienne de PostProcessing.\n"
+msgstr ""
+"Compressing with the 1.0 version. Should not be a problem, but not "
+"recommended\n"
+
+#: LDump.cpp:584
+msgid "Compression avec la version 2.0, ne devrait pas poser de probl�me \n"
+msgstr "Compressing with the 2.0 version. Should not be a problem\n"
+
+#: LDump.cpp:585
+msgid "Compression avec la version 2.1, pourrait causer des erreurs\n"
+msgstr "Compressing with the 2.1 version. Could cause issues\n"
+
+#: LDump.cpp:586
+msgid "WARN : le fichier compressé ne semble pas avoir l'header correct\n"
+msgstr "WARN: the compressed file does not seem to have the correct header\n"
+
+#: LDump.cpp:642
+msgid "AFormat inconnu dans la sous fonction convertDBL"
+msgstr "AFormat unknown in the subfunction convertDBL"
+
+#: LDump.cpp:710
+msgid "BFormat inconnu dans la sous fonction convertDBL"
+msgstr "BFormat unknown in the subfunction convertDBL"
+
+#: LDump.cpp:734 LDump.cpp:765
+msgid "ERR : format inconnu lors de la décompression des steps."
+msgstr "ERR: unknown format for uncompression steps"
+
+#: LDump.cpp:777
+msgid ""
+"ERR ! Le fichier de dump doit être ouvert au format C (FILE*) pour être "
+"utilisé dans un dump compressé. Des erreurs surviendront."
+msgstr ""
+"ERR! the dump file must be opened in C format (FILE*) to be read in a "
+"compressed dump. Errors will happens. "
+
+#: LDump.cpp:825
+msgid ""
+"WARN : le type de steps n'est pas connu pour les dump compressé, disp "
+"impossible"
+msgstr "WARN: unknown type of steps for compressed dump, cannot disp."
+
+#: LStep.cpp:175
+msgid "Ceci ne fonctionne que pour les grains de type granular\n"
+msgstr "This is only working for granular type grains.\n"
+
+#: LStep.cpp:176
+msgid "Ecriture du timestep "
+msgstr "Writing of timestep"
+
+#: LStep.cpp:196
+msgid "La densité des atomes est fixée à 2500 !\n"
+msgstr "The atom density is fixed to 2500!\n"
+
+#: LStep.cpp:207
+msgid ""
+"Attention : il y a plus d'1 type d'atome, une erreur surviendra sans doute "
+"dans liggghts !"
+msgstr "Warning: there is more than 1 atom type, probably errors in liggghts!"
+
+#: LStep.cpp:219 LStep.cpp:254
+msgid ""
+"Les valeurs FORCEWALLX/FORCEWALLY/FORCEWALLZ sont necessaires avec --w/"
+"forcetot et un Ldump"
+msgstr ""
+"The values FORCEWALLX/FORCEWALLY/FORCEWALLZ are necessary with --w/forcetot "
+"and Ldump"
+
+#: LStep.cpp:256
+msgid "Utilisation d'une fenêtre créneau"
+msgstr "Using a rectangular window"
+
+#: LStep.cpp:257
+msgid "Utilisation d'une fenêtre gaussienne"
+msgstr "Using a gaussian window"
+
+#: LStep.cpp:321
+msgid "Pixels de l'image assez éloignés d'être carrés ..."
+msgstr "Pixels of the image far from being square ..."
+
+#: LStep.cpp:368
+msgid "Program not compiled with voronoi support, no result computed.\n"
+msgstr ""
+
+#: LStep.cpp:382
+msgid "WARN: one of the expected index was not found in Step::GetVoronoi()\n"
+msgstr ""
+
+#: LcfDump.cpp:76
+msgid ""
+"Conversion to double failed ! Something really bad happened. Going to next "
+"field...\n"
+msgstr ""
+
+#: LcfDump.cpp:84
+msgid "Une valeur lue est inf ou nan \n"
+msgstr "A read value is inf or nan\n"
+
+#: LcfDump.cpp:89
+msgid ""
+"\n"
+"\n"
+"!!! Une valeur lue est inf ou nan.  "
+msgstr ""
+"\n"
+"\n"
+"!!A read value is inf or nan"
+
+#: LcfDump.cpp:324
+msgid ""
+"\n"
+"LcfDump::write_grainforce         "
+msgstr ""
+
+#: LcfDump.cpp:326
+msgid "On travail sur du 2D en xy\n"
+msgstr "Working on 2D in xy\n"
+
+#: LcfDump.cpp:369
+msgid "Il n'y a pas le bon ID dans la chaines !"
+msgstr "ID not found in the chainforce!"
+
+#: LcfDump.cpp:453
+msgid "Nombre total de chainforce: "
+msgstr "Total number of chainforce: "
+
+#: LcfDump.cpp:542
+msgid ""
+"\n"
+"LcfDump::write_radiuscontact          "
+msgstr ""
+
+#: LcfDump.cpp:547
+msgid ""
+"On utilise un fichier externe de rayons Radius.txt. Ce n'est certes pas "
+"joli, mais beaucoup plus simple !!\n"
+msgstr ""
+"Using an external file for radius Radius.txt. Not pretty, but so much "
+"easier!!\n"
+
+#: LcfDump.cpp:606
+#, c-format
+msgid "Nombre de ts utilises : %d sur %ld. Rayon : %.15lf.\n"
+msgstr "Number of ts used: %d out of %ld. Radius: %.15lf.\n"
+
+#: LcfDump.cpp:629
+msgid " Entrer la position du centre du cylindre (x y z) (constante) : \n"
+msgstr "Input the position of cylinder centre (x y z) (constant): \n"
+
+#: LcfDump.cpp:634
+msgid " Entrer l'axe initial du cylindre (x y z) (premier tsdump) : \n"
+msgstr "Input the original axis of the cylinder (x y z) (first tsdump): \n"
+
+#: LcfDump.cpp:640
+msgid " Entrer la vitesse de rotation (en degré par tsdump) : \n"
+msgstr " Input the angular velocity (in degree per tsdump): \n"
+
+#: LcfDump.cpp:644
+msgid "Vitesse entrée : "
+msgstr "Velocity indicated: "
+
+#: LcfDump.cpp:646
+msgid " Entrer l'axe de rotation du cylindre (x, y, z) : \n"
+msgstr "Enter the axis of rotation of the cylinder (x y z): \n"
+
+#: LcfDump.cpp:749
+msgid "Cannot open output file\n"
+msgstr ""
+
+#: Main.cpp:105
+msgid ""
+"ATTENTION : dump atomique et de chainforce devraient être au même "
+"échantillonnage (ne semble pas le cas pour l'instant ...) (effectuer d'abord "
+"un /PostProcessing --reechantillonner --downsampling xx --extract xx yy dump."
+"atm/ si besoin)\n"
+msgstr ""
+"WARNING: the atomic and chainforce dump must have the same sampling rate "
+"(does not seem to be the case currently). May be usefull to run a /"
+"PostProcessing --reechantillonner --downsampling xx --extract xx yy dump."
+"atm/ if needed.\n"
+
+#: Main.cpp:359
+#, c-format
+msgid "Utilisation d'une constante (1e fois) : %s=%f.\n"
+msgstr "First use of a constant: %s=%f.\n"
+
+#: Main.cpp:365
+msgid "Actions : Constante inconnue"
+msgstr "Actions: unknown constant"
+
+#: Main.cpp:373
+msgid "Paramètres pour l'écriture des fichiers de sorti (cf. la documentation)"
+msgstr "Parameters for writing output files (cf. documentation)"
+
+#: Main.cpp:374 Main.cpp:471 Main.cpp:473
+msgid "Raccourci du précédent"
+msgstr "Shortcut of the preceding"
+
+#: Main.cpp:376
+msgid ""
+"génère / appelle / liste / décrit un alias, selon l'argument donné sous la "
+"forme : set:alias, call:alias,list, info:alias"
+msgstr ""
+"generate/call/list/ described an alias, depending on the argument: set:"
+"alias, call:alias,list, info:alias"
+
+#: Main.cpp:378
+msgid "le dump est au format vtk"
+msgstr "The dump has vtk format"
+
+#: Main.cpp:380
+msgid "coupe un vtk à chaque pas de temps"
+msgstr "cut a vtk to extract ecery timestep"
+
+#: Main.cpp:381
+msgid ""
+"écrit un fichier dump.forces.txt contenant la force totale à chaque pas de "
+"temps"
+msgstr "Write a file dump.forces.txt with the total force at each timestep"
+
+#: Main.cpp:383
+msgid ""
+"écrit un fichier dump.forces.txt contenant le couple total à chaque pas de "
+"temps. Avec vtk : a partir des données dans un vtk. Avec Chainforce : en "
+"comparant les écart de force propre des grains dans le ldump avec la somme "
+"des chaines de forces par grains. "
+msgstr ""
+"write a file dump.forces.txt providing the total torque at each timestep. "
+"With vtk: uses the data in a vtk file. With chainforce: uses the different "
+"between the own forces of the grains in ldump with the sum of chainforces to "
+"compute the missing force from the wall(?)"
+
+#: Main.cpp:387
+msgid ""
+"Retire la tige de support dans le calcul du couple pour le cas où on l'a "
+"simulée"
+msgstr "Remove the central post in computing the torque, if it was simulated. "
+
+#: Main.cpp:388
+msgid "Fait la moyenne des triangles de même normale dans un mesh"
+msgstr "Average all the triangles with same normal from a mesh. "
+
+#: Main.cpp:390
+msgid ""
+"si le mesh est en rotation autour du centre indiqué, angle de rotation "
+"effectué en 1 pas de step (en degrés)"
+msgstr ""
+"If a mesh is rotating around the indicated center, rotation angle during one "
+"timestep (in degrees)"
+
+#: Main.cpp:391
+msgid ""
+"recode le vtk en enlevant des signes - en vadrouille pour comparer avant/"
+"après compression"
+msgstr "Not sure what that does, see French translation"
+
+#: Main.cpp:392
+msgid ""
+"Ne tente pas de reconstruire des données manquantes. Plutôt utilisé pour les "
+"vtk dans la cadre de Liggghts 1 (--v1)"
+msgstr ""
+"Do not attempt to reconstruct missing data. Used for old vtk from liggghts. "
+"(--v1)"
+
+#: Main.cpp:394
+msgid "identifie un dump compressé"
+msgstr "Identify a compressed dump"
+
+#: Main.cpp:396
+msgid "décompresse un dump compressé"
+msgstr "uncompress a compressed dump"
+
+#: Main.cpp:399
+msgid ""
+"extrait des vtk avec coarse graining en vitesse d'un dump. Les params sont "
+"le nb de boites en x, y, z."
+msgstr ""
+"extract coarse-grained vtk. The arguments are the number of grid points in "
+"x, y, z"
+
+#: Main.cpp:400
+msgid ""
+"Extrait les vitesses coarsed moyennes (fonctionne pour type non granulaires "
+"aussi). Les params sont le nb de boites en x, y, z."
+msgstr ""
+"Extract coarse-grained velocities (also worked for non granular types). "
+
+#: Main.cpp:402
+msgid "soustrait la valeur donnée à la valeur x du champ de vitesse"
+msgstr "subtract the indicated value to the velocity in x"
+
+#: Main.cpp:406
+msgid ""
+"Supprime le cylindre du calcul de coarse graining dans le cas des "
+"winspheres, pour un meilleur PHI près du cylindre en particulier."
+msgstr ""
+"Subtract the cylinder in computing the coarse graining, in the case of "
+"winspheres, for a better PHI near the cylinder. "
+
+#: Main.cpp:408
+msgid ""
+"Supprime le tank du calcul de coarse graining dans le cas des chaines de "
+"forces, pour un meilleur P près du tank en particulier."
+msgstr ""
+"Remove the tank from the coarse-graining computation, when using "
+"chainforces, for a better pressure calculation near the tank. "
+
+#: Main.cpp:409
+msgid ""
+"annule la composante y de la vitesse (pour tracer les lignes de courant ...)"
+msgstr "Cancel the y component of velocity (to draw streamlines ...)"
+
+#: Main.cpp:411
+msgid "ne pas utiliser la boîte de la simu mais une boîte perso"
+msgstr "do not use the simulation box, but a custom one"
+
+#: Main.cpp:413
+msgid "indique la valeur de deltaboite"
+msgstr "indicate the deltabox value"
+
+#: Main.cpp:415
+msgid "taille des boites de coarse graining en x y z"
+msgstr "size of the coarse-graining box in x y z"
+
+#: Main.cpp:416
+msgid "utiliser un fenêtrage box precis grace a une périodicité en y"
+msgstr "use an accurate window thanks to the y periodicity"
+
+#: Main.cpp:418
+msgid "utiliser un fenêtrage gaussien (sigma=-1 : le calculer automatiquement)"
+msgstr "use a gaussian window (sigma=-1: compute the size automaticaly)"
+
+#: Main.cpp:420
+msgid ""
+"utiliser un fenêtrage gaussien avec 3 sigma differents (sigmax|y|z=-1 : le "
+"calculer automatiquement)"
+msgstr ""
+"use a gaussian window with different sigma in each direction (sigmax|y|z=-1: "
+"compute automatically)"
+
+#: Main.cpp:421
+msgid "calcul aussi la partie cinétique du tenseur des contraintes"
+msgstr "Also compute the kinetic part of stress tensor"
+
+#: Main.cpp:422
+msgid "Calculer un vecteur de pression à partir de la force sur chaque grain"
+msgstr "Compute a pressure vector from all the forces on a grain"
+
+#: Main.cpp:424
+msgid "trouve la surface libre haute avec l'échantillonnage donné en x et y"
+msgstr "Find the top surface with the sampling given in x and y"
+
+#: Main.cpp:425
+msgid "trouve la surface libre haute en yavec l'échantillonnage donné en x "
+msgstr "Find the top surface with the sampling given in x"
+
+#: Main.cpp:426
+msgid ""
+"trouve les surfaces libres haute & basse avec l'échantillonnage donné en x "
+"et y"
+msgstr "Find the top and bottom surfaces with the sampling given in x"
+
+#: Main.cpp:429
+msgid ""
+"effectue une projection rayons y (image de la densité locale) selon une "
+"direction donnée. (direction:x=0, y=1, z=2) "
+msgstr ""
+"create an xray projection along a given direction (direction:x=0, y=1, z=2) "
+
+#: Main.cpp:431
+msgid "charger un dump en mémoire en entier"
+msgstr "load a dump fully in memory"
+
+#: Main.cpp:433
+msgid "n'extraire qu'un timestep sur n"
+msgstr "extract only 1 out of n timesteps"
+
+#: Main.cpp:435
+msgid "Calculer la distance minimale et maximale entre atome au timestep ts"
+msgstr "compute minimal and maximal distance between grains"
+
+#: Main.cpp:437
+msgid "n'extraire que les timestep entre arg1 et arg2"
+msgstr "only extract timesteps between arg1 and arg2"
+
+#: Main.cpp:438
+msgid "ne pas faire de dump par pas de tps mais seulment des moyenne"
+msgstr "average the dumps in time"
+
+#: Main.cpp:439
+msgid ""
+"ne pas faire de dump par pas de tps mais seulment des moyenne, pondérées par "
+"l'importance (pour CoarseGraining. Pas défini pour le reste pour l'instant)"
+msgstr ""
+"average the timesteps in time weighted by their coarse-graining coefficient"
+
+#: Main.cpp:441
+msgid ""
+"Pour des interactions ycylindre-grains,calcul les forces en fonction de "
+"l'angle. arg1=posx, arg2=posz, arg3=discretisation en angle, arg4=sigma en "
+"degré pour moyennage gaussien (si =0 moyenne créneau) "
+msgstr ""
+"For interactions between ycylinder and grains, compute the force as a "
+"function of the angle. arg1=posx, arg2=posz, arg3=angle sampling, arg4=sigma "
+"in degrees for gaussian averaging (si =0 if rectangular average) "
+
+#: Main.cpp:444
+msgid "Ecrit un fichier restart pour charger des atomes dans liggghts"
+msgstr "Write a restart file to load the grains in liggghts"
+
+#: Main.cpp:445
+msgid "transforme un dump en vtk séparés"
+msgstr "split a dump into vtk files"
+
+#: Main.cpp:447
+msgid "ajoute les données de vitesse au dump2vtk"
+msgstr "include velocity information in dump2vtk"
+
+#: Main.cpp:448
+msgid "ajoute les forces au dump2vtk"
+msgstr "include forces in dump2vtk"
+
+#: Main.cpp:449
+msgid "ajoute les numéros d'identification au dump2vtk"
+msgstr "include ids in dump2vtk"
+
+#: Main.cpp:450
+msgid "ajoute les rayons au dump2vtk"
+msgstr "include radii in dump2vtk"
+
+#: Main.cpp:451
+msgid "ajoute les masses au dump2vtk"
+msgstr "include mass in dump2vtk"
+
+#: Main.cpp:453
+msgid "les particules sont en fait des multispheres... Type: 0=long, 1=flat"
+msgstr "particles are actually multispheres. Type: 0=elongated, 1=flattened. "
+
+#: Main.cpp:454
+msgid ""
+"les particules sont en fait des multispheres, mais avec un flux (constante "
+"creation et disparition de groupes)... Type: 0=long, 1=flat"
+msgstr ""
+"particles are actually multispheres, but with a constant flux (constant "
+"creation and removing of particles). Type: 0=elongated, 1=flattened."
+
+#: Main.cpp:456
+msgid ""
+"convert quaternion orientation to orientation matrix for superquadrics in "
+"Liggghts (arguments: semi-axis length, assumes blockiness==2 (ellipsoids))"
+msgstr ""
+"convert quaternion orientation to orientation matrix for superquadrics in "
+"ligggts (arguments: semi-axis length, assume blockiness==2 (ellipsoids))"
+
+#: Main.cpp:458
+msgid ""
+"les particules seront symetrisées selon les directions choisies. Ex: 100: "
+"symetrie axe x, 101: symetrie x & z"
+msgstr ""
+"particles are symetrised according to the chosen direntions: Ex: 100: "
+"symetrie axe x, 101: symetrie x & z"
+
+#: Main.cpp:459
+msgid ""
+"Prend les eigenvalues / eigenvectors des tenseurs. Le writing du tenseur "
+"génère alors les eigenvectors (columns), et demander lambda génère les "
+"eigenvalues"
+msgstr ""
+"Get the eigenvalues/eigenvectors of the tensors. The writing generates "
+"eigenvectors (columns), asking for lambda gives the eigenvalues."
+
+#: Main.cpp:460
+msgid ""
+"compresse un dump ou un vtk ou un chainforce dump (dans ce cas, mettre un "
+"null en avant-dernier argument !!!)"
+msgstr ""
+"compress a dump of vtk  or a chainforce dump (in that case, need to put a "
+"null before the last argumen)"
+
+#: Main.cpp:461
+msgid ""
+"Réécris le dump atomique en modifiant si besoin l'échantillonnage et les "
+"timestep de départ et de fin."
+msgstr ""
+"Rewrite an atomic dump by changing the sampling and etxracting the timesteps "
+"if needed."
+
+#: Main.cpp:464
+msgid ""
+"s'occupe des chaines de force. ATTENTION : l'avant dernier argument doit "
+"être le dump des positions, le dernier le dump des chaines de forces."
+msgstr ""
+"Handle the chainforces. WARNING: the argument before last must the the "
+"atomic dump, the last one must be the dump of chainforce. "
+
+#: Main.cpp:466
+msgid ""
+"ne pas utiliser le cfdump pour reconstruire les positions des particules"
+msgstr "Do not use the cfdump to reconstruct particle positions"
+
+#: Main.cpp:467
+msgid "Get the different energy components from a ldump and a lcfdump.\n"
+msgstr ""
+
+#: Main.cpp:469
+msgid "force exercée par le tank sur une tranche de grains"
+msgstr "force created by the tank on the slice of grains. "
+
+#: Main.cpp:470
+msgid ""
+"filtre les données de LDUMP avec l'argument suivant entre guillemets. Chaque "
+"opération est séparé par un point-virgule (cf. examples ailleurs TODO)"
+msgstr ""
+"filter the LDUMP data with the argument in quotes. Each operation is "
+"separated by a semi-column"
+
+#: Main.cpp:472
+msgid ""
+"filtre les données de CFDUMP avec l'argument suivant entre guillemets. "
+"Chaque opération est séparé par un point-virgule (cf. examples ailleurs TODO)"
+msgstr ""
+"filter the CFDUMP data with the argument in quotes. Each operation is "
+"separated by a semi-column"
+
+#: Main.cpp:475
+msgid ""
+"utilise un dump externe pour les liaisons grains-murs. 2 manières de "
+"l'utiliser:\n"
+" 1) avec --chainforce, 3 dump: wallforce, atoms, chainforces.\n"
+" 2/ sans --chainforce, 2 dumps: wallforce suivi de test."
+msgstr ""
+"Use an external dump for the links grain-walls. 2 ways to use it\n"
+" 1) with --chainforce, 3 dump: wallforce, atoms, chainforces.\n"
+" 2/ without --chainforce, 2 dumps: wallforce then atoms."
+
+#: Main.cpp:476
+msgid "calcul les liaisons grains-murs par équilibre des forces"
+msgstr "compute the links grains-walls from force equilibrium"
+
+#: Main.cpp:478
+msgid ""
+"copie les chaines de force traversant les parois periodiques (pas pour "
+"cylperiodic !)"
+msgstr ""
+"copy the chain forces through the periodic boundary conditions (not working "
+"with cylperiodic)"
+
+#: Main.cpp:479
+msgid "ne garde que les n percent de chaînes de force de plus grande magnitude"
+msgstr "only keep the n percent of the forces with highest magnitude"
+
+#: Main.cpp:480
+msgid ""
+"les chaines de forces n'indiquent pas la periodicité (LIGGHTS version < "
+"1.4.6)"
+msgstr "No periodicy in chainforce dump (LIGGGHTS version <1.4.6"
+
+#: Main.cpp:481
+msgid ""
+"modifie les parametres de PostProcessing pour la compatibilité avec Liggghts "
+"v1.x.x. -> autoset --noperiodicity"
+msgstr ""
+"modify parametres for PostProcessing for retro-compatibility with Liggghts "
+"v1.x.x -> autoset --noperiodicity"
+
+#: Main.cpp:483 Main.cpp:484
+msgid "répartition angulaire des forces sur un grain"
+msgstr "angular dependency of forces on a grain"
+
+#: Main.cpp:486
+msgid "histogramme des durées de contact"
+msgstr "histogram of contact duraction"
+
+#: Main.cpp:489
+msgid "Get the voronoi volume around a grain"
+msgstr "get voronoi volume around a grain"
+
+#: Main.cpp:491
+msgid "répartition des rayons autour d'un grain"
+msgstr "radius dependency around a grain"
+
+#: Main.cpp:493
+msgid "indique qu'il s'agit d'un coarse 2D"
+msgstr "indicate a 2D coarse"
+
+#: Main.cpp:494
+msgid "Supposer qu'il y a des données de break"
+msgstr "Assume that there are breakage information"
+
+#: Main.cpp:496
+msgid "ne pas effectuer le coarse atomique"
+msgstr "do not coarse grain atoms"
+
+#: Main.cpp:497
+msgid "Moyenner sur une fenetre creneau"
+msgstr "Do an average on a rectangular window"
+
+#: Main.cpp:498
+msgid ""
+"Dans le cas où on ne simule qu'1/4 de la boîte (x+, y+, z) ; utilisé en "
+"conjonction avec w/coupletot et coarse-graining"
+msgstr ""
+"when only 1/4th of the box is simulated (x+, y+, z) ; use with w/coupletot "
+"and coarse-graining"
+
+#: Main.cpp:499
+msgid ""
+"Créer un nouveau dossier pour stocker les fichiers ecrits. Si le dossier "
+"existe, il est utilisé"
+msgstr ""
+"Create a new folder to store the files written. If the folder exists, it is "
+"used. "
+
+#: Main.cpp:500
+msgid ""
+"Créer seulement les fichiers tmp pour les dumps, sans faire aucun calcul"
+msgstr "Create only the tmp files for the dumps, without calculation. "
+
+#: Main.cpp:501
+msgid ""
+"Force l'écriture du tmp indépendamment de se taille relative avec le dump"
+msgstr ""
+"Force writing of the tmp file, independently of its size relative to the "
+"dump file"
+
+#: Main.cpp:502
+msgid "Rend silencieuses les erreurs de lecture de fichier"
+msgstr "silence reading errors"
+
+#: Main.cpp:503
+msgid "Nettoie des fichiers vtk et tmp avant tout calcul."
+msgstr "clear the vtk and tmp files"
+
+#: Main.cpp:504
+msgid "Genere le script restart2vtk pour transformer les restart en vtk"
+msgstr "generate the script restart2vtk to transform the restart file in vtk"
+
+#: Main.cpp:505
+msgid "Affiche tous les arguments possibles et sort."
+msgstr "show all possible arguments and sort them"
+
+#: Main.cpp:506
+msgid "Genère le script pour la completion bash"
+msgstr "generate the bash completion script"
+
+#: Main.cpp:507
+msgid "Indique la date de compilation."
+msgstr "indicate the compilation date"
+
+#: Main.cpp:508
+msgid "Affiche la liste des IDs definis."
+msgstr "list the IDs defined"
+
+#: Main.cpp:509
+msgid "Génére des forces par triangle idéales pour tester"
+msgstr "generate ideal forces on triangles for testing"
+
+#: Main.cpp:543 Main.cpp:544
+msgid "Boucle de progression incohérente"
+msgstr "Inconsistant progress loop"
+
+#: Main.cpp:561
+msgid ""
+"!! Attention : les fichiers .vtk et .tmp du répertoire où se trouve le dump "
+"seront supprimés avant toute opération.\n"
+"Êtes-vous sûr de vouloir cela ([Yy | Nn]) ? \n"
+msgstr ""
+"!!Warning: the .vtk and .tmp files from the directory where the dump is "
+"located. Are you sure? ([Yy | Nn]) ? \n"
+
+#: Main.cpp:586 Main.cpp:594 Main.cpp:602
+msgid "ERR : il manque des arguments au nouvel argument "
+msgstr "ERR: missing arguments to the new argument"
+
+#: Main.cpp:639
+msgid "WARN : Impossible de trouver un argument correspondant à la string "
+msgstr "WARN: cannot find an argument correspond to the string"
+
+#: Main.cpp:652
+msgid "WARN : Impossible de trouver un paramètre correspondant à la string "
+msgstr "WARN: cannot find a parameter corresponding to the string"
+
+#: Main.cpp:663
+msgid ""
+"WARN : Impossible de trouver un paramètre correspondant à la string // not "
+"set\n"
+msgstr ""
+"WARN: cannot find a parameter corresponding to the string // not set \n"
+
+#: Main.cpp:679
+msgid ""
+"WARN: argument de ligne de commande inconnu (verifier les deprecated "
+"argument peut-être?) : "
+msgstr ""
+"WARN: unknown command line argument (maybe check for deprecated arguments)"
+
+#: Main.cpp:685 Main.cpp:693
+msgid "NB : Filter est une commande fournie sans garantie d'être correcte.\n"
+msgstr "NB: Filter is a command provided without any warranty\n"
+
+#: Main.cpp:700
+msgid "L'argument writing est encore en phase de test.\n"
+msgstr "Writing argument is still in testing phase\n"
+
+#: Main.cpp:710
+msgid "L'argument alias est encore en phase de test.\n"
+msgstr "Alias argument is still in testing phase\n"
+
+#: Main.cpp:743
+msgid "Lecture des arguments depuis l'entrée standard ..."
+msgstr "Reading arguments from command line ..."
+
+#: Main.cpp:749
+msgid "Buffer trop petit pour l'entree standard"
+msgstr "Buffer too small for the command line"
+
+#: Main.cpp:793
+msgid ""
+"La variable environnement $HOME n'est pas accessible, impossible "
+"d'enregistrer/lire un fichier d'alias de Post Processing\n"
+msgstr ""
+"The $HOME environnement variable is not accessible. Cannot read/write an "
+"alias file for post processing\n"
+
+#: Main.cpp:823
+msgid "L'alias existe déjà. Impossible de l'ajouter."
+msgstr "The alias already exists, cannot add it"
+
+#: Main.cpp:841
+msgid "Impossible de changer un alias qui n'existe pas. Utiliser set.\n"
+msgstr "Cannot change a non existing alias. Use set.\n"
+
+#: Main.cpp:865
+msgid "Impossible de charger l'alias qui n'existe pas"
+msgstr "Cannot change a non existing alias."
+
+#: Main.cpp:894
+#, c-format
+msgid "Listing des alias définis\n"
+msgstr "List the defined aliases\n"
+
+#: Main.cpp:899
+msgid "Argument d'alias inconnu"
+msgstr "Unknown aliad argument"
+
+#: Main.cpp:925
+msgid ""
+"Les paramètres des arguments ne sont pas les mêmes, la copie est plus que "
+"discutable ..."
+msgstr "The argument parameters are different, copying seems ill-advised. "
+
+#: Main.cpp:983
+msgid ""
+"La variable environnement $HOME n'est pas accessible, impossible "
+"d'enregistrer un log de lancement de Post Processing\n"
+msgstr ""
+"The $HOME environnement variable is not accessible. Cannot write a log of "
+"Post Processing\n"
+
+#: Main.cpp:988
+#, c-format
+msgid "WARN : impossible d'enregistrer un log de lancement de PostProcessing"
+msgstr "WARN: Cannot write a log of Post Processing "
+
+#: Main.cpp:1030
+msgid ""
+"Le fichier restart2vtk existe deja dans le dossier courant. Supprimez-le "
+"pour le recréer.\n"
+msgstr ""
+"The restart2vtk file already exists in the current folder. Remove it to "
+"recreate it.\n"
+
+#: Multisphere.cpp:39
+msgid "Aucun groupe multisphere trouvé, il y a un problème."
+msgstr "No multisphere group found. Problem."
+
+#: Multisphere.cpp:92
+msgid "Probleme in multisphere ici\n"
+msgstr "Probleme in multisphere here\n"
+
+#: Multisphere.cpp:98
+#, c-format
+msgid "Le groupe %d a été perdu. Atomes:"
+msgstr "The goup %d was lost. Atoms:"
+
+#: Multisphere.cpp:173 Multisphere.cpp:338
+msgid "NaN dans le data multisphere avec GP_OK, probleme\n"
+msgstr "NaN in the data multisphere with GP_OK, problem\n"
+
+#: Multisphere.cpp:194
+msgid "symetriser not implemented in multisphere for fluxes\n"
+msgstr ""
+
+#: Multisphere.cpp:283
+#, c-format
+msgid ""
+"Le groupe %d a été perdu, ne devrait pas arriver pour multisphere flux. "
+"Atomes:"
+msgstr "A group %d was lost. Should not happen for multisphere flux. Atoms: "
+
+#: Multisphere.cpp:384
+msgid ""
+"This function hasn't been tested and probably don't work. Please check the "
+"source (Multisphere::compute_eigen()) to check what to do"
+msgstr ""
+
+#: Statistics.cpp:163
+#, c-format
+msgid ""
+"Distance min entre atomes : %f\n"
+"Distance max entre atomes : %f\n"
+msgstr "Min distance between atoms: %f\nMax distance between atoms: %f\n"
+
+#: Statistics.cpp:174
+msgid ""
+"\n"
+"---------------------------\n"
+" Statistiques des données : \n"
+"---------------------------\n"
+" IDX  "
+msgstr ""
+"\n"
+"---------------------------\n"
+" Data statistics: \n"
+"---------------------------\n"
+" IDX  "
+
+#: Step.cpp:17
+msgid "An expected id could not be found, problems will happen.\n"
+msgstr ""
+
+#: Step.cpp:35
+msgid ""
+"Les id FORCE ont été cherchés mais non trouvés. Les id STRESS ont été "
+"trouvés. Les id de forces vont être reconstruits ... (indiqué une seule "
+"fois)\n"
+msgstr "The id FORCE were searched but not found. The id STRESS were found. Reconstructing the force id... (unique message)\n"
+
+#: Step.cpp:44
+msgid ""
+"Les id NORMALE ont été cherchés mais non trouvés. Ils vont être "
+"reconstruits ... (indiqué une seule fois)\n"
+msgstr "The id NORMALE were searched but not found. Reconstructing them... (unique message)\n"
+
+#: Step.cpp:52
+msgid ""
+"Les id CENTRE ont été cherchés mais non trouvés. Ils vont être "
+"reconstruits ... (indiqué une seule fois)\n"
+msgstr "The id CENTRE were searched but not found. Reconstructing them... (unique message)\n"
+
+#: Step.cpp:60
+msgid ""
+"Les id F[XYZ] ont été cherchés mais non trouvés. Ils vont être reconstruits "
+"à partir du CFSTEP ... (indiqué une seule fois)\n"
+msgstr "The id F[XYZ] were searched but not found. Reconstructing them from CFSTEP... (unique message)\n"
+
+#: Step.cpp:68
+msgid ""
+"Les id FORCEWALL[XYZ] ont été cherchés mais non trouvés. Ils vont être "
+"reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n"
+msgstr "The id FORCEWALL[XYZ] were searched but not found.  Reconstructing them from CFSTEP... (unique message)\n"
+
+#: Step.cpp:76
+msgid ""
+"Les id ATMPRESSURE ont été cherchés mais non trouvés. Ils vont être "
+"reconstruits à partir du CFSTEP ... (indiqué une seule fois)\n"
+msgstr "The id ATMPRESSURE were searched but not found.  Reconstructing them from CFSTEP... (unique message)"
+
+#: Step.cpp:85
+#, c-format
+msgid ""
+"\n"
+"WARNING : l'id n° %d a été cherché mais pas trouvé. Enlever --norebuild peut "
+"aider. \n"
+msgstr "\nWARNING: the id number %d was searched but not found. Removing --norebuild may help.\n"
+
+#: Step.cpp:173
+msgid "WARN5 : index inconnu pour l'écriture des titres de colonnes\n"
+msgstr "WARN5: unknown index for writing the column titles\n"
+
+#: Surface.cpp:166 Surface.cpp:218
+#, c-format
+msgid "% Commande matlab de redimensionnement : reshape(X,"
+msgstr "% Reshaping command for matlab: reshape(X,"
+
+#: Surface.cpp:167 Surface.cpp:219
+msgid "Commande matlab de redimensionnement : reshape(X,"
+msgstr "Reshaping command for matlab: reshape(X,"
+
+#: Test.cpp:17
+#, c-format
+msgid "Ceci est un test. %d %g\n"
+msgstr "This is a test. %d %g\n"
+
+#: Test.cpp:18
+msgid "Un autre test "
+msgstr ""
