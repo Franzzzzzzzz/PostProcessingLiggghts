@@ -36,6 +36,9 @@ Examples:
 
 - Create a vtk with the contact forces: `PostProcessing --dump2vtk --chainforce --W '[vtk]def,f' dump.test dump.force`
 
+- Create a vtk with orientation information for superquadric/ellipsoidal particles, to use with the TensorGlyph filter in Paraview (requires to export the quaternion components quat1-4): `PostProcessingGamma --dump2vtk --superquadric 0.001 0.001 0.002 --W '[+vtk]def,v,orient,radius' dump.test`
+
 - Coarse-grain particle data: `PostProcessing --coarse-graining 3 4 5 --W "[vtk]v,phi" dump.test`
 
 - Coarse-grain contact data: `PostProcessing --coarse-graining 3 4 5 --use-box -0.2 0.2 -0.1 0.1 1.2 1.5 --chainforce --W "[vtk]sigmatot" --w/kinetic dump.particles dump.contact`
+
