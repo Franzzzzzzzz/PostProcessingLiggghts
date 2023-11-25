@@ -34,7 +34,7 @@ Examples:
 
 - Create vtk files from dump files: `PostProcessing --dump2vtk --W '[vtk]def,v,type,radius' dump.test`
 
-- Create a vtk with the contact forces: `PostProcessing --dump2vtk --chainforce --W '[vtk]def,f' dump.test dump.force`
+- Create a vtk with the contact forces: `PostProcessing --dump2vtk --chainforce --W '[vtk]def,cff' dump.test dump.force`
 
 - Create a vtk with orientation information for superquadric/ellipsoidal particles, to use with the TensorGlyph filter in Paraview (requires to export the quaternion components quat1-4): `PostProcessingGamma --dump2vtk --superquadric 0.001 0.001 0.002 --W '[+vtk]def,v,orient,radius' dump.test`
 
